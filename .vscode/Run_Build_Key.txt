@@ -1,16 +1,3 @@
-빌드 / Run
-Run Build Task : ctrl + cmd + B
-Run Test Task : ctrl + cmd + R
-
-# Header Run
-1. gcc ./filename.c ... ./filename.c -c
-2. gcc ./filename.o ... ./filename.o -o filename.exe
-3. ./filename.exe
-
-# SQL
-1. gcc ./filename.c -o filename -lsqlite3
-2. ./filename
-
 # Header + SQL
 1. gcc ./filename.c ... -o filename_ -lsqlite3
 2. ./filename_

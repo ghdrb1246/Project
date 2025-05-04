@@ -10,7 +10,7 @@ Project DB - https://github.com/ghdrb1246/Project.git
 
 *ToDoList*
 - <...>
-- '25.05.04::V0.1|C
+- '25.05.05::V0.2|C
 
 @Team
 - <...>

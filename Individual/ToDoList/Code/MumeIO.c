@@ -101,7 +101,7 @@ void scheduleRegistrationMenu() {
             printf("---------------------------------------------------------\n");
 
             if (strcmp(str, "Y") == 0 || strcmp(str, "y") == 0) {
-                // saveDB(s);
+                saveDB(s);
                 printf("\n일정을 저장되었습니다.\n\n");
                 sw = 0;
                 break;
@@ -348,8 +348,8 @@ void scheduleModificationMenu(int id) {
     char *str = "", *sitme = "", *eitme = "";
     int meunNumber = 0, sw = 1;
 
-    printf("===================== [ 일정 수정 ] =====================")
-    printf("수정 대상 : %s, %s, %s, %s, %d\n", s.title, s.scheduled_date_time, s.end_date_time, s.tag, s.priority);
+    printf("===================== [ 일정 수정 ] =====================");
+    printf("수정 대상 : %s, %s, %s, %s, %d\n", old_s.title, old_s.scheduled_date_time, old_s.end_date_time, old_s.tag, old_s.priority);
     printf("[ ----------------------------------------------------- ]\n");
     
     while (sw) {

@@ -21,6 +21,8 @@ int main() {
         
     main_meun();
     
+    // viewAllByStatus("TODO");
+    // viewDB();
     DBC();
 
     return 0;

@@ -96,7 +96,18 @@ VALUES ('과제 제출13', '2025-04-21 23:59', NULL, '수업4', 3),
 ('과제 제출12', '2025-04-22 10:00', NULL, '수업2', 3);
 
 SELECT * FROM schedules;  */
-
+/* 
 SELECT tag, COUNT(*) AS count
 FROM schedules
-WHERE tag = '수업4';
+WHERE tag = '수업4'; */
+
+UPDATE schedules
+SET end_date_time = NULL
+WHERE id = 15;
+UPDATE schedules
+SET end_date_time = NULL
+WHERE id = 16;
+UPDATE schedules
+SET end_date_time = NULL
+WHERE id = 17;
+SELECT * FROM schedules;
