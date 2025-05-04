@@ -156,58 +156,6 @@ void calendarViewMenu() {
     printf("=========================================================\n");
 }
 
-/* 
-void scheduleViewMenuByStatus() {
-    int meunNumber = 0;
-    char *status;
-
-    printf("================= [ 일정 조회 : 전체 ] ================\n");
-    printf("[ ----------------------- TODO ----------------------- ]\n");
-    // printf("1. 과제 제출\n");
-    // printf("2. C응용프로젝트\n");
-    // printf("3. ...\n");
-    // printf("n. ... \n");
-    
-    viewAllByStatus("TODO");
-    
-    printf("[ ----------------------- DOING ---------------------- ]\n");
-    // printf("1. 계획서 작성\n");
-    // printf("2. ...\n");
-    // printf("n. ...\n");
-
-    viewAllByStatus("DOING");
-
-    printf("[ ----------------------- DONE ----------------------- ]\n");
-    // printf("1. ...\n");
-    // printf("2. ...\n");
-    // printf("n. ...\n");
-    
-    printf("--------------------------------------------------------\n");
-    printf("[ 선택 ----------------------------------------------- ]\n");
-    printf("1. 일정 상태별 보기(메뉴 번호 -> 상태)\n");
-    printf("2. 뒤로\n");
-    printf("--------------------------------------------------------\n");
-    printf("선택 : ");
-    scanf("%d", &meunNumber);
-    switch (meunNumber) {
-        case 1: 
-            printf("조회할 상태 : ");
-            scanf("%s", status); 
-        break;
-
-        case 2: 
-            printf("\n뒤로.\n"); 
-        break;
-
-        default : 
-            printf("Input Error\n");
-        break;
-    }
-
-    printf("========================================================\n");
-}
-*/
-
 void scheduleViewMenuByStatus(int statusNumer) {
     printf("================= [ 일정 상태별 조회 ] ================\n");
     printf("[ %s -------------------------------------------- ]\n", estatus[statusNumer - 1]);
@@ -616,29 +564,3 @@ void scheduleMenuByTag(char *tag) {
     }
     printf("=========================================================\n");
 }
-
-/* 
-typedef struct {
-    char *title;
-    char *scheduled_time;  // "2025-04-16 09:00"
-    char *end_time;        // "2025-04-23 23:59" // 선택 사항
-    char *tag;             // 일정 관련 태그(수업, 버스 시간, 시험.. 등)
-    int priority;          // 0(없음), 1(낮음), 2(중간), 3(높음)
-    char *status;          // TODO, DOING, DONE
-} Schedule;
-
-#include <stdio.h>
-
-int main() {
-    Schedule s;
-
-    printf("날짜/시간을 입력하세요 (YYYY-MM-DD HH:MM): ");
-    //scanf("%s-%s-%s %s:%s", year, month, day, hour, minute);
-    scanf("%s %s", s.scheduled_Date, s.scheduled_time);
-
-    printf("입력된 날짜: %s\n",s.scheduled_Date);
-    printf("입력된 시간: %s\n", s.scheduled_time);
-
-    return 0;
-}
-*/
