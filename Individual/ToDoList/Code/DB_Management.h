@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct Schedule{
+struct Schedule {
     char *title;
     char *scheduled_date_time;
     char *end_date_time;

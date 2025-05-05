@@ -8,11 +8,11 @@ static sqlite3 *db;
 
 Schedule smalloc() {
     Schedule s;
-    s.title = (char*)malloc(100 * sizeof(char));
-    s.scheduled_date_time = (char*)malloc(20 * sizeof(char));
-    s.end_date_time = (char*)malloc(20 * sizeof(char));
-    s.tag = (char*)malloc(10 * sizeof(char));
-    s.status = (char*)malloc(5 * sizeof(char));
+    s.title = malloc(100 * sizeof(char));
+    s.scheduled_date_time = malloc(20 * sizeof(char));
+    s.end_date_time = malloc(20 * sizeof(char));
+    s.tag = malloc(10 * sizeof(char));
+    s.status = malloc(5 * sizeof(char));
 
     return s;
 }
@@ -54,10 +54,12 @@ void saveDB(Schedule s) {
         fprintf(stderr, "데이터 저장 오류: %s\n", err_msg);
         sqlite3_free(err_msg);
     }
+
+    sqlite3_free(sql);
 }
 
 void updateDB(Schedule s, int id) {
-    char *sql = sqlite3_mprintf("UPDATE schedules SET title = '%s', scheduled_date_time = '%s', end_date_time = '%s', tag = '%s', priority = %d, status = '%s' WHERE id = %d;", s.title, s.scheduled_date_time, s.end_date_time, s.tag, s.priority, s.status, id);
+    char *sql = sqlite3_mprintf("UPDATE schedules SET title = '%s', scheduled_date_time = '%s', end_date_time = '%s', tag = '%s', priority = %d WHERE id = %d;", s.title, s.scheduled_date_time, s.end_date_time, s.tag, s.priority, id);
     char *err_msg = "0";
     int rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
     
@@ -65,10 +67,11 @@ void updateDB(Schedule s, int id) {
         fprintf(stderr, "데이터 업데이트 오류: %s\n", err_msg);
         sqlite3_free(err_msg);
     }
+    sqlite3_free(sql);
 }
 
 void deleteDB(int id) {
-    char *sql = sqlite3_mprintf("DELETE FROM employee WHERE id = %d;", id);
+    char *sql = sqlite3_mprintf("DELETE FROM schedules WHERE id = %d;", id);
     char *err_msg = "0";
     int rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
     
@@ -76,6 +79,7 @@ void deleteDB(int id) {
         fprintf(stderr, "데이터 삽입 오류: %s\n", err_msg);
         sqlite3_free(err_msg);
     }
+    sqlite3_free(sql);
 }
 
 void viewDB() {
@@ -119,6 +123,7 @@ void viewAllByStatus(char *status) {
             printf("%2d | %s | %s | %s | %s | %d | %s\n", no, title, sdt, edt, tag, priority, status);
         }
         sqlite3_finalize(stmt);
+        sqlite3_free(sql);
     }
 
     else fprintf(stderr, "데이터 조회 오류: %s\n", sqlite3_errmsg(db));
@@ -126,9 +131,16 @@ void viewAllByStatus(char *status) {
 
 int statusIndexToId(char *status, int user_no) {
     int real_id = -1;
+
+    if (DBO("DBSC.db") != 0) {
+        printf("DB 연결이 되어 있지 않습니다.\n");
+        return real_id;
+    }
+
     char *sql = sqlite3_mprintf("SELECT id FROM (SELECT ROW_NUMBER() OVER (ORDER BY scheduled_date_time) AS no, id FROM schedules WHERE status = '%s') WHERE no = %d;", status, user_no);
     sqlite3_stmt *stmt;
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
+
 
     if (rc == SQLITE_OK) {
         if (sqlite3_step(stmt) == SQLITE_ROW) {
@@ -138,6 +150,9 @@ int statusIndexToId(char *status, int user_no) {
     }
     else printf("SQL 실행 실패 : %s\n", sqlite3_errmsg(db));
 
+    sqlite3_finalize(stmt);
+    sqlite3_free(sql);
+
     return real_id;
 }
 
@@ -145,6 +160,7 @@ Schedule idToStatusView(int id) {
     char *sql = sqlite3_mprintf("SELECT title, scheduled_date_time, end_date_time, tag, priority FROM schedules WHERE id = %d;", id);
     sqlite3_stmt *stmt;
     Schedule s = smalloc();
+
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
 
     if (rc == SQLITE_OK) {
@@ -155,15 +171,17 @@ Schedule idToStatusView(int id) {
             const unsigned char *tag = sqlite3_column_text(stmt, 3);
             int priority = sqlite3_column_int(stmt, 4);
 
-            s.title = (char*)title;
-            s.scheduled_date_time = (char*)sdt;
-            s.end_date_time = (char*)edt;
-            s.tag = (char*)tag;
+            // NULL 체크 필요
+            strcpy(s.title, (((char*)title) != NULL) ? (char*)title : "NULL");
+            strcpy(s.scheduled_date_time, (((char*)sdt) != NULL) ? (char*)sdt : "NULL");
+            strcpy(s.end_date_time, (((char*)edt) != NULL) ? (char*)edt : "NULL");
+            strcpy(s.tag, (((char*)tag) != NULL) ? (char*)tag : "NULL");
             s.priority = priority;
 
-            // printf("%s, %s, %s, %s, %d\n", title, sdt, edt, tag, priority);
+            // printf("%s, %s, %s, %s, %d\n", s.title, s.scheduled_date_time, s.end_date_time, s.tag, s.priority);
         }
         sqlite3_finalize(stmt);
+        sqlite3_free(sql);
     }
     else fprintf(stderr, "데이터 조회 오류: %s\n", sqlite3_errmsg(db)); 
 
@@ -179,6 +197,8 @@ void todoToDoing(int id) {
         fprintf(stderr, "데이터 업데이트 오류: %s\n", err_msg);
         sqlite3_free(err_msg);
     }
+    
+    sqlite3_free(sql);
 }
 
 void doingToDone(int id) {
@@ -190,6 +210,8 @@ void doingToDone(int id) {
         fprintf(stderr, "데이터 업데이트 오류: %s\n", err_msg);
         sqlite3_free(err_msg);
     }
+    
+    sqlite3_free(sql);
 }
 
 void viewAllByTag() {
@@ -204,7 +226,9 @@ void viewAllByTag() {
 
             printf("%d | %s\n", on, tag);
         }
+
         sqlite3_finalize(stmt);
+        sqlite3_free(sql);
     }
 
     else fprintf(stderr, "데이터 조회 오류: %s\n", sqlite3_errmsg(db));
@@ -212,7 +236,6 @@ void viewAllByTag() {
 
 char *tagIndexToId(int user_no) {
     const unsigned char *real_tag = NULL;
-    // char *ret_tag = NULL;
     char *sql = sqlite3_mprintf("SELECT tag FROM (SELECT ROW_NUMBER() OVER (ORDER BY scheduled_date_time) AS no, tag FROM schedules) WHERE no = %d;", user_no);
     sqlite3_stmt *stmt;
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
@@ -225,7 +248,9 @@ char *tagIndexToId(int user_no) {
     }
     else printf("SQL 실행 실패 : %s\n", sqlite3_errmsg(db));
 
-    // memcpy(ret_tag real_tag);
+    sqlite3_finalize(stmt);
+    sqlite3_free(sql);
+
     return (char*)real_tag;
 }
 
@@ -242,6 +267,9 @@ int tagCount(char *tag) {
         else printf("%d 해당 번호의 태그가 존재하지 않습니다.\n", real_count);
     }
     else printf("SQL 실행 실패 : %s\n", sqlite3_errmsg(db));
+
+    sqlite3_finalize(stmt);
+    sqlite3_free(sql);
 
     return real_count;
 }
@@ -260,9 +288,10 @@ void viewTagByschedule(char *tag) {
             const unsigned char *tag = sqlite3_column_text(stmt, 4);
             int priority = sqlite3_column_int(stmt, 5);
 
-            printf("ID: %d, title: %s, sdt: %s, edt: %s, tag: %s, priority %d\n", id, title, sdt, edt, tag, priority);
+            printf("%2d| %s | %s | %s | %s | %d\n", id, title, sdt, edt, tag, priority);
         }
         sqlite3_finalize(stmt);
+        sqlite3_free(sql);
     }
 
     else fprintf(stderr, "데이터 조회 오류: %s\n", sqlite3_errmsg(db));

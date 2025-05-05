@@ -100,7 +100,7 @@ SELECT * FROM schedules;  */
 SELECT tag, COUNT(*) AS count
 FROM schedules
 WHERE tag = '수업4'; */
-
+/* 
 UPDATE schedules
 SET end_date_time = NULL
 WHERE id = 15;
@@ -110,4 +110,20 @@ WHERE id = 16;
 UPDATE schedules
 SET end_date_time = NULL
 WHERE id = 17;
+SELECT * FROM schedules; */
+
+/* SELECT id FROM (
+    SELECT ROW_NUMBER() OVER (
+        ORDER BY scheduled_date_time) AS no, 
+        id FROM schedules WHERE status = 'TODO'
+    )
+WHERE no = 1; */
+
+/* UPDATE schedules
+SET status = 'TODO'
+WHERE id = 2;
+ */
+
+DELETE FROM schedules WHERE id = 15;
+
 SELECT * FROM schedules;
