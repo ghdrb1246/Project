@@ -124,6 +124,46 @@ SET status = 'TODO'
 WHERE id = 2;
  */
 
-DELETE FROM schedules WHERE id = 15;
+/* DELETE FROM schedules WHERE id = 15;
+
+SELECT * FROM schedules; */
+
+-- SELECT ROW_NUMBER() OVER (ORDER BY scheduled_date_time) AS no, tag FROM schedules;
+
+
+/* SELECT ROW_NUMBER() OVER (ORDER BY tag) AS no, tag
+FROM (SELECT DISTINCT tag FROM schedules);
+ */
+
+-- SELECT tag FROM (SELECT ROW_NUMBER() OVER (ORDER BY tag) AS no, tag FROM schedules) WHERE no = 1;
+
+/* SELECT COUNT(*) AS count FROM schedules WHERE tag = '수업1';
+
+SELECT * FROM schedules; */
+
+/* SELECT tag FROM (SELECT ROW_NUMBER() OVER (ORDER BY tag) AS no, tag FROM schedules) WHERE no = 1;
+SELECT COUNT(*) AS count FROM schedules WHERE tag = 'test2'; */
+
+/* SELECT 
+    temp_tag.tag, 
+    (SELECT COUNT(*) FROM schedules WHERE tag = temp_tag.tag) AS count
+FROM (
+    SELECT tag 
+    FROM (
+        SELECT ROW_NUMBER() OVER (ORDER BY tag) AS no, tag 
+        FROM schedules 
+        WHERE tag IS NOT NULL
+    ) 
+    WHERE no = 4
+) AS temp_tag; */
 
 SELECT * FROM schedules;
+
+SELECT ROW_NUMBER() OVER (ORDER BY tag) AS no, tag
+FROM (SELECT DISTINCT tag FROM schedules WHERE tag IS NOT NULL);
+
+SELECT COUNT(*) AS count FROM schedules WHERE tag = '수업2';
+
+SELECT temp_tag.tag, (SELECT COUNT(*) FROM schedules WHERE tag = temp_tag.tag) AS count FROM (SELECT tag FROM (SELECT ROW_NUMBER() OVER (ORDER BY tag) AS no, tag FROM (SELECT DISTINCT tag FROM schedules WHERE tag IS NOT NULL)) WHERE no = 3) AS temp_tag;
+
+SELECT tag FROM (SELECT ROW_NUMBER() OVER (ORDER BY tag) AS no, tag FROM (SELECT DISTINCT tag FROM schedules WHERE tag IS NOT NULL)) WHERE no = 3;

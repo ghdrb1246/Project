@@ -4,10 +4,13 @@
 #include "sqlite/sqlite3.h"
 #include "DB_Management.h"
 
+// DB 관리 모듈
+
 static sqlite3 *db;
 
 Schedule smalloc() {
     Schedule s;
+    
     s.title = malloc(100 * sizeof(char));
     s.scheduled_date_time = malloc(20 * sizeof(char));
     s.end_date_time = malloc(20 * sizeof(char));
@@ -48,6 +51,7 @@ void saveDB(Schedule s) {
     // ((s.end_date_time != "x") ? s.end_date_time : "NULL")?
     char *sql = sqlite3_mprintf("INSERT INTO schedules (title, scheduled_date_time, end_date_time, tag, priority) VALUES ('%s', '%s', '%s', '%s', %d);", s.title, s.scheduled_date_time, s.end_date_time, s.tag, s.priority);
     char *err_msg = "0";
+    
     int rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
     
     if (rc != SQLITE_OK) {
@@ -83,8 +87,8 @@ void deleteDB(int id) {
 }
 
 void viewDB() {
-    char *sql = "SELECT * FROM schedules WHERE status;";
     sqlite3_stmt *stmt;
+    char *sql = "SELECT * FROM schedules WHERE status;";
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
 
     if (rc == SQLITE_OK) {
@@ -105,8 +109,8 @@ void viewDB() {
 }
 
 void viewAllByStatus(char *status) {
-    char *sql = sqlite3_mprintf("SELECT ROW_NUMBER() OVER (ORDER BY scheduled_date_time) AS no, title, scheduled_date_time, end_date_time, tag, priority, status FROM schedules WHERE status = '%s';", status);
     sqlite3_stmt *stmt;
+    char *sql = sqlite3_mprintf("SELECT ROW_NUMBER() OVER (ORDER BY scheduled_date_time) AS no, title, scheduled_date_time, end_date_time, tag, priority, status FROM schedules WHERE status = '%s';", status);
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
 
     if (rc == SQLITE_OK) {
@@ -132,7 +136,7 @@ void viewAllByStatus(char *status) {
 int statusIndexToId(char *status, int user_no) {
     int real_id = -1;
 
-    if (DBO("DBSC.db") != 0) {
+    if (DBO("DB/DBSC.db") != 0) {
         printf("DB 연결이 되어 있지 않습니다.\n");
         return real_id;
     }
@@ -157,9 +161,9 @@ int statusIndexToId(char *status, int user_no) {
 }
 
 Schedule idToStatusView(int id) {
-    char *sql = sqlite3_mprintf("SELECT title, scheduled_date_time, end_date_time, tag, priority FROM schedules WHERE id = %d;", id);
     sqlite3_stmt *stmt;
     Schedule s = smalloc();
+    char *sql = sqlite3_mprintf("SELECT title, scheduled_date_time, end_date_time, tag, priority FROM schedules WHERE id = %d;", id);
 
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
 
@@ -188,21 +192,8 @@ Schedule idToStatusView(int id) {
     return s;
 }
 
-void todoToDoing(int id) {
-    char *sql = sqlite3_mprintf("UPDATE schedules SET status = 'DOING' WHERE id = %d;", id);
-    char *err_msg = "0";
-    int rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
-    
-    if (rc != SQLITE_OK) {
-        fprintf(stderr, "데이터 업데이트 오류: %s\n", err_msg);
-        sqlite3_free(err_msg);
-    }
-    
-    sqlite3_free(sql);
-}
-
-void doingToDone(int id) {
-    char *sql = sqlite3_mprintf("UPDATE schedules SET status = 'DONE' WHERE id = %d;", id);
+void updateStatus(char *status, int id) {
+    char *sql = sqlite3_mprintf("UPDATE schedules SET status = '%s' WHERE id = %d;", status, id);
     char *err_msg = "0";
     int rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
     
@@ -215,8 +206,8 @@ void doingToDone(int id) {
 }
 
 void viewAllByTag() {
-    char *sql = sqlite3_mprintf("SELECT ROW_NUMBER() OVER (ORDER BY scheduled_date_time) AS no, tag FROM schedules;");
     sqlite3_stmt *stmt;
+    char *sql = sqlite3_mprintf("SELECT ROW_NUMBER() OVER (ORDER BY tag) AS no, tag FROM (SELECT DISTINCT tag FROM schedules);");
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
 
     if (rc == SQLITE_OK) {
@@ -224,7 +215,7 @@ void viewAllByTag() {
             int on = sqlite3_column_int(stmt, 0);
             const unsigned char *tag = sqlite3_column_text(stmt, 1);
 
-            printf("%d | %s\n", on, tag);
+            printf("%2d | %s\n", on, tag);
         }
 
         sqlite3_finalize(stmt);
@@ -234,49 +225,88 @@ void viewAllByTag() {
     else fprintf(stderr, "데이터 조회 오류: %s\n", sqlite3_errmsg(db));
 }
 
+/*
+// tagIndexToId(), tagCount()을 indexToTagCount()으로 통합
 char *tagIndexToId(int user_no) {
-    const unsigned char *real_tag = NULL;
-    char *sql = sqlite3_mprintf("SELECT tag FROM (SELECT ROW_NUMBER() OVER (ORDER BY scheduled_date_time) AS no, tag FROM schedules) WHERE no = %d;", user_no);
     sqlite3_stmt *stmt;
+    
+    const unsigned char *tag = NULL;
+    char *tag_r = malloc(10 * sizeof(char));
+    char *sql = sqlite3_mprintf("SELECT tag FROM (SELECT ROW_NUMBER() OVER (ORDER BY tag) AS no, tag FROM schedules) WHERE no = %d;", user_no);
+    
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
 
     if (rc == SQLITE_OK) {
         if (sqlite3_step(stmt) == SQLITE_ROW) {
-            real_tag = sqlite3_column_text(stmt, 0);
+            tag = sqlite3_column_text(stmt, 0);
+
+            strcpy(tag_r, (((char*)tag) != NULL) ? (char*)tag : "NULL");
         }
-        else printf("%s 해당 번호의 일정이 존재하지 않습니다.\n", real_tag);
+        else printf("%s 해당 번호의 태그가 존재하지 않습니다.\n", tag);
     }
     else printf("SQL 실행 실패 : %s\n", sqlite3_errmsg(db));
 
     sqlite3_finalize(stmt);
     sqlite3_free(sql);
-
-    return (char*)real_tag;
+    return tag_r;
 }
 
 int tagCount(char *tag) {
-    int real_count = 0;
-    char *sql = sqlite3_mprintf("SELECT tag, COUNT(*) AS count FROM schedules WHERE tag = '%s';", tag);
     sqlite3_stmt *stmt;
+    
+    char *sql = sqlite3_mprintf("SELECT COUNT(*) AS count FROM schedules WHERE tag = '%s';", tag);
+    
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
+    int count = 0;
 
     if (rc == SQLITE_OK) {
         if (sqlite3_step(stmt) == SQLITE_ROW) {
-            real_count = sqlite3_column_int(stmt, 0);
+            count = sqlite3_column_int(stmt, 0);
         }
-        else printf("%d 해당 번호의 태그가 존재하지 않습니다.\n", real_count);
+        else printf("%d 해당 번호의 태그가 존재하지 않습니다.\n", count);
     }
     else printf("SQL 실행 실패 : %s\n", sqlite3_errmsg(db));
 
     sqlite3_finalize(stmt);
     sqlite3_free(sql);
 
-    return real_count;
+    return count;
+}
+*/
+
+TagCount indexToTagCount(int user_no) {
+    sqlite3_stmt *stmt;
+    TagCount tc;
+    tc.tag = malloc(10 * sizeof(char));
+    
+    const unsigned char *tag = NULL;
+    char *sql = sqlite3_mprintf("SELECT temp_tag.tag, (SELECT COUNT(*) FROM schedules WHERE tag = temp_tag.tag) AS count FROM (SELECT tag FROM (SELECT ROW_NUMBER() OVER (ORDER BY tag) AS no, tag FROM (SELECT DISTINCT tag FROM schedules WHERE tag IS NOT NULL)) WHERE no = %d) AS temp_tag;", user_no);
+    
+    int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
+    int count = 0;
+    
+    if (rc == SQLITE_OK) {
+        if (sqlite3_step(stmt) == SQLITE_ROW) {
+            tag = sqlite3_column_text(stmt, 0);
+            count = sqlite3_column_int(stmt, 1);
+
+            strcpy(tc.tag, (((char*)tag) != NULL) ? (char*)tag : "NULL");
+            tc.count = count;
+            printf("-> %s %d\n", tc.tag, tc.count);
+        }
+        else printf("%d 해당 번호의 태그가 존재하지 않습니다.\n", count);
+    }
+    else printf("SQL 실행 실패 : %s\n", sqlite3_errmsg(db));
+
+    sqlite3_finalize(stmt);
+    sqlite3_free(sql);
+
+    return tc;
 }
 
 void viewTagByschedule(char *tag) {
-    char *sql = sqlite3_mprintf("SELECT * FROM schedules WHERE tag = '%s';", tag);
     sqlite3_stmt *stmt;
+    char *sql = sqlite3_mprintf("SELECT * FROM schedules WHERE tag = '%s';", tag);
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
 
     if (rc == SQLITE_OK) {
@@ -288,7 +318,7 @@ void viewTagByschedule(char *tag) {
             const unsigned char *tag = sqlite3_column_text(stmt, 4);
             int priority = sqlite3_column_int(stmt, 5);
 
-            printf("%2d| %s | %s | %s | %s | %d\n", id, title, sdt, edt, tag, priority);
+            printf("%2d | %s | %s | %s | %s | %d\n", id, title, sdt, edt, tag, priority);
         }
         sqlite3_finalize(stmt);
         sqlite3_free(sql);

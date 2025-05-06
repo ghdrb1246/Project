@@ -3,6 +3,8 @@
 
 #include <stdio.h>
 
+// 메뉴 입출력 모듈
+
 /**
  * @brief 메인 메뉴
  * 
@@ -69,8 +71,10 @@ void tagViewMenu();
 /**
  * @brief 태그별 일정 조회
  * 
- * @param tag 특정 조회할 태그
+ * @param user_no 특정 사용자 번호
  */
-void scheduleMenuByTag(char *tag);
+void scheduleMenuByTag(int user_no);
+
+// void scheduleMenuByTag(char *tag);
 
 // #endif

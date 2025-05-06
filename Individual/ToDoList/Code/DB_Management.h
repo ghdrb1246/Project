@@ -1,16 +1,23 @@
 // #ifndef _DBM_H_
 // #define _DBM_H_
 
+// DB 관리 모듈
+
 #include <stdio.h>
 #include <stdlib.h>
 
-struct Schedule {
+struct Schedule { // 이동
     char *title;
     char *scheduled_date_time;
     char *end_date_time;
     char *tag;
     int priority;
     char *status;
+};
+
+struct TagCount {  // 이동
+    char *tag;
+    int count;
 };
 
 /**
@@ -24,14 +31,22 @@ struct Schedule {
  * @param status 상태(TODO, DOING, DONE)
  * 
  */
-typedef struct Schedule Schedule;
+typedef struct Schedule Schedule;  // 이동
+
+/**
+ * @brief 태그와 태그의 건수 구조체
+ * 
+ * @param tag 태그
+ * @param count 해당 태그의 건수
+ */
+typedef struct TagCount TagCount; // 이동
 
 /**
  * @brief 메모리 할당
  * 
  * @return Schedule 
  */
-Schedule smalloc();
+Schedule smalloc(); // 이동
 
 /**
  * @brief DB을 열기
@@ -106,40 +121,33 @@ int statusIndexToId(char *status, int user_no);
 Schedule idToStatusView(int id);
 
 /**
- * @brief 상태 : TODO -> DOING
+ * @brief 특정 상태 변경 (TODO -> DOING -> DONE)
  * 
+ * @param status 변경할 상태 (DOING, DONE)
  * @param id 특정 일정 id
  */
-void todoToDoing(int id);
-
-/**
- * @brief 상태 : DOING -> DONE
- * 
- * @param id 특정 일정 id
- */
-void doingToDone(int id);
+void updateStatus(char *status, int id);
 
 /**
  * @brief 일정 태그 전체 조회
  * 
  */
 void viewAllByTag();
-
-/**
- * @brief 특정 인덱스 tag 반환
- * 
- * @param user_no 사용자 메뉴 선택 번호
- * @return char* 
- */
+/* 
+// 특정 인덱스 tag 반환
 char *tagIndexToId(int user_no);
 
-/**
- * @brief tag 건수 반환
- * 
- * @param tag 특정 tag
- * @return int 
- */
+// tag 건수 반환
 int tagCount(char *tag);
+*/
+
+/**
+ * @brief 특정 번호에 태그와 해당 태그 계수는 반환(tagIndexToId() + tagCount())
+ * 
+ * @param user_no 특정 사용자 번호
+ * @return TagCount 
+ */
+TagCount indexToTagCount(int user_no);
 
 /**
  * @brief 특정 tag 전채 조회

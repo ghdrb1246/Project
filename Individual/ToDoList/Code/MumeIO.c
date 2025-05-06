@@ -4,7 +4,9 @@
 #include "MumeIO.h"
 #include "DB_Management.h"
 
-char *estatus[3] = { "TODO", "DOING", "DONE" };
+// 메뉴 입출력 모듈
+
+char *estatus[3] = { "TODO", "DOING", "DONE" }; // 이동
 
 void main_meun() {
     int meunNumber = 0, sw = 1;
@@ -62,15 +64,18 @@ void scheduleRegistrationMenu() {
         strcat(s.scheduled_date_time, sitme);
         
         while (1) {
+            int in_x = -1;
             printf("종료 날짜(YYYY-MM-DD or x) : ");
             scanf("%s", s.end_date_time);
             
-            if (strcmp(s.end_date_time, "x") == 0 || strcmp(s.end_date_time, "X") == 0) {
+            in_x = (strcmp(s.end_date_time, "x") == 0 || strcmp(s.end_date_time, "X") == 0) ? 1 : 0;
+            
+            if (in_x == 1) {
                 strcpy(s.end_date_time, "NULL");
                 break;
             }
 
-            else if (!(strcmp(s.end_date_time, "x") == 0 || strcmp(s.end_date_time, "X") == 0)) {
+            else if (in_x == 0) {
                 printf("-> 종료 시간(HH:MM) : ");
                 scanf("%s", eitme);
                 strcat(s.end_date_time, " ");
@@ -454,8 +459,8 @@ void scheduleCompleteMenu(int id) {
         scanf("%s", str);
     
         if (strcmp(str, "Y") == 0 || strcmp(str, "y") == 0) {
-            doingToDone(id);
-            printf("\n일정을 완료되었습니다.\n\n");
+            updateStatus("DONE", id);
+            printf("\n완료 처리 되었습니다.\n\n");
             break;
         }
         else if (strcmp(str, "N") == 0 || strcmp(str, "n") == 0) { 
@@ -478,12 +483,12 @@ void schedulePostponedMenu(int id) {
     printf("연기 대상 : %s, %s, %s, %s, %d\n", old_s.title, old_s.scheduled_date_time, old_s.end_date_time, old_s.tag, old_s.priority);
     printf("[ ----------------------------------------------------- ]\n");
     while (sw) {
-        printf("연기 항목 선택(1.예정 날짜, 2.종류 날짜, 3.저장) : ");
+        printf("연기 항목 선택(1.예정 날짜/시간, 2.종료 날짜/시간, 3.저장) : ");
         scanf("%d", &meunNumber);
 
         switch (meunNumber) {
             case 1:
-                printf("예정 날짜(YYYY-MM-DD HH:MM) : \n");  
+                printf("예정 날짜/시간(YYYY-MM-DD HH:MM) : \n");  
                 printf("%s -> ", old_s.scheduled_date_time); 
                 scanf("%s %s", new_s.scheduled_date_time, sitme);
                 strcat(new_s.scheduled_date_time, " ");
@@ -492,7 +497,7 @@ void schedulePostponedMenu(int id) {
             break;
             
             case 2:
-                printf("종료 날짜(YYYY-MM-DD HH:MM) : \n"); 
+                printf("종료 날짜/시간(YYYY-MM-DD HH:MM) : \n"); 
                 printf("%s -> ", old_s.end_date_time); 
                 scanf("%s %s", new_s.end_date_time, eitme);
                 strcat(new_s.end_date_time, " ");
@@ -538,18 +543,19 @@ void tagViewMenu() {
     printf("================= [ 일정 조회 : 태그 ] ================\n");
     viewAllByTag();
     printf("[ 선택 ----------------------------------------------- ]\n");
-    printf("1. 태크별 일정\n");
+    printf("1. 태크별 일정 조회\n");
     printf("2. 뒤로가기\n");
     printf("--------------------------------------------------------\n");
     while (sw) {
-        printf("메뉴 선택 : \n");
+        printf("메뉴 선택 : ");
         scanf("%d", &meunNumber);
 
         switch (meunNumber) {
             case 1:
                 printf("확인할 태그 번호 선택 : ");
                 scanf("%d", &user_no);
-                scheduleMenuByTag(tagIndexToId(user_no));
+                // scheduleMenuByTag(tagIndexToId(user_no));
+                scheduleMenuByTag(user_no);
                 sw = 0;
             break;
 
@@ -567,13 +573,41 @@ void tagViewMenu() {
     printf("========================================================\n");
 }
 
-void scheduleMenuByTag(char *tag) {
+/* void scheduleMenuByTag(char *tag) {
     char str[2] = "";
 
     printf("==================== [ 태그별 일정 ] ====================\n");
     printf("[ %s | %d -------------------------------------------- ]\n", tag, tagCount(tag));
     
     viewTagByschedule(tag);
+    
+    while (1) {
+        printf("[ ----------------------------------------------------- ]\n");
+        printf("뒤로가기[Y/N] : ");
+        scanf("%s", str);
+    
+        if (strcmp(str, "Y") == 0 || strcmp(str, "y") == 0) {
+            printf("\n뒤로 갑니다.\n\n");
+            tagViewMenu();
+            break;
+        }
+        else if (strcmp(str, "N") == 0 || strcmp(str, "n") == 0) { 
+            printf("\n취소.\n\n");
+            break;
+        }
+        else printf("Input Error\n");
+    }
+    printf("=========================================================\n");
+} */
+
+void scheduleMenuByTag(int user_no) {
+    char str[2] = "";
+    TagCount tc = indexToTagCount(user_no);
+
+    printf("==================== [ 태그별 일정 ] ====================\n");
+    printf("[ %s | %d -------------------------------------------- ]\n", tc.tag, tc.count);
+    
+    viewTagByschedule(tc.tag);
     
     while (1) {
         printf("[ ----------------------------------------------------- ]\n");
