@@ -5,48 +5,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
-struct Schedule { // 이동
-    char *title;
-    char *scheduled_date_time;
-    char *end_date_time;
-    char *tag;
-    int priority;
-    char *status;
-};
-
-struct TagCount {  // 이동
-    char *tag;
-    int count;
-};
-
-/**
- * @brief 일정 구조체
- * 
- * @param title 제목
- * @param scheduled_date_time 예정 날짜/시간
- * @param end_date_time 종료 날짜/시간
- * @param tag 일정 관련 태그
- * @param priority 우선순위 (0:없음, 1:낮음, 2:중간, 3:높음)
- * @param status 상태(TODO, DOING, DONE)
- * 
- */
-typedef struct Schedule Schedule;  // 이동
-
-/**
- * @brief 태그와 태그의 건수 구조체
- * 
- * @param tag 태그
- * @param count 해당 태그의 건수
- */
-typedef struct TagCount TagCount; // 이동
-
-/**
- * @brief 메모리 할당
- * 
- * @return Schedule 
- */
-Schedule smalloc(); // 이동
+#include "UserStructure.h"
 
 /**
  * @brief DB을 열기
@@ -72,7 +31,7 @@ void tableDB();
  * 
  * @param s 일정 정보 구조체
  */
-void saveDB(Schedule s);
+void saveDB(Schedule *s);
 
 /**
  * @brief DB 데이터 업데이트
@@ -80,7 +39,7 @@ void saveDB(Schedule s);
  * @param s 일정 정보 구조체
  * @param id id
  */
-void updateDB(Schedule s, int id);
+void updateDB(Schedule *s, int id);
 
 /**
  * @brief DB 항목 삭제
@@ -90,11 +49,10 @@ void updateDB(Schedule s, int id);
 void deleteDB(int id);
 
 /**
- * @brief DB 조회
+ * @brief 전체 일정 상태 예정 날짜/시간(종료) 따라 "TODO" -> "DOING" 변경
  * 
- * @param s 일정 정보 구조체
  */
-void viewDB();
+void checkScheduleStatus();
 
 /**
  * @brief DB 상테별 전체 조회
@@ -116,9 +74,9 @@ int statusIndexToId(char *status, int user_no);
  * @brief 특정 id 일정 조회
  * 
  * @param id 특정 일정 id
- * @return Schedule
+ * @return Schedule*
  */
-Schedule idToStatusView(int id);
+Schedule *idToStatusView(int id);
 
 /**
  * @brief 특정 상태 변경 (TODO -> DOING -> DONE)
@@ -133,6 +91,7 @@ void updateStatus(char *status, int id);
  * 
  */
 void viewAllByTag();
+
 /* 
 // 특정 인덱스 tag 반환
 char *tagIndexToId(int user_no);
@@ -145,9 +104,9 @@ int tagCount(char *tag);
  * @brief 특정 번호에 태그와 해당 태그 계수는 반환(tagIndexToId() + tagCount())
  * 
  * @param user_no 특정 사용자 번호
- * @return TagCount 
+ * @return TagCount *
  */
-TagCount indexToTagCount(int user_no);
+TagCount *indexToTagCount(int user_no);
 
 /**
  * @brief 특정 tag 전채 조회

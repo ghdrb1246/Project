@@ -49,7 +49,7 @@ Schedule smalloc();
  * 
  * @param s 일정
  */
-void updateScheduleStatus(Schedule s);
+Schedule updateScheduleStatus(Schedule s);
 
 /**
  * @brief YYYY-MM-DD HH:MM 형식을 time_t 타입으로 변경

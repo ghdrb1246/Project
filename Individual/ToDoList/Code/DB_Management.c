@@ -3,22 +3,12 @@
 #include <stdlib.h>
 #include "sqlite/sqlite3.h"
 #include "DB_Management.h"
+#include "UserStructure.h"
+#include "Utils.h"
 
 // DB 관리 모듈
 
 static sqlite3 *db;
-
-Schedule smalloc() {
-    Schedule s;
-    
-    s.title = malloc(100 * sizeof(char));
-    s.scheduled_date_time = malloc(20 * sizeof(char));
-    s.end_date_time = malloc(20 * sizeof(char));
-    s.tag = malloc(10 * sizeof(char));
-    s.status = malloc(5 * sizeof(char));
-
-    return s;
-}
 
 int DBO(char *F) {
     int rc = sqlite3_open(F, &db);
@@ -47,9 +37,9 @@ void tableDB() {
     }
 }
 
-void saveDB(Schedule s) {
+void saveDB(Schedule *s) {
     // ((s.end_date_time != "x") ? s.end_date_time : "NULL")?
-    char *sql = sqlite3_mprintf("INSERT INTO schedules (title, scheduled_date_time, end_date_time, tag, priority) VALUES ('%s', '%s', '%s', '%s', %d);", s.title, s.scheduled_date_time, s.end_date_time, s.tag, s.priority);
+    char *sql = sqlite3_mprintf("INSERT INTO schedules (title, scheduled_date_time, end_date_time, tag, priority) VALUES ('%s', '%s', '%s', '%s', %d);", s->title, s->scheduled_date_time, s->end_date_time, s->tag, s->priority);
     char *err_msg = "0";
     
     int rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
@@ -62,8 +52,8 @@ void saveDB(Schedule s) {
     sqlite3_free(sql);
 }
 
-void updateDB(Schedule s, int id) {
-    char *sql = sqlite3_mprintf("UPDATE schedules SET title = '%s', scheduled_date_time = '%s', end_date_time = '%s', tag = '%s', priority = %d WHERE id = %d;", s.title, s.scheduled_date_time, s.end_date_time, s.tag, s.priority, id);
+void updateDB(Schedule *s, int id) {
+    char *sql = sqlite3_mprintf("UPDATE schedules SET title = '%s', scheduled_date_time = '%s', end_date_time = '%s', tag = '%s', priority = %d WHERE id = %d;", s->title, s->scheduled_date_time, s->end_date_time, s->tag, s->priority, id);
     char *err_msg = "0";
     int rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
     
@@ -86,23 +76,43 @@ void deleteDB(int id) {
     sqlite3_free(sql);
 }
 
-void viewDB() {
+void checkScheduleStatus() {
+    Schedule *s = smalloc();
     sqlite3_stmt *stmt;
-    char *sql = "SELECT * FROM schedules WHERE status;";
+    char *sql = "SELECT * FROM schedules WHERE status = 'TODO';";
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
 
     if (rc == SQLITE_OK) {
-        while (sqlite3_step(stmt) == SQLITE_ROW) {
+        while (sqlite3_step(stmt) == SQLITE_ROW) {    
             int id = sqlite3_column_int(stmt, 0);
             const unsigned char *title = sqlite3_column_text(stmt, 1);
             const unsigned char *sdt = sqlite3_column_text(stmt, 2);
             const unsigned char *edt = sqlite3_column_text(stmt, 3);
             const unsigned char *tag = sqlite3_column_text(stmt, 4);
             int priority = sqlite3_column_int(stmt, 5);
+            const unsigned char *status = sqlite3_column_text(stmt, 6);
+            
+            // NULL 체크 필요
+            strcpy(s->title, (((char*)title) != NULL) ? (char*)title : "NULL");
+            strcpy(s->scheduled_date_time, (((char*)sdt) != NULL) ? (char*)sdt : "NULL");
+            strcpy(s->end_date_time, (((char*)edt) != NULL) ? (char*)edt : "NULL");
+            strcpy(s->tag, (((char*)tag) != NULL) ? (char*)tag : "NULL");
+            s->priority = priority;
+            strcpy(s->status, (((char*)status) != NULL) ? (char*)status : "NULL");
 
-            printf("ID: %d, title: %s, sdt: %s, edt: %s, tag: %s, priority %d\n", id, title, sdt, edt, tag, priority);
+            int id_c = updateScheduleStatus(s, id);
+            if (id_c) {
+                printf("%d\n", id_c);
+                updateStatus("DOING", id_c);
+            }
+            // printf("ID: %d, title: %s, sdt: %s, edt: %s, tag: %s, priority %d\n", id, title, sdt, edt, tag, priority);
         }
-        sqlite3_finalize(stmt);
+        
+        // SQL문이 NULL일떄 동적 할당 해제 에러 방지
+        if (sqlite3_step(stmt) == SQLITE_ROW) {
+            sqlite3_finalize(stmt);
+            sqlite3_free(sql);
+        }
     }
 
     else fprintf(stderr, "데이터 조회 오류: %s\n", sqlite3_errmsg(db));   
@@ -160,11 +170,11 @@ int statusIndexToId(char *status, int user_no) {
     return real_id;
 }
 
-Schedule idToStatusView(int id) {
+Schedule *idToStatusView(int id) {
     sqlite3_stmt *stmt;
-    Schedule s = smalloc();
+    Schedule *s = smalloc();
     char *sql = sqlite3_mprintf("SELECT title, scheduled_date_time, end_date_time, tag, priority FROM schedules WHERE id = %d;", id);
-
+    
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
 
     if (rc == SQLITE_OK) {
@@ -174,15 +184,15 @@ Schedule idToStatusView(int id) {
             const unsigned char *edt = sqlite3_column_text(stmt, 2);
             const unsigned char *tag = sqlite3_column_text(stmt, 3);
             int priority = sqlite3_column_int(stmt, 4);
-
+        
             // NULL 체크 필요
-            strcpy(s.title, (((char*)title) != NULL) ? (char*)title : "NULL");
-            strcpy(s.scheduled_date_time, (((char*)sdt) != NULL) ? (char*)sdt : "NULL");
-            strcpy(s.end_date_time, (((char*)edt) != NULL) ? (char*)edt : "NULL");
-            strcpy(s.tag, (((char*)tag) != NULL) ? (char*)tag : "NULL");
-            s.priority = priority;
+            strcpy(s->title, (((char*)title) != NULL) ? (char*)title : "NULL");
+            strcpy(s->scheduled_date_time, (((char*)sdt) != NULL) ? (char*)sdt : "NULL");
+            strcpy(s->end_date_time, (((char*)edt) != NULL) ? (char*)edt : "NULL");
+            strcpy(s->tag, (((char*)tag) != NULL) ? (char*)tag : "NULL");
+            s->priority = priority;
 
-            // printf("%s, %s, %s, %s, %d\n", s.title, s.scheduled_date_time, s.end_date_time, s.tag, s.priority);
+            // printf("%s, %s, %s, %s, %d\n", s->title, s->scheduled_date_time, s->end_date_time, s->tag, s->priority);
         }
         sqlite3_finalize(stmt);
         sqlite3_free(sql);
@@ -274,11 +284,10 @@ int tagCount(char *tag) {
 }
 */
 
-TagCount indexToTagCount(int user_no) {
+TagCount *indexToTagCount(int user_no) {
     sqlite3_stmt *stmt;
-    TagCount tc;
-    tc.tag = malloc(10 * sizeof(char));
-    
+    TagCount *tc = tcmalloc();
+
     const unsigned char *tag = NULL;
     char *sql = sqlite3_mprintf("SELECT temp_tag.tag, (SELECT COUNT(*) FROM schedules WHERE tag = temp_tag.tag) AS count FROM (SELECT tag FROM (SELECT ROW_NUMBER() OVER (ORDER BY tag) AS no, tag FROM (SELECT DISTINCT tag FROM schedules WHERE tag IS NOT NULL)) WHERE no = %d) AS temp_tag;", user_no);
     
@@ -290,9 +299,9 @@ TagCount indexToTagCount(int user_no) {
             tag = sqlite3_column_text(stmt, 0);
             count = sqlite3_column_int(stmt, 1);
 
-            strcpy(tc.tag, (((char*)tag) != NULL) ? (char*)tag : "NULL");
-            tc.count = count;
-            printf("-> %s %d\n", tc.tag, tc.count);
+            strcpy(tc->tag, (((char*)tag) != NULL) ? (char*)tag : "NULL");
+            tc->count = count;
+            // printf("-> %s %d\n", tc->tag, tc->count);
         }
         else printf("%d 해당 번호의 태그가 존재하지 않습니다.\n", count);
     }

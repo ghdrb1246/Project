@@ -26,7 +26,7 @@ void calendarViewMenu();
 /**
  * @brief 일정 조회 메뉴 : 상테별
  * 
- * @param statusNumer 상태 열거형 상수 인덱스
+ * @param statusNumer 상태 열거형 상수 인덱스 (1:"TODO", 2:"DOING", 3:"DONE")
  */
 void scheduleViewMenuByStatus(int statusNumer);
 
