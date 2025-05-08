@@ -1,5 +1,5 @@
-// #ifndef _DBM_H_
-// #define _DBM_H_
+#ifndef _DBM_
+#define _DBM_
 
 // DB 관리 모듈
 
@@ -115,4 +115,4 @@ TagCount *indexToTagCount(int user_no);
  */
 void viewTagByschedule(char *tag);
 
-// #endif
+#endif

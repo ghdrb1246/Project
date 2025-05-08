@@ -146,10 +146,10 @@ void viewAllByStatus(char *status) {
 int statusIndexToId(char *status, int user_no) {
     int real_id = -1;
 
-    if (DBO("DB/DBSC.db") != 0) {
-        printf("DB 연결이 되어 있지 않습니다.\n");
+    /* if (DBO("DB/DBSC.db") != 0) {
+        // printf("DB 연결이 되어 있지 않습니다.\n");
         return real_id;
-    }
+    } */
 
     char *sql = sqlite3_mprintf("SELECT id FROM (SELECT ROW_NUMBER() OVER (ORDER BY scheduled_date_time) AS no, id FROM schedules WHERE status = '%s') WHERE no = %d;", status, user_no);
     sqlite3_stmt *stmt;

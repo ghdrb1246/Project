@@ -1,5 +1,5 @@
-// #ifndef _MIO_H_
-// #define _MIO_H
+#ifndef _MIO_
+#define _MIO_
 
 #include <stdio.h>
 
@@ -77,4 +77,4 @@ void scheduleMenuByTag(int user_no);
 
 // void scheduleMenuByTag(char *tag);
 
-// #endif
+#endif

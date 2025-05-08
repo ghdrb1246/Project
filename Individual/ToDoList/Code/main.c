@@ -5,17 +5,14 @@
 #include "Utils.h" */
 
 int main() {
-   int test = 1;
-
-    while (test) {
-        test = DBO("DB/DBSC.db");
-    }
+   int test = DBO("DB/DBSC.db");
+   if (test) return 1;
 
     main_meun();
 
     // checkScheduleStatus();
 
-    DBC();
+    // DBC();
 
    /*  Schedule *s = smalloc();
     if (!s) printf("smalloc Eorr");

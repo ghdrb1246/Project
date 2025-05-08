@@ -14,6 +14,7 @@ int updateScheduleStatus(Schedule *s, int id) {
     
     // printf("%ld %ld %ld\n", now, start, end);
     // printf("안 : %s | %s | %s | %s | %d | %s\n", s->title, s->scheduled_date_time, s->end_date_time, s->tag, s->priority, s->status);
+    
     // TODO → DOING
     if (strcmp(s->status, "TODO") == 0 && (now >= start || (end > 0 && now >= end))) {
         // strcpy(s->status, "DOING");

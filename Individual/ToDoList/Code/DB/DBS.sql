@@ -170,4 +170,4 @@ SELECT tag FROM (SELECT ROW_NUMBER() OVER (ORDER BY tag) AS no, tag FROM (SELECT
 
 -- SELECT title, scheduled_date_time, end_date_time, tag, priority, status FROM schedules WHERE status = 'TODO';
 
-SELECT * FROM schedules WHERE status = 'TODO'
+-- SELECT * FROM schedules WHERE status = 'TODO'
