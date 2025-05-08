@@ -171,3 +171,36 @@ SELECT tag FROM (SELECT ROW_NUMBER() OVER (ORDER BY tag) AS no, tag FROM (SELECT
 -- SELECT title, scheduled_date_time, end_date_time, tag, priority, status FROM schedules WHERE status = 'TODO';
 
 -- SELECT * FROM schedules WHERE status = 'TODO'
+
+/* SELECT 
+    id,
+    CASE
+        WHEN priority = 1 THEN '!' || title
+        WHEN priority = 2 THEN '!!' || title
+        WHEN priority >= 3 THEN '!!!' || title
+        ELSE title
+    END AS priority_title,
+    scheduled_date_time,
+    status,
+    tag
+FROM schedules
+ORDER BY priority DESC; */
+
+-- 우선순위 + 일정 정렬
+
+SELECT
+    id,
+    CASE
+        WHEN priority = 1 THEN '! ' || title
+        WHEN priority = 2 THEN '!! ' || title
+        WHEN priority >= 3 THEN '!!! ' || title
+        ELSE title
+    END AS priority_title,
+    title,
+    priority,
+    scheduled_date_time,
+    end_date_time,
+    tag,
+    status
+FROM schedules
+ORDER BY priority DESC, scheduled_date_time ASC, id ASC;
