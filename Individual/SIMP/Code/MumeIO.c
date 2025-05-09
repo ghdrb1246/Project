@@ -9,13 +9,36 @@ const char *CSTATUS[3] = { "TODO", "DOING", "DONE" };
 
 // 메뉴 입출력 모듈
 
-void main_meun() {
-    int meunNumber = 0, sw = 1;
+void runMenu() {
+    if (DBO("DB/DBSC.db")) return;
 
-    while (sw) {
-        // 상태 변경 확인
-        // checkScheduleStatus();
+    MenuState current = MM;
+    while (current != EXIT) {
+        switch (current) {
+            case MM:    current = main_meun();                 break;
+            case SRM:   current = scheduleRegistrationMenu();  break;
+            case CVM:   current = calendarViewMenu();          break;
+            case SVBSM: current = scheduleViewByStatusMenu();  break;
+            case SMM:   current = scheduleModificationMenu();  break;
+            case DSM:   current = deleteScheduleMenu();        break;
+            case SCM:   current = scheduleCompleteMenu();      break;
+            case SPM:   current = schedulePostponedMenu();     break;
+            case TVM:   current = tagViewMenu();               break;
+            case SBTM:  current = scheduleByTagMenu();         break;
+            default:    current = EXIT;                        break;
+        }
+    }
 
+    DBC();
+}
+
+MenuState main_meun() {
+    int meunNumber = 0;
+   
+    // 상태 변경 확인
+    // checkScheduleStatus();
+    
+    while(1) {
         printf("================= [ 일정 관리 프로그램 ] =================\n");
         printf("1. 일정 등록\n");
         printf("2. 일정 조회\n");
@@ -24,23 +47,14 @@ void main_meun() {
         printf("메뉴 선택 : ");
         scanf("%d", &meunNumber);
         printf("=========================================================\n");
-    
+
         switch (meunNumber) {
-            case 1:
-                scheduleRegistrationMenu();
-                sw = 0;
-            break;
-    
-            case 2: 
-                calendarViewMenu();
-                sw = 0;
-            break;
-    
-            case 3:
-                DBC();
-                exit(0);
-            break;
-    
+            case 1: return SRM;
+
+            case 2: return CVM;
+
+            case 3: return EXIT;
+
             default : 
                 printf("Input Error\n");
             break;
@@ -48,7 +62,7 @@ void main_meun() {
     }
 }
 
-void scheduleRegistrationMenu() {
+MenuState scheduleRegistrationMenu() {
     char str[2] = "", sitme[6] = "", eitme[6] = "";
     int sw = 1;
     Schedule *s = smalloc();
@@ -129,49 +143,53 @@ void scheduleRegistrationMenu() {
     printf("=========================================================\n");
     
     sfree(s);
-    main_meun();
+    return MM;
 }
 
-void calendarViewMenu() {
-    int meunNumber = 0, status = 0;
+MenuState calendarViewMenu() {
+    int meunNumber = 0;
     
-    printf("===================== [ 일정 조회 ] =====================\n");
-    printf("1. 상태별 조회\n");
-    printf("2. 태그 조회\n");
-    printf("3. 뒤로가기\n");
-    printf("---------------------------------------------------------\n");
-    printf("메뉴 선택 : ");
-    scanf("%d", &meunNumber);
-
-    switch (meunNumber) {
-        case 1: 
-            printf("조회할 상태(1:%s / 2:%s / 3:%s) : ", CSTATUS[0], CSTATUS[1], CSTATUS[2]);
-            scanf("%d", &status);
-            scheduleViewMenuByStatus(status);
-        break;
-
-        case 2: 
-            tagViewMenu();
-        break;
-
-        case 3:
-            printf("\n뒤로가기.\n");
-            main_meun();
-        break;
-
-        default : 
-            printf("Input Error\n");
-        break;
+    while (1) {
+        printf("===================== [ 일정 조회 ] =====================\n");
+        printf("1. 상태별 조회\n");
+        printf("2. 태그 조회\n");
+        printf("3. 뒤로가기\n");
+        printf("---------------------------------------------------------\n");
+        printf("메뉴 선택 : ");
+        scanf("%d", &meunNumber);
+    
+        switch (meunNumber) {
+            case 1: return SVBSM;
+            case 2: return TVM;
+            case 3: return MM;
+            default : printf("Input Error\n"); break;
+        }
     }
-
-    printf("=========================================================\n");
 }
 
-void scheduleViewMenuByStatus(int statusNumer) {
+MenuState scheduleViewByStatusMenu() {
+    int statusNumer = 0, meunNumber = 0;
+    
     // 상태 변경 확인
     // checkScheduleStatus();
 
-    printf("================= [ 일정 상태별 조회 ] ================\n");
+    printf("================= [ 일정 상태별 조회 ] ----------------------\n");
+    while (1) {
+        printf("1:%s\n", CSTATUS[0]);
+        printf("2:%s\n", CSTATUS[1]);
+        printf("3:%s\n", CSTATUS[2]);
+        printf("4:뒤로가기\n");
+        printf("---------------------------------------------------------\n");
+        printf("메뉴 선택 : ");
+        scanf("%d", &statusNumer);
+        
+        if ((statusNumer >= 1 && statusNumer <= 3) && statusNumer != 4) break;
+        else if (statusNumer == 4) return CVM;
+        else printf("Input Error\n");
+    }
+
+    printf("--------------------------------------------------------\n");
+
     printf("[ %s -------------------------------------------- ]\n", CSTATUS[statusNumer - 1]);
 
     viewAllByStatus(CSTATUS[statusNumer - 1]);
@@ -179,162 +197,91 @@ void scheduleViewMenuByStatus(int statusNumer) {
     printf("--------------------------------------------------------\n");
 
     switch(statusNumer) {
-        case 1: _TODO(); break;
-        case 2: _DOING(); break;
-        case 3: _DONE(); break;
+        case 1: 
+            // _TODO
+            while (1) {
+                printf("[ 선택 ----------------------------------------------- ]\n");
+                printf("1. 일정 수정\n");
+                printf("2. 일정 삭제\n");
+                printf("3. 뒤로가기\n");
+                printf("--------------------------------------------------------\n");
+                printf("메뉴 선택 : ");
+                scanf("%d", &meunNumber);
+                
+                switch (meunNumber) {
+                    case 1: return SMM;
+                    case 2: return DSM;
+                    case 3: return SVBSM;
+                    default : printf("Input Error\n"); break;
+                }
+            }
+        case 2: 
+            // _DOING
+            while (1) {
+                printf("[ 선택 ----------------------------------------------- ]\n");
+                printf("1. 일정 완료\n");
+                printf("2. 일정 연기\n");
+                printf("3. 일정 삭제\n");
+                printf("4. 뒤로가기\n");
+                printf("--------------------------------------------------------\n");
+                printf("메뉴 선택 : ");
+                scanf("%d", &meunNumber);
+            
+                switch (meunNumber) {
+                    case 1: return SCM;
+                    case 2: return SPM;
+                    case 3: return DSM;
+                    case 4: return SVBSM;
+                    default : printf("Input Error\n"); break;
+                }
+            }
+        case 3: 
+            // _DONE
+            while (1) {
+                printf("[ 선택 ----------------------------------------------- ]\n");
+                printf("1. 일정 삭제\n");
+                printf("2. 뒤로가기\n");
+                printf("--------------------------------------------------------\n");
+                printf("메뉴 선택 : ");
+                scanf("%d", &meunNumber);
+            
+                switch (meunNumber) {
+                    case 1: return DSM;
+                    case 2: return SVBSM;
+                    default : printf("Input Error\n"); break;
+                }
+            }
         default : printf("Return Error : %d\n", statusNumer); break;
     }
 
     printf("========================================================\n");
+    
+    return CVM;
 }
 
-static void _TODO() {
-    int meunNumber = 0, sw = 1, user_no = 0, id = 0;
-    
-    while (sw) {
-        printf("[ 선택 ----------------------------------------------- ]\n");
-        printf("1. 일정 수정\n");
-        printf("2. 일정 삭제\n");
-        printf("3. 뒤로가기\n");
-        printf("--------------------------------------------------------\n");
-        printf("메뉴 선택 : ");
-        scanf("%d", &meunNumber);
-        
-        switch (meunNumber) {
-            case 1:
-                printf("수정할 일정 번호 선택 : ");
-                scanf("%d", &user_no);
-
-                id = statusIndexToId(CSTATUS[0], user_no);
-
-                if (id != -1) scheduleModificationMenu(id);
-                else printf("db Error");
-                sw = 0;
-            break;
-    
-            case 2: 
-                printf("삭제할 일정 선택 : ");
-                scanf("%d", &user_no);
-
-                id = statusIndexToId(CSTATUS[0], user_no);
-                
-                if (id != -1) deleteScheduleMenu(id);
-                else printf("db Error");
-                sw = 0;
-            break;
-    
-            case 3:
-                calendarViewMenu();
-                sw = 0;
-            break;
-    
-            default : 
-                printf("Input Error\n");
-            break;
-        }
-    }
-}
-
-static void _DOING() {
-    int meunNumber = 0, sw = 1, user_no = 0, id = 0;
-    
-    while (sw) {
-        printf("[ 선택 ----------------------------------------------- ]\n");
-        printf("1. 일정 완료\n");
-        printf("2. 일정 연기\n");
-        printf("3. 일정 삭제\n");
-        printf("4. 뒤로가기\n");
-        printf("--------------------------------------------------------\n");
-        printf("메뉴 선택 : ");
-        scanf("%d", &meunNumber);
-    
-        switch (meunNumber) {
-            case 1:
-                printf("완료할 일정 선택 : ");
-                scanf("%d", &user_no);
-
-                id = statusIndexToId(CSTATUS[1], user_no);
-                
-                if (id != -1) scheduleCompleteMenu(id);
-                else printf("db Error");
-                sw = 0;
-            break;
-    
-            case 2:
-                printf("연기할 일정 선택 : ");
-                scanf("%d", &user_no);
-
-                id = statusIndexToId(CSTATUS[1], user_no);
-                
-                if (id != -1) schedulePostponedMenu(id);
-                else printf("db Error");
-                sw = 0;
-            break;
-            
-            case 3:
-                printf("식제할 일정 선택 : ");
-                scanf("%d", &user_no);
-
-                id = statusIndexToId(CSTATUS[1], user_no);
-                
-                if (id != -1) deleteScheduleMenu(id);
-                else printf("db Error");
-                sw = 0;
-            break;
-
-            case 4:
-                calendarViewMenu();
-                sw = 0;
-            break;
-    
-            default : 
-                printf("Input Error\n");
-            break;
-        }
-    }
-}
-
-static void _DONE() {
-    int meunNumber = 0, sw = 1, user_no = 0, id = 0;
-    
-    while (sw) {
-        printf("[ 선택 ----------------------------------------------- ]\n");
-        printf("1. 일정 삭제\n");
-        printf("2. 뒤로가기\n");
-        printf("--------------------------------------------------------\n");
-        printf("메뉴 선택 : ");
-        scanf("%d", &meunNumber);
-    
-        switch (meunNumber) {
-            case 1:
-                printf("삭제할 일정 선택 : ");
-                scanf("%d", &user_no);
-
-                id = statusIndexToId(CSTATUS[2], user_no);
-                
-                if (id != -1) deleteScheduleMenu(id);
-                else printf("db Error");
-                sw = 0;
-            break;
-    
-            case 2:
-                calendarViewMenu();
-                sw = 0;
-            break;
-    
-            default : 
-                printf("Input Error\n");
-            break;
-        }
-    }
-}
-
-void scheduleModificationMenu(int id) {
-    Schedule *new_s = smalloc(), *old_s = idToStatusView(id);
+MenuState scheduleModificationMenu() {
+    Schedule *new_s = smalloc(), *old_s;
     char str[2] = "", sitme[6] = "", eitme[6] = "";
-    int meunNumber = 0, sw = 1;
+    int meunNumber = 0, sw = 1, id = 0;
 
-    printf("===================== [ 일정 수정 ] =====================\n");
+    printf("[ 일정 수정 --------------------------------------------- ]\n");
+
+    printf("수정할 일정 번호 선택 : ");
+    scanf("%d", &meunNumber);
+
+    id = statusIndexToId(CSTATUS[0], meunNumber);
+    meunNumber = 0;
+    
+    if (id != -1) {
+        old_s = idToStatusView(id);
+    }
+    else {
+        printf("db Error");
+        return SVBSM;
+    }
+
+    printf("---------------------------------------------------------\n");
+    
     printf("수정 대상 : %s, %s, %s, %s, %d\n", old_s->title, old_s->scheduled_date_time, old_s->end_date_time, old_s->tag, old_s->priority);
     printf("[ ----------------------------------------------------- ]\n");
     
@@ -430,16 +377,34 @@ void scheduleModificationMenu(int id) {
     
     sfree(new_s);
     sfree(old_s);
-    calendarViewMenu();
+    return SVBSM;
 }
 
-void deleteScheduleMenu(int id) {
-    Schedule *s = idToStatusView(id);
+MenuState deleteScheduleMenu() {
+    Schedule *s;
     char str[2] = "";
+    int meunNumber = 0, id = 0;
 
-    printf("===================== [ 일정 삭제 ] =====================\n");
+    printf("[ 일정 삭제 --------------------------------------------- ]\n");
+
+    printf("삭제할 일정 선택 : ");
+    scanf("%d", &meunNumber);
+
+    id = statusIndexToId(CSTATUS[0], meunNumber);
+    
+    if (id != -1) {
+        s = idToStatusView(id);
+    }
+    else {
+        printf("db Error");
+        return SVBSM;
+    }
+
+    printf("---------------------------------------------------------\n");
+
     printf("삭제 대상 : %s, %s, %s, %s, %d\n", s->title, s->scheduled_date_time, s->end_date_time, s->tag, s->priority);
     printf("[ ----------------------------------------------------- ]\n");
+    
     while (1) {
         printf("선택한 일정을 삭제 하겠습니까?[Y/N] : ");
         scanf("%s", str);
@@ -458,19 +423,37 @@ void deleteScheduleMenu(int id) {
     printf("=========================================================\n");
 
     sfree(s);
-    calendarViewMenu();
+    return SVBSM;
 }
 
-void scheduleCompleteMenu(int id) {
-    Schedule *s = idToStatusView(id);
+MenuState scheduleCompleteMenu() {
+    Schedule *s;
     char str[2] = "";
-    
+    int meunNumber = 0, id = 0;
+
     // 상태 변경 확인
     // checkScheduleStatus();
     
-    printf("===================== [ 일정 완료 ] =====================\n");
+    printf("[ 일정 완료 --------------------------------------------- ]\n");
+
+    printf("완료할 일정 선택 : ");
+    scanf("%d", &meunNumber);
+
+    id = statusIndexToId(CSTATUS[1], meunNumber);
+    
+    if (id != -1) {
+        s = idToStatusView(id);
+    }
+    else {
+        printf("db Error");
+        return SVBSM;
+    }
+
+    printf("---------------------------------------------------------\n");
+
     printf("완료 대상 : %s, %s, %s, %s, %d\n", s->title, s->scheduled_date_time, s->end_date_time, s->tag, s->priority);
     printf("[ ----------------------------------------------------- ]\n");
+    
     while (1) {
         printf("선택한 일정을 완료 하셨습니까?[Y/N] : ");
         scanf("%s", str);
@@ -489,15 +472,32 @@ void scheduleCompleteMenu(int id) {
     printf("=========================================================\n");
 
     sfree(s);
-    calendarViewMenu();
+    return SVBSM;
 }
 
-void schedulePostponedMenu(int id) {
+MenuState schedulePostponedMenu() {
     char str[2] = "", sitme[6] = "", eitme[6] = "";
-    int meunNumber = 0, sw = 1;
-    Schedule *new_s = smalloc(), *old_s = idToStatusView(id);
+    int meunNumber = 0, sw = 1, id = 0;
+    Schedule *new_s = smalloc(), *old_s;
+    
+    printf("[ 일정 연기 ---------------------------------------------- ]\n");
 
-    printf("===================== [ 일정 연기 ] =====================\n");
+    printf("연기할 일정 선택 : ");
+    scanf("%d", &meunNumber);
+
+    id = statusIndexToId(CSTATUS[1], meunNumber);
+    meunNumber = 0;
+
+    if (id != -1) {
+        old_s = idToStatusView(id);
+    }
+    else {
+        printf("db Error");
+        return SVBSM;
+    }
+
+    printf("---------------------------------------------------------\n");
+
     printf("연기 대상 : %s, %s, %s, %s, %d\n", old_s->title, old_s->scheduled_date_time, old_s->end_date_time, old_s->tag, old_s->priority);
     printf("[ ----------------------------------------------------- ]\n");
     while (sw) {
@@ -554,12 +554,12 @@ void schedulePostponedMenu(int id) {
 
     sfree(new_s);
     sfree(old_s);
-    calendarViewMenu();
+    return SVBSM;
 }
 
-void tagViewMenu() {
-    int meunNumber = 0, sw = 1, user_no = 0;
-
+MenuState tagViewMenu() {
+    int meunNumber = 0;
+    
     printf("================= [ 일정 조회 : 태그 ] ================\n");
     viewAllByTag();
     printf("[ 선택 ----------------------------------------------- ]\n");
@@ -567,38 +567,33 @@ void tagViewMenu() {
     printf("2. 뒤로가기\n");
     printf("--------------------------------------------------------\n");
     
-    while (sw) {
+    while (1) {
         printf("메뉴 선택 : ");
         scanf("%d", &meunNumber);
 
         switch (meunNumber) {
-            case 1:
-                printf("확인할 태그 번호 선택 : ");
-                scanf("%d", &user_no);
-                // scheduleMenuByTag(tagIndexToId(user_no));
-                scheduleMenuByTag(user_no);
-                sw = 0;
-            break;
-
-            case 2:
-                calendarViewMenu();
-                sw = 0;
-            break;
-
-            default :
-                printf("Input Error\n");
-            break;
+            case 1: return SBTM;
+            case 2: return CVM;
+            default : printf("Input Error\n"); break;
         }
     }
 
     printf("========================================================\n");
 }
 
-void scheduleMenuByTag(int user_no) {
+MenuState scheduleByTagMenu() {
     char str[2] = "";
-    TagCount *tc = indexToTagCount(user_no);
+    int user_no = 0;
+    TagCount *tc;
 
-    printf("==================== [ 태그별 일정 ] ====================\n");
+    printf("[ 태그별 일정 -------------------------------------------- ]\n");
+
+    printf("확인할 태그 번호 선택 : ");
+    scanf("%d", &user_no);
+
+    tc = indexToTagCount(user_no);
+
+    printf("--------------------------------------------------------\n");
     printf("[ %s | %d -------------------------------------------- ]\n", tc->tag, tc->count);
     
     viewTagByschedule(tc->tag);
@@ -622,4 +617,5 @@ void scheduleMenuByTag(int user_no) {
     printf("=========================================================\n");
 
     tcfree(tc);
+    return TVM;
 }

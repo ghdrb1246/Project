@@ -2,88 +2,84 @@
 #define _MIO_
 
 #include <stdio.h>
+#include "UserStructure.h"
 
 // 메뉴 입출력 모듈
 
 /**
- * @brief 메인 메뉴
+ * @brief 메뉴 뒤로가기
  * 
  */
-void main_meun();
+void runMenu();
+
+/**
+ * @brief 메인 메뉴
+ * 
+ * @return MenuState : SRM, CVM, EXIT
+ */
+MenuState main_meun();
 
 /**
  * @brief 일정 등록 메뉴
  * 
+ * @return MenuState : MM
  */
-void scheduleRegistrationMenu();
+MenuState scheduleRegistrationMenu();
 
 /**
  * @brief 일정 조회 메뉴
  * 
+ * @return MenuState : SVBSM, TVM, MM
  */
-void calendarViewMenu();
+MenuState calendarViewMenu();
 
 /**
  * @brief 일정 조회 메뉴 : 상테별
  * 
- * @param statusNumer 상태 열거형 상수 인덱스 (1:"TODO", 2:"DOING", 3:"DONE")
+ * @return MenuState : SMM, DSM, SVBSM, SCM, SPM
  */
-void scheduleViewMenuByStatus(int statusNumer);
-
-/**
- * @brief 일정 상태 메뉴 : TODO
- */
-static void _TODO();
-
-/**
- * @brief 일정 상태 메뉴 : DOING
- */
-static void _DOING();
-
-/**
- * @brief 일정 상태 메뉴 : DONE
- */
-static void _DONE();
+MenuState scheduleViewByStatusMenu();
 
 /**
  * @brief 일정 수정
- * 
- * @param id 특정 수정할 일정 id
+ *
+ * @return MenuState : SVBSM
  */
-void scheduleModificationMenu(int id);
+MenuState scheduleModificationMenu();
 
 /**
  * @brief 일정 삭제
  * 
- * @param id 특정 삭제할 일정 id
+ * @return MenuState : SVBSM
  */
-void deleteScheduleMenu(int id);
+MenuState deleteScheduleMenu();
 
 /**
  * @brief 일정 완료
  * 
- * @param id 특정 완료할 일정 id
+ * @return MenuState : SVBSM
  */
-void scheduleCompleteMenu(int id);
+MenuState scheduleCompleteMenu();
 
 /**
  * @brief 일정 연기
  * 
- * @param id 특정 연기할 일정 id
+ * @return MenuState : SVBSM
  */
-void schedulePostponedMenu(int id);
+MenuState schedulePostponedMenu();
 
 /**
  * @brief 태그 전체 조회
  * 
+ * @return MenuState : SBTM, CVM
  */
-void tagViewMenu();
+MenuState tagViewMenu();
 
 /**
  * @brief 태그별 일정 조회
  * 
- * @param user_no 특정 사용자 번호
+ * @return MenuState : TVM
  */
-void scheduleMenuByTag(int user_no);
+MenuState scheduleByTagMenu();
 
 #endif

@@ -1,6 +1,26 @@
 #ifndef _USERSTRUCTURE_
 #define _USERSTRUCTURE_
 
+enum MenuState{
+   MM, SRM, CVM, SVBSM, SMM, DSM, SCM, SPM, TVM, SBTM, EXIT
+};
+
+/**
+ * @brief runMenu
+ * 
+ * @param MM main_meun
+ * @param SRM scheduleRegistrationMenu
+ * @param CVM calendarViewMenu
+ * @param SVBSM scheduleViewByStatusMenu
+ * @param SMM scheduleModificationMenu
+ * @param DSM deleteScheduleMenu
+ * @param SCM scheduleCompleteMenu
+ * @param SPM schedulePostponedMenu
+ * @param TVM tagViewMenu
+ * @param SBTM scheduleByTagMenu
+ */
+typedef enum MenuState MenuState;
+
 struct Schedule {
     char *title;
     char *scheduled_date_time;

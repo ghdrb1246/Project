@@ -5,7 +5,7 @@
 #include "Utils.h"
 #include "UserStructure.h"
 
-// 시간이랑 문자열 파싱 함수, 날짜 비교 함수 등 "도구 함수" 전용
+// 날짜/시간 비교 함수
 
 int updateScheduleStatus(Schedule *s, int id) {
     // char new_status[5] = "DOING";
@@ -33,6 +33,5 @@ static time_t parseTime(const char *datetime_str) {
     memset(&tm, 0, sizeof(struct tm));
     strptime(datetime_str, "%Y-%m-%d %H:%M", &tm);
 
-    // printf("%d-%d-%d %d:%d\n", tm.tm_year, tm.tm_mon, tm.tm_mday, tm.tm_hour, tm.tm_min);
     return mktime(&tm);
 }
