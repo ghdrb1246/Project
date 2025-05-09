@@ -177,7 +177,7 @@ SELECT tag FROM (SELECT ROW_NUMBER() OVER (ORDER BY tag) AS no, tag FROM (SELECT
     CASE
         WHEN priority = 1 THEN '!' || title
         WHEN priority = 2 THEN '!!' || title
-        WHEN priority >= 3 THEN '!!!' || title
+        WHEN priority = 3 THEN '!!!' || title
         ELSE title
     END AS priority_title,
     scheduled_date_time,
@@ -188,19 +188,60 @@ ORDER BY priority DESC; */
 
 -- 우선순위 + 일정 정렬
 
-SELECT
+/* SELECT
     id,
     CASE
         WHEN priority = 1 THEN '! ' || title
         WHEN priority = 2 THEN '!! ' || title
-        WHEN priority >= 3 THEN '!!! ' || title
+        WHEN priority = 3 THEN '!!! ' || title
         ELSE title
     END AS priority_title,
-    title,
     priority,
     scheduled_date_time,
     end_date_time,
     tag,
     status
 FROM schedules
-ORDER BY priority DESC, scheduled_date_time ASC, id ASC;
+ORDER BY priority DESC, scheduled_date_time ASC, id ASC; */
+
+/* SELECT ROW_NUMBER() 
+    OVER (ORDER BY priority DESC, scheduled_date_time ASC, id ASC) AS no, 
+    CASE
+        WHEN priority = 1 THEN '! ' || title
+        WHEN priority = 2 THEN '!! ' || title
+        WHEN priority = 3 THEN '!!! ' || title
+        ELSE title
+    END AS priority_title,
+    scheduled_date_time,
+    end_date_time,
+    tag,
+    status
+FROM schedules
+WHERE status = 'DOING'; */
+
+/* SELECT
+    CASE
+        WHEN priority = 1 THEN '! ' || title
+        WHEN priority = 2 THEN '!! ' || title
+        WHEN priority = 3 THEN '!!! ' || title
+        ELSE title
+    END AS priority_title,
+    scheduled_date_time, 
+    end_date_time, 
+    tag
+FROM schedules WHERE id = 2; */
+
+/* SELECT ROW_NUMBER() 
+    OVER (ORDER BY priority DESC, scheduled_date_time ASC, id ASC) AS no, 
+    CASE
+        WHEN priority = 1 THEN '! ' || title
+        WHEN priority = 2 THEN '!! ' || title
+        WHEN priority = 3 THEN '!!! ' || title
+        ELSE title
+    END AS priority_title,
+    scheduled_date_time,
+    end_date_time,
+    tag,
+    status
+FROM schedules
+WHERE tag = '수업1'; */
