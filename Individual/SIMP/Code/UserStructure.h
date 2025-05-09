@@ -37,7 +37,6 @@ typedef struct Schedule Schedule;
 typedef struct TagCount TagCount;
 
 // 메모리 할당 및 해제 함수
-
 /**
  * @brief Schedule 구조체 메모리 할당
  * 
@@ -48,7 +47,7 @@ Schedule *smalloc();
 /**
  * @brief Schedule 구조체 메모리 해제
  * 
- * @param s  
+ * @param s 동적 해제할 Schedule 구조체
  */
 void sfree(Schedule *s);
 
@@ -62,9 +61,8 @@ TagCount *tcmalloc();
 /**
  * @brief TagCount 구조체 메모리 해제
  * 
- * @param tc 
+ * @param tc 동적 해제할 TagCount 구조체
  */
 void tcfree(TagCount *tc);
-
 
 #endif

@@ -59,7 +59,7 @@ void checkScheduleStatus();
  * 
  * @param status TODO, DOING, DONE 중 선택
  */
-void viewAllByStatus(char *status);
+void viewAllByStatus(const char *status);
 
 /**
  * @brief 특정 인덱스 위치 id 반환
@@ -68,7 +68,7 @@ void viewAllByStatus(char *status);
  * @param user_no 사용자 메뉴 선택 번호
  * @return int 
  */
-int statusIndexToId(char *status, int user_no);
+int statusIndexToId(const char *status, int user_no);
 
 /**
  * @brief 특정 id 일정 조회
@@ -84,7 +84,7 @@ Schedule *idToStatusView(int id);
  * @param status 변경할 상태 (DOING, DONE)
  * @param id 특정 일정 id
  */
-void updateStatus(char *status, int id);
+void updateStatus(const char *status, int id);
 
 /**
  * @brief 일정 태그 전체 조회
@@ -101,7 +101,7 @@ int tagCount(char *tag);
 */
 
 /**
- * @brief 특정 번호에 태그와 해당 태그 계수는 반환(tagIndexToId() + tagCount())
+ * @brief 특정 번호에 태그와 해당 태그 계수 반환(tagIndexToId() + tagCount())
  * 
  * @param user_no 특정 사용자 번호
  * @return TagCount *

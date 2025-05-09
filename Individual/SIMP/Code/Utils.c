@@ -5,6 +5,8 @@
 #include "Utils.h"
 #include "UserStructure.h"
 
+// 시간이랑 문자열 파싱 함수, 날짜 비교 함수 등 "도구 함수" 전용
+
 int updateScheduleStatus(Schedule *s, int id) {
     // char new_status[5] = "DOING";
     int new_id = 0;

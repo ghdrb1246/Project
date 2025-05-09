@@ -80,7 +80,7 @@ void checkScheduleStatus() {
     Schedule *s = smalloc();
     sqlite3_stmt *stmt;
     char *sql = "SELECT * FROM schedules WHERE status = 'TODO';";
-    int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
+    int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0), id_c = 0;
 
     if (rc == SQLITE_OK) {
         while (sqlite3_step(stmt) == SQLITE_ROW) {    
@@ -100,7 +100,7 @@ void checkScheduleStatus() {
             s->priority = priority;
             strcpy(s->status, (((char*)status) != NULL) ? (char*)status : "NULL");
 
-            int id_c = updateScheduleStatus(s, id);
+            id_c = updateScheduleStatus(s, id);
             if (id_c) {
                 printf("%d\n", id_c);
                 updateStatus("DOING", id_c);
@@ -108,7 +108,7 @@ void checkScheduleStatus() {
             // printf("ID: %d, title: %s, sdt: %s, edt: %s, tag: %s, priority %d\n", id, title, sdt, edt, tag, priority);
         }
         
-        // SQL문이 NULL일떄 동적 할당 해제 에러 방지
+        // SQL문이 NULL일때 동적 할당 해제 에러 방지
         if (sqlite3_step(stmt) == SQLITE_ROW) {
             sqlite3_finalize(stmt);
             sqlite3_free(sql);
@@ -118,7 +118,7 @@ void checkScheduleStatus() {
     else fprintf(stderr, "데이터 조회 오류: %s\n", sqlite3_errmsg(db));   
 }
 
-void viewAllByStatus(char *status) {
+void viewAllByStatus(const char *status) {
     sqlite3_stmt *stmt;
     char *sql = sqlite3_mprintf("SELECT ROW_NUMBER() OVER (ORDER BY scheduled_date_time) AS no, title, scheduled_date_time, end_date_time, tag, priority, status FROM schedules WHERE status = '%s';", status);
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
@@ -136,14 +136,18 @@ void viewAllByStatus(char *status) {
             // edt "NULL" x -> NULL in
             printf("%2d | %s | %s | %s | %s | %d | %s\n", no, title, sdt, edt, tag, priority, status);
         }
-        sqlite3_finalize(stmt);
-        sqlite3_free(sql);
+
+        // SQL문이 NULL일때 동적 할당 해제 에러 방지
+        if (sqlite3_step(stmt) == SQLITE_ROW) {
+            sqlite3_finalize(stmt);
+            sqlite3_free(sql);
+        }
     }
 
     else fprintf(stderr, "데이터 조회 오류: %s\n", sqlite3_errmsg(db));
 }
 
-int statusIndexToId(char *status, int user_no) {
+int statusIndexToId(const char *status, int user_no) {
     int real_id = -1;
 
     /* if (DBO("DB/DBSC.db") != 0) {
@@ -161,11 +165,11 @@ int statusIndexToId(char *status, int user_no) {
             real_id = sqlite3_column_int(stmt, 0);
         }
         else printf("%d 해당 번호의 일정이 존재하지 않습니다.\n", real_id);
+
+        sqlite3_finalize(stmt);
+        sqlite3_free(sql);
     }
     else printf("SQL 실행 실패 : %s\n", sqlite3_errmsg(db));
-
-    sqlite3_finalize(stmt);
-    sqlite3_free(sql);
 
     return real_id;
 }
@@ -194,15 +198,18 @@ Schedule *idToStatusView(int id) {
 
             // printf("%s, %s, %s, %s, %d\n", s->title, s->scheduled_date_time, s->end_date_time, s->tag, s->priority);
         }
-        sqlite3_finalize(stmt);
-        sqlite3_free(sql);
+        // SQL문이 NULL일때 동적 할당 해제 에러 방지
+        if (sqlite3_step(stmt) == SQLITE_ROW) {
+            sqlite3_finalize(stmt);
+            sqlite3_free(sql);
+        }
     }
     else fprintf(stderr, "데이터 조회 오류: %s\n", sqlite3_errmsg(db)); 
 
     return s;
 }
 
-void updateStatus(char *status, int id) {
+void updateStatus(const char *status, int id) {
     char *sql = sqlite3_mprintf("UPDATE schedules SET status = '%s' WHERE id = %d;", status, id);
     char *err_msg = "0";
     int rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
@@ -210,9 +217,9 @@ void updateStatus(char *status, int id) {
     if (rc != SQLITE_OK) {
         fprintf(stderr, "데이터 업데이트 오류: %s\n", err_msg);
         sqlite3_free(err_msg);
+        sqlite3_free(sql);
     }
     
-    sqlite3_free(sql);
 }
 
 void viewAllByTag() {
@@ -228,8 +235,11 @@ void viewAllByTag() {
             printf("%2d | %s\n", on, tag);
         }
 
-        sqlite3_finalize(stmt);
-        sqlite3_free(sql);
+        // SQL문이 NULL일때 동적 할당 해제 에러 방지
+        if (sqlite3_step(stmt) == SQLITE_ROW) {
+            sqlite3_finalize(stmt);
+            sqlite3_free(sql);
+        }
     }
 
     else fprintf(stderr, "데이터 조회 오류: %s\n", sqlite3_errmsg(db));
@@ -304,11 +314,11 @@ TagCount *indexToTagCount(int user_no) {
             // printf("-> %s %d\n", tc->tag, tc->count);
         }
         else printf("%d 해당 번호의 태그가 존재하지 않습니다.\n", count);
+
+        sqlite3_finalize(stmt);
+        sqlite3_free(sql);
     }
     else printf("SQL 실행 실패 : %s\n", sqlite3_errmsg(db));
-
-    sqlite3_finalize(stmt);
-    sqlite3_free(sql);
 
     return tc;
 }
@@ -329,8 +339,12 @@ void viewTagByschedule(char *tag) {
 
             printf("%2d | %s | %s | %s | %s | %d\n", id, title, sdt, edt, tag, priority);
         }
-        sqlite3_finalize(stmt);
-        sqlite3_free(sql);
+
+        // SQL문이 NULL일때 동적 할당 해제 에러 방지
+        if (sqlite3_step(stmt) == SQLITE_ROW) {
+            sqlite3_finalize(stmt);
+            sqlite3_free(sql);
+        }
     }
 
     else fprintf(stderr, "데이터 조회 오류: %s\n", sqlite3_errmsg(db));

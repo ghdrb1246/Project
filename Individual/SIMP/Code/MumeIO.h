@@ -30,8 +30,19 @@ void calendarViewMenu();
  */
 void scheduleViewMenuByStatus(int statusNumer);
 
+/**
+ * @brief 일정 상태 메뉴 : TODO
+ */
 static void _TODO();
+
+/**
+ * @brief 일정 상태 메뉴 : DOING
+ */
 static void _DOING();
+
+/**
+ * @brief 일정 상태 메뉴 : DONE
+ */
 static void _DONE();
 
 /**
@@ -74,7 +85,5 @@ void tagViewMenu();
  * @param user_no 특정 사용자 번호
  */
 void scheduleMenuByTag(int user_no);
-
-// void scheduleMenuByTag(char *tag);
 
 #endif

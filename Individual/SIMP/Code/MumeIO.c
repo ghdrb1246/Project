@@ -5,9 +5,9 @@
 #include "DB_Management.h"
 #include "UserStructure.h"
 
-// 메뉴 입출력 모듈
+const char *CSTATUS[3] = { "TODO", "DOING", "DONE" };
 
-char *estatus[3] = { "TODO", "DOING", "DONE" }; // 이동
+// 메뉴 입출력 모듈
 
 void main_meun() {
     int meunNumber = 0, sw = 1;
@@ -145,7 +145,7 @@ void calendarViewMenu() {
 
     switch (meunNumber) {
         case 1: 
-            printf("조회할 상태(1:%s / 2:%s / 3:%s) : ", estatus[0], estatus[1], estatus[2]);
+            printf("조회할 상태(1:%s / 2:%s / 3:%s) : ", CSTATUS[0], CSTATUS[1], CSTATUS[2]);
             scanf("%d", &status);
             scheduleViewMenuByStatus(status);
         break;
@@ -172,9 +172,9 @@ void scheduleViewMenuByStatus(int statusNumer) {
     // checkScheduleStatus();
 
     printf("================= [ 일정 상태별 조회 ] ================\n");
-    printf("[ %s -------------------------------------------- ]\n", estatus[statusNumer - 1]);
+    printf("[ %s -------------------------------------------- ]\n", CSTATUS[statusNumer - 1]);
 
-    viewAllByStatus(estatus[statusNumer - 1]);
+    viewAllByStatus(CSTATUS[statusNumer - 1]);
 
     printf("--------------------------------------------------------\n");
 
@@ -205,7 +205,7 @@ static void _TODO() {
                 printf("수정할 일정 번호 선택 : ");
                 scanf("%d", &user_no);
 
-                id = statusIndexToId(estatus[0], user_no);
+                id = statusIndexToId(CSTATUS[0], user_no);
 
                 if (id != -1) scheduleModificationMenu(id);
                 else printf("db Error");
@@ -216,7 +216,7 @@ static void _TODO() {
                 printf("삭제할 일정 선택 : ");
                 scanf("%d", &user_no);
 
-                id = statusIndexToId(estatus[0], user_no);
+                id = statusIndexToId(CSTATUS[0], user_no);
                 
                 if (id != -1) deleteScheduleMenu(id);
                 else printf("db Error");
@@ -253,7 +253,7 @@ static void _DOING() {
                 printf("완료할 일정 선택 : ");
                 scanf("%d", &user_no);
 
-                id = statusIndexToId(estatus[1], user_no);
+                id = statusIndexToId(CSTATUS[1], user_no);
                 
                 if (id != -1) scheduleCompleteMenu(id);
                 else printf("db Error");
@@ -264,7 +264,7 @@ static void _DOING() {
                 printf("연기할 일정 선택 : ");
                 scanf("%d", &user_no);
 
-                id = statusIndexToId(estatus[1], user_no);
+                id = statusIndexToId(CSTATUS[1], user_no);
                 
                 if (id != -1) schedulePostponedMenu(id);
                 else printf("db Error");
@@ -275,7 +275,7 @@ static void _DOING() {
                 printf("식제할 일정 선택 : ");
                 scanf("%d", &user_no);
 
-                id = statusIndexToId(estatus[1], user_no);
+                id = statusIndexToId(CSTATUS[1], user_no);
                 
                 if (id != -1) deleteScheduleMenu(id);
                 else printf("db Error");
@@ -310,7 +310,7 @@ static void _DONE() {
                 printf("삭제할 일정 선택 : ");
                 scanf("%d", &user_no);
 
-                id = statusIndexToId(estatus[2], user_no);
+                id = statusIndexToId(CSTATUS[2], user_no);
                 
                 if (id != -1) deleteScheduleMenu(id);
                 else printf("db Error");
@@ -593,33 +593,6 @@ void tagViewMenu() {
 
     printf("========================================================\n");
 }
-
-/* void scheduleMenuByTag(char *tag) {
-    char str[2] = "";
-
-    printf("==================== [ 태그별 일정 ] ====================\n");
-    printf("[ %s | %d -------------------------------------------- ]\n", tag, tagCount(tag));
-    
-    viewTagByschedule(tag);
-    
-    while (1) {
-        printf("[ ----------------------------------------------------- ]\n");
-        printf("뒤로가기[Y/N] : ");
-        scanf("%s", str);
-    
-        if (strcmp(str, "Y") == 0 || strcmp(str, "y") == 0) {
-            printf("\n뒤로 갑니다.\n\n");
-            tagViewMenu();
-            break;
-        }
-        else if (strcmp(str, "N") == 0 || strcmp(str, "n") == 0) { 
-            printf("\n취소.\n\n");
-            break;
-        }
-        else printf("Input Error\n");
-    }
-    printf("=========================================================\n");
-} */
 
 void scheduleMenuByTag(int user_no) {
     char str[2] = "";
