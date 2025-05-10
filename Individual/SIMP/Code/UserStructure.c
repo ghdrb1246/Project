@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include "UserStructure.h"
 
+// 연거체, 구조체 정의
+
 Schedule *smalloc() {
     Schedule *s = (Schedule*)malloc(sizeof(Schedule));
     if (!s) return NULL;

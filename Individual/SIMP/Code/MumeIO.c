@@ -10,12 +10,12 @@ const char *CSTATUS[3] = { "TODO", "DOING", "DONE" };
 // 메뉴 입출력 모듈
 
 void runMenu() {
-    if (DBO("DB/DBSC.db")) return;
+    if (DBO("DBSC")) return;
 
     MenuState current = MM;
     while (current != EXIT) {
         switch (current) {
-            case MM:    current = main_meun();                 break;
+            case MM:    current = mainMenu();                  break;
             case SRM:   current = scheduleRegistrationMenu();  break;
             case CVM:   current = calendarViewMenu();          break;
             case SVBSM: current = scheduleViewByStatusMenu();  break;
@@ -32,7 +32,7 @@ void runMenu() {
     DBC();
 }
 
-MenuState main_meun() {
+MenuState mainMenu() {
     int meunNumber = 0;
    
     // 상태 변경 확인
@@ -173,7 +173,8 @@ MenuState scheduleViewByStatusMenu() {
     // 상태 변경 확인
     // checkScheduleStatus();
 
-    printf("================= [ 일정 상태별 조회 ] ----------------------\n");
+    // printf("================= [ 일정 상태별 조회 ] ----------------------\n");
+    printf("---------------------------------------------------------\n");
     while (1) {
         printf("1:%s\n", CSTATUS[0]);
         printf("2:%s\n", CSTATUS[1]);
@@ -190,6 +191,7 @@ MenuState scheduleViewByStatusMenu() {
 
     printf("--------------------------------------------------------\n");
 
+    printf("================= [ 일정 상태별 조회 ] ----------------------\n");
     printf("[ %s -------------------------------------------- ]\n", CSTATUS[statusNumer - 1]);
 
     viewAllByStatus(CSTATUS[statusNumer - 1]);

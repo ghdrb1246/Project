@@ -1,25 +1,70 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <sys/stat.h> // mkdir
+
 #include "sqlite/sqlite3.h"
 #include "DB_Management.h"
 #include "UserStructure.h"
 #include "Utils.h"
 
+#ifdef _WIN32
+    // Windows 환경 
+    #include <direct.h>
+    #define mkdir(dir, mode) _mkdir(dir)
+
+#else 
+    // macOS 환경
+    #include <sys/types.h>
+    #include <unistd.h>
+#endif
+
 // DB 관리 모듈
 
 static sqlite3 *db;
 
-int DBO(char *F) {
-    int rc = sqlite3_open(F, &db);
-    
+int DBO(const char *filename) {
+
+    // 폴더 이름
+    const char *foldername = "DB";
+
+    // 생성하려는 디렉터리에 대한 접근 권한 설정 값
+    int mode = 0755;
+
+    // DB 폴더 확인 및 생성
+    #ifdef _WIN32
+        // Windows 환경일 때
+        struct _stat st = { 0 };
+        if (_stat(foldername, &st) != 0) {
+            if (mkdir(foldername, mode) != 0) {
+                perror("DB 폴더 생성 실패");
+                return 1;
+            }
+        }
+    #else
+        // macOS 환경일 때
+        struct stat st = { 0 };
+        if (stat(foldername, &st) != 0) {
+            if (mkdir(foldername, mode) != 0) {
+                perror("DB 폴더 생성 실패");
+                return 1;
+            }
+        }
+    #endif
+
+    // 파일 경로 생성
+    char path[256];
+    snprintf(path, sizeof(path), "%s/%s.db", foldername, filename);  // "DB/..filename.db"
+
+    // SQLite DB 열기 또는 생성
+    int rc = sqlite3_open(path, &db);
     if (rc != SQLITE_OK) {
-        fprintf(stderr, "데이터베이스 열기 오류: %s\n", sqlite3_errmsg(db));
+        fprintf(stderr, "DB 열기 실패: %s\n", sqlite3_errmsg(db));
         sqlite3_close(db);
         return 1;
     }
 
-    else return 0;
+    return 0; // 성공
 }
 
 void DBC() {
@@ -101,7 +146,7 @@ void checkScheduleStatus() {
             strcpy(s->status, (((char*)status) != NULL) ? (char*)status : "NULL");
 
             id_c = updateScheduleStatus(s, id);
-            if (id_c) {
+            if (id_c > 0) {
                 printf("%d\n", id_c);
                 updateStatus("DOING", id_c);
             }

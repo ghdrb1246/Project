@@ -17,7 +17,7 @@ void runMenu();
  * 
  * @return MenuState : SRM, CVM, EXIT
  */
-MenuState main_meun();
+MenuState mainMenu();
 
 /**
  * @brief 일정 등록 메뉴

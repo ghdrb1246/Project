@@ -1,19 +1,19 @@
 #ifndef _DBM_
 #define _DBM_
 
-// DB 관리 모듈
-
 #include <stdio.h>
 #include <stdlib.h>
 #include "UserStructure.h"
 
+// DB 관리 모듈
+
 /**
- * @brief DB을 열기
+ * @brief DB 파일을 "DB/..filename" 폴더에 생성 또는 오픈
  * 
- * @param F DB 파일
+ * @param filename DB 파일 이름
  * @return int DB파일 열 떄 0:성공, 1:오류
  */
-int DBO(char *F);
+int DBO(const char *filename);
 
 /**
  * @brief DB 닫기

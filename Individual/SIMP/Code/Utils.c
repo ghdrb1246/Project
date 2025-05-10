@@ -8,20 +8,13 @@
 // 날짜/시간 비교 함수
 
 int updateScheduleStatus(Schedule *s, int id) {
-    // char new_status[5] = "DOING";
-    int new_id = 0;
+    int new_id = -1;
     time_t now = time(NULL);
     time_t start = (strcmp(s->scheduled_date_time, "NULL") != 0 || s->scheduled_date_time != NULL) ? parseTime(s->scheduled_date_time) : 0;
     time_t end = (strcmp(s->end_date_time, "NULL") != 0 || s->end_date_time != NULL) ? parseTime(s->end_date_time) : 0;
     
-    // printf("%ld %ld %ld\n", now, start, end);
-    // printf("안 : %s | %s | %s | %s | %d | %s\n", s->title, s->scheduled_date_time, s->end_date_time, s->tag, s->priority, s->status);
-    
     // TODO → DOING
     if (strcmp(s->status, "TODO") == 0 && (now >= start || (end > 0 && now >= end))) {
-        // strcpy(s->status, "DOING");
-        // s->status = "DOING";
-        // s->status = strdup("DOING");
         printf("id : %d, s: %s -> DOING\n", id, s->status);
         new_id = id;
     }

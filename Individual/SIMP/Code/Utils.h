@@ -4,6 +4,8 @@
 #include <time.h>
 #include "UserStructure.h"
 
+// 날짜/시간 비교 함수
+
 /**
  * @brief 현재 시간과 일정 시간을 비교
  * 

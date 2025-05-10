@@ -1,23 +1,26 @@
 #ifndef _USERSTRUCTURE_
 #define _USERSTRUCTURE_
 
+// 연거체, 구조체 정의
+
 enum MenuState{
-   MM, SRM, CVM, SVBSM, SMM, DSM, SCM, SPM, TVM, SBTM, EXIT
+   EXIT, MM, SRM, CVM, SVBSM, SMM, DSM, SCM, SPM, TVM, SBTM
 };
 
 /**
  * @brief runMenu
  * 
- * @param MM main_meun
- * @param SRM scheduleRegistrationMenu
- * @param CVM calendarViewMenu
- * @param SVBSM scheduleViewByStatusMenu
- * @param SMM scheduleModificationMenu
- * @param DSM deleteScheduleMenu
- * @param SCM scheduleCompleteMenu
- * @param SPM schedulePostponedMenu
- * @param TVM tagViewMenu
- * @param SBTM scheduleByTagMenu
+ * @param EXIT  종료
+ * @param MM    mainMenu()
+ * @param SRM   scheduleRegistrationMenu()
+ * @param CVM   calendarViewMenu()
+ * @param SVBSM scheduleViewByStatusMenu()
+ * @param SMM   scheduleModificationMenu()
+ * @param DSM   deleteScheduleMenu()
+ * @param SCM   scheduleCompleteMenu()
+ * @param SPM   schedulePostponedMenu()
+ * @param TVM   tagViewMenu()
+ * @param SBTM  scheduleByTagMenu()
  */
 typedef enum MenuState MenuState;
 
@@ -28,11 +31,6 @@ struct Schedule {
     char *tag;
     int priority;
     char *status;
-};
-
-struct TagCount {
-    char *tag;
-    int count;
 };
 
 /**
@@ -47,6 +45,11 @@ struct TagCount {
  * 
  */
 typedef struct Schedule Schedule;
+
+struct TagCount {
+    char *tag;
+    int count;
+};
 
 /**
  * @brief 태그와 태그의 건수 구조체
