@@ -3,7 +3,20 @@
 
 // 연거체, 구조체 정의
 
-enum MenuState{
+enum MallocSize {
+    STATUS_SIZE = 5,
+    TAG_SIZE = 10,
+    DT_SIZE = 17,
+    TITLE_SIZE = 101
+};
+
+/**
+ * @brief 동적 할당 크기
+ * 
+ */
+typedef enum MellocSize MellocSize;
+
+enum MenuState {
    EXIT, MM, SRM, CVM, SVBSM, SMM, DSM, SCM, SPM, TVM, SBTM
 };
 

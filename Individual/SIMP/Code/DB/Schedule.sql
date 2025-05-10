@@ -72,4 +72,6 @@ SELECT * FROM schedules;
 /*  
 DELETE FROM schedules;
 SELECT * FROM schedules;
- */
+*/
+
+SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'schedules';

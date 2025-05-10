@@ -6,12 +6,12 @@
 Schedule *smalloc() {
     Schedule *s = (Schedule*)malloc(sizeof(Schedule));
     if (!s) return NULL;
-    
-    s->title = (char*)malloc(100);
-    s->scheduled_date_time = (char*)malloc(20);
-    s->end_date_time = (char*)malloc(20);
-    s->tag = (char*)malloc(10);
-    s->status = (char*)malloc(5);
+
+    s->title = (char*)malloc(TITLE_SIZE * sizeof(char));
+    s->scheduled_date_time = (char*)malloc(DT_SIZE  * sizeof(char));
+    s->end_date_time = (char*)malloc(DT_SIZE  * sizeof(char));
+    s->tag = (char*)malloc(TAG_SIZE  * sizeof(char));
+    s->status = (char*)malloc(STATUS_SIZE  * sizeof(char));
 
     return s;
 }
@@ -31,7 +31,7 @@ TagCount *tcmalloc() {
     TagCount *tc = (TagCount*)malloc(sizeof(TagCount));
     if (!tc) return NULL;
 
-    tc->tag = (char*)malloc(10 * sizeof(char));
+    tc->tag = (char*)malloc(TAG_SIZE * sizeof(char));
 
     return tc;
 }

@@ -24,13 +24,10 @@
 static sqlite3 *db;
 
 int DBO(const char *filename) {
-
-    // 폴더 이름
-    const char *foldername = "DB";
-
-    // 생성하려는 디렉터리에 대한 접근 권한 설정 값
-    int mode = 0755;
-
+    const char *foldername = "DB";  // 폴더 이름
+    char path[256];                 // 파일 경로 생성 문자열
+    int mode = 0755;                // 생성하려는 디렉터리에 대한 접근 권한 설정 값
+    
     // DB 폴더 확인 및 생성
     #ifdef _WIN32
         // Windows 환경일 때
@@ -53,16 +50,17 @@ int DBO(const char *filename) {
     #endif
 
     // 파일 경로 생성
-    char path[256];
-    snprintf(path, sizeof(path), "%s/%s.db", foldername, filename);  // "DB/..filename.db"
+    snprintf(path, sizeof(path), "%s/%s.db", foldername, filename);
 
     // SQLite DB 열기 또는 생성
-    int rc = sqlite3_open(path, &db);
-    if (rc != SQLITE_OK) {
+    if (sqlite3_open(path, &db) != SQLITE_OK) {
         fprintf(stderr, "DB 열기 실패: %s\n", sqlite3_errmsg(db));
         sqlite3_close(db);
         return 1;
     }
+
+    // 테이블이 존재하면 1, 존재하지 않으면 0이 반환
+    if (tableExists() != 1) tableDB();
 
     return 0; // 성공
 }
@@ -71,9 +69,28 @@ void DBC() {
     sqlite3_close(db);
 }
 
+int tableExists() {
+    sqlite3_stmt *stmt;
+    char *sql = "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'schedules';";
+    int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
+    int real_id = -1;
+    
+    if (rc == SQLITE_OK) {
+        if (sqlite3_step(stmt) == SQLITE_ROW) {
+            real_id = sqlite3_column_int(stmt, 0);
+        }
+        else fprintf(stderr, "'%s' 해당 파일에 테이블이 존재하지 않습니다\n", sqlite3_errmsg(db));
+
+        sqlite3_finalize(stmt);
+    }
+    else printf("SQL 실행 실패 : %s\n", sqlite3_errmsg(db));
+
+    return real_id;
+}
+
 void tableDB() {
     char *sql = "CREATE TABLE schedules (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, scheduled_date_time TEXT, end_date_time TEXT, tag TEXT, priority INTEGER, status TEXT DEFAULT 'TODO');";
-    char *err_msg = "0";
+    char *err_msg = 0;
 
     int rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
     if (rc != SQLITE_OK) { 
@@ -167,10 +184,11 @@ void viewAllByStatus(const char *status) {
     sqlite3_stmt *stmt;
     // char *sql = sqlite3_mprintf("SELECT ROW_NUMBER() OVER (ORDER BY scheduled_date_time) AS no, title, scheduled_date_time, end_date_time, tag, priority, status FROM schedules WHERE status = '%s';", status);
     char *sql = sqlite3_mprintf("SELECT ROW_NUMBER() OVER (ORDER BY priority DESC, scheduled_date_time ASC, id ASC) AS no, CASE WHEN priority = 1 THEN '! ' || title WHEN priority = 2 THEN '!! ' || title WHEN priority = 3 THEN '!!! ' || title ELSE title END AS priority_title, scheduled_date_time, end_date_time, tag, status FROM schedules WHERE status = '%s';", status);
-    int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
+    int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0), sw = 0;
 
     if (rc == SQLITE_OK) {
         while (sqlite3_step(stmt) == SQLITE_ROW) {
+            sw = 1;
             int no = sqlite3_column_int(stmt, 0);
             const unsigned char *title = sqlite3_column_text(stmt, 1);
             const unsigned char *sdt = sqlite3_column_text(stmt, 2);
@@ -183,12 +201,13 @@ void viewAllByStatus(const char *status) {
         }
 
         // SQL문이 NULL일때 동적 할당 해제 에러 방지
-        if (sqlite3_step(stmt) == SQLITE_ROW) {
+        if (sw) {
             sqlite3_finalize(stmt);
             sqlite3_free(sql);
+            printf("%d\n", sw);
         }
+        else printf("%s 상태의 일정이 없습니다.\n", status);
     }
-
     else fprintf(stderr, "데이터 조회 오류: %s\n", sqlite3_errmsg(db));
 }
 
@@ -255,7 +274,7 @@ Schedule *idToStatusView(int id) {
 
 void updateStatus(const char *status, int id) {
     char *sql = sqlite3_mprintf("UPDATE schedules SET status = '%s' WHERE id = %d;", status, id);
-    char *err_msg = "0";
+    char *err_msg = 0;
     int rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
     
     if (rc != SQLITE_OK) {

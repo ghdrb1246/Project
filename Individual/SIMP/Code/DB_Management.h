@@ -20,6 +20,8 @@ int DBO(const char *filename);
  */
 void DBC();
 
+int tableExists();
+
 /**
  * @brief DB 테이블 생성
  * 
