@@ -60,8 +60,10 @@ void checkScheduleStatus();
  * @brief DB 상테별 전체 조회
  * 
  * @param status TODO, DOING, DONE 중 선택
+ * 
+ * @return int 0: 조회 에러 1: 조회 성공 
  */
-void viewAllByStatus(const char *status);
+int viewAllByStatus(const char *status);
 
 /**
  * @brief 특정 인덱스 위치 id 반환

@@ -1,7 +1,7 @@
 #ifndef _USERSTRUCTURE_
 #define _USERSTRUCTURE_
 
-// 연거체, 구조체 정의
+// 열거체, 구조체 정의
 
 enum MallocSize {
     STATUS_SIZE = 5,
