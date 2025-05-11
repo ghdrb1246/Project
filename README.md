@@ -10,8 +10,8 @@ Project DB - https://github.com/ghdrb1246/Project.git
 
 *ToDoList*
 - <...>
-- ~~'25.05.11::V0.9|SIMP~~
-- '25.05.11::V1.0|SIMP
+- ~~'25.05.11::V1.0|SIMP~~
+- '25.05.12::V1.1|SIMP
 
 @Team
 - <...>
