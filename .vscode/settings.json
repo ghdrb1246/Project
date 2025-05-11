@@ -36,5 +36,5 @@
     "C_Cpp.errorSquiggles": "disabled",
     "cmake.configureOnOpen": true,
     "java.debug.settings.onBuildFailureProceed": true,
-    "terminal.integrated.fontFamily": "MesloLGS NF"
+    "terminal.integrated.fontFamily": "monospace, MesloLGS NF"
 }

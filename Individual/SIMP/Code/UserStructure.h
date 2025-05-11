@@ -4,8 +4,8 @@
 // 열거체, 구조체 정의
 
 enum MallocSize {
-    STATUS_SIZE = 5,
-    TAG_SIZE = 10,
+    STATUS_SIZE = 6,
+    TAG_SIZE = 11,
     DT_SIZE = 17,
     TITLE_SIZE = 101
 };

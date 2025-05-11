@@ -4,18 +4,11 @@
 #include "MumeIO.h"
 #include "DB_Management.h"
 #include "UserStructure.h"
+#include "Utils.h"
 
-#define P_MENU_TITLE(s) printf("================= [ %s ] =================\n", s)
-#define P_MENU_IN       printf("----------------------------------------------------------\n")
-#define P_MENU_END      printf("==========================================================\n\n")
-#define P_MENU_SB_S(s, l)  printf("[ %s %s------------------------------------------ ]\n", s, l)
-#define P_MENU_SB       printf("[ ------------------------------------------------------ ]\n")
-#define P_MENU_TC(t, c) printf("{ %s | %d }\n", t, c)
-
-const char *CSTATUS[3] = { "TODO", "DOING", "DONE" };
-int deleteStatusNumer = 0;
-
-// 메뉴 입출력 모듈
+static const char *CSTATUS[3] = { "TODO", "DOING", "DONE" };
+static int deleteStatusNumer = 0;
+/* --------------------- 메뉴 입출력 모듈 --------------------- */
 
 void runMenu() {
     if (DBO("Schedule")) return;
@@ -56,11 +49,11 @@ MenuState mainMenu() {
         printf("3. 종료하기\n");
         
         P_MENU_IN;
-    
         
         printf("메뉴 선택 : ");
         scanf("%d", &meunNumber);
-        getchar(); // 버퍼 제거
+        // getchar(); // 버퍼 제거
+        clearInputBuffer();
         
         P_MENU_IN;
         P_MENU_END;
@@ -69,7 +62,7 @@ MenuState mainMenu() {
             case 1: return SRM;
             case 2: return CVM;
             case 3: return EXIT;
-            default : printf("Input Error\n"); break;
+            default : printf("%d 은 메뉴 번호가 아닙니다.\n", meunNumber); break;
         }
     }
 }
@@ -79,26 +72,41 @@ MenuState scheduleRegistrationMenu() {
     int sw = 1;
     Schedule *s = smalloc();
 
-    P_MENU_END;
+    // P_MENU_END;
 
     while (sw) {
         P_MENU_TITLE("    일정  등록    ");
         // printf("===================== [ 일정 등록 ] =====================\n");
         
-        printf("제목 : "); 
-        // scanf("%s", s->title);
-        fgets(s->title, TITLE_SIZE, stdin);
-        s->title[strlen(s->title) - 1] = '\0';
-
+        /* while (1) {
+            printf("제목 : "); 
+            // scanf("%s", s->title);
+            fgets(s->title, TITLE_SIZE, stdin);
+            s->title[strcspn(s->title, "\n")] = 0;
+    
+            if (strlen(s->title) >= TITLE_SIZE - 1) {
+                printf("제목이 너무 깁니다. 다시 입력해주세요.\n");
+            } 
+            else if (strlen(s->title) == 0) {
+                printf("제목이 비어있습니다. 다시 입력하세요.\n");
+            } 
+            else break;
+        } */
+        
+        inputTitle(s->title);
+        
+        /* 
         printf("예정 날짜(YYYY-MM-DD) : "); 
         scanf("%s", s->scheduled_date_time);
         
         printf("-> 예정 시간(HH:MM) : ");
         scanf("%s", sitme);
         strcat(s->scheduled_date_time, " ");
-        strcat(s->scheduled_date_time, sitme);
+        strcat(s->scheduled_date_time, sitme); */
         
-        while (1) {
+        inputSDT(s->scheduled_date_time);
+
+       /*  while (1) {
             int in_x = -1;
             printf("종료 날짜(YYYY-MM-DD or x) : ");
             scanf("%s", s->end_date_time);
@@ -120,18 +128,26 @@ MenuState scheduleRegistrationMenu() {
 
             else printf("Input Error\n");
         }
+ */
+        
+        inputEDT(s->end_date_time);
 
-        printf("태그 : "); 
-        scanf("%s", s->tag);
 
-        while (1) {
+        /* printf("태그 : "); 
+        scanf("%s", s->tag); */
+        
+        inputTag(s->tag);
+
+        /* while (1) {
             printf("우선순위(0:없음, 1:낮음, 2:중간, 3:높음) : "); 
             scanf("%d", &s->priority);
 
             if (s->priority >= 0 && s->priority <= 3) break;
             else printf("Input Error : %d\n", s->priority);
-        }
+        } */
         
+        s->priority = inputPriority();
+
         P_MENU_IN;
         // printf("---------------------------------------------------------\n");
 
@@ -153,7 +169,7 @@ MenuState scheduleRegistrationMenu() {
                 sw = 0;
                 break;
             }
-            else printf("Input Error : %s\n", str);
+            else printf("%s은 잘못 된 입력입니다.\n", str);
         }
     }
 
@@ -194,8 +210,8 @@ MenuState calendarViewMenu() {
         switch (meunNumber) {
             case 1: return SVBSM;
             case 2: return TVM;
-            case 3: return MM;
-            default : printf("Input Error\n"); break;
+            case 3: P_MENU_END; return MM;
+            default : printf("%d 은 메뉴 번호가 아닙니다.\n", meunNumber); break;
         }
     }
 }
@@ -231,7 +247,6 @@ MenuState scheduleViewByStatusMenu() {
         else printf("Input Error\n");
     }
     
-    P_MENU_IN;
     P_MENU_END;
 
     P_MENU_TITLE(" 일정 상태별 조회 ");
@@ -326,7 +341,7 @@ MenuState scheduleViewByStatusMenu() {
                     default : printf("Input Error\n"); break;
                 }
             }
-        default : printf("Return Error : %d\n", statusNumer); break;
+        default : printf("%d 은 메뉴 번호가 아닙니다.\n", meunNumber); break;
     }
 
     // P_MENU_END;
@@ -387,53 +402,55 @@ MenuState scheduleModificationMenu() {
 
         switch (meunNumber) {
             case 1:
-                printf("제목 : "); 
+
+                /* printf("제목 : "); 
                 // scanf("%s", new_s->title);
                 fgets(new_s->title, TITLE_SIZE, stdin);
                 new_s->title[strlen(new_s->title) - 1] = '\0';
-    
+                */
+                inputTitle(new_s->title);
                 strcpy(old_s->title, new_s->title);
             break;
     
             case 2:
-                printf("예정 날짜(YYYY-MM-DD) : "); 
+                /* printf("예정 날짜(YYYY-MM-DD) : "); 
                 scanf("%s", new_s->scheduled_date_time);
     
                 printf("-> 예정 시간(HH:MM) : ");
                 scanf("%s", sitme);
                 strcat(new_s->scheduled_date_time, " ");
-                strcat(new_s->scheduled_date_time, sitme);
-    
+                strcat(new_s->scheduled_date_time, sitme); */
+                inputSDT(new_s->scheduled_date_time);
                 strcpy(old_s->scheduled_date_time, new_s->scheduled_date_time);
             break;
     
             case 3:
-                printf("종료 날짜(YYYY-MM-DD or x) : ");
+                /* printf("종료 날짜(YYYY-MM-DD or x) : ");
                 scanf("%s", new_s->end_date_time);
                 printf("-> 종료 시간(HH:MM) : ");
                 scanf("%s", eitme);
                 strcat(new_s->end_date_time, " ");
-                strcat(new_s->end_date_time, eitme);
-    
+                strcat(new_s->end_date_time, eitme); */
+                inputEDT(new_s->end_date_time);
                 strcpy(old_s->end_date_time, new_s->end_date_time);
             break;
     
             case 4:
-                printf("태그 : "); 
-                scanf("%s", new_s->tag);
-    
+                /* printf("태그 : "); 
+                scanf("%s", new_s->tag); */
+                inputTag(new_s->tag);
                 strcpy(old_s->tag, new_s->tag);
             break;
     
             case 5:
-                while (1) {
+                /* while (1) {
                     printf("우선순위(0:없음, 1:낮음, 2:중간, 3:높음) : "); 
                     scanf("%d", &new_s->priority);
             
                     if (new_s->priority >= 0 && new_s->priority <= 3) break;
                     else printf("Input Error : %d\n", new_s->priority);
-                }
-    
+                } */
+                new_s->priority = inputPriority();
                 old_s->priority = new_s->priority;
             break;
     
@@ -462,13 +479,11 @@ MenuState scheduleModificationMenu() {
                         break;
                     }
 
-                    else printf("%s : Input Error\n", str);
+                    else printf("%s은 잘못 된 입력입니다.\n", str);
                 }
             break;
-    
-            default :
-                printf("%d : Input Error\n", meunNumber);
-            break;
+            
+            default : printf("%d 은 메뉴 번호가 아닙니다.\n", meunNumber); break;
         }
     }
 
@@ -525,7 +540,7 @@ MenuState deleteScheduleMenu() {
             printf("취소.\n");
             break;
         }
-        else printf("Input Error\n");
+        else printf("%s은 잘못 된 입력입니다.\n", str);
     }
 
     P_MENU_IN;
@@ -583,7 +598,7 @@ MenuState scheduleCompleteMenu() {
             printf("취소.\n");
             break;
         }
-        else printf("Input Error\n");
+        else printf("%s은 잘못 된 입력입니다.\n", str);
     }
     
     P_MENU_IN;
@@ -672,13 +687,11 @@ MenuState schedulePostponedMenu() {
                         sw = 0;
                         break;
                     }
-                    else printf("Input Error\n");
+                    else printf("%s은 잘못 된 입력입니다.\n", str);
                 }
             break;
             
-            default :
-                printf("Input Error\n");
-            break;
+            default : printf("%d 은 메뉴 번호가 아닙니다.\n", meunNumber); break;
         }
     }
     
@@ -716,7 +729,7 @@ MenuState tagViewMenu() {
         switch (meunNumber) {
             case 1: return SBTM;
             case 2: return CVM;
-            default : printf("Input Error\n"); break;
+            default : printf("%d 은 메뉴 번호가 아닙니다.\n", meunNumber); break;
         }
     }
 }
@@ -754,14 +767,13 @@ MenuState scheduleByTagMenu() {
 
         if (strcmp(str, "Y") == 0 || strcmp(str, "y") == 0) {
             printf("\n뒤로 갑니다.\n\n");
-            tagViewMenu();
             break;
         }
         else if (strcmp(str, "N") == 0 || strcmp(str, "n") == 0) { 
             printf("\n취소.\n\n");
             break;
         }
-        else printf("Input Error\n");
+        else printf("%s은 잘못 된 입력입니다.\n", str);
     }
 
     P_MENU_IN;
@@ -771,3 +783,163 @@ MenuState scheduleByTagMenu() {
     tcfree(tc);
     return TVM;
 }
+
+/* --------------------------------------------------------- */
+
+/* --------------------- Input 관련 함수 --------------------- */
+
+int isValidDateTime(char *datetime) {
+    int y, m, d, h, min;
+    int daysInMonth[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+    
+    // "YYYY-MM-DD HH:MM" → 총 16자 (문자열 + 널 포함 17바이트)
+    if (strlen(datetime) != 16 || datetime[4] != '-' || datetime[7] != '-' || datetime[10] != ' ' || datetime[13] != ':') {
+        // printf("1. 형식 에러\n");
+        // getchar(); // 버퍼 제거
+        return 0;
+    }
+
+    // 날짜와 시간 추출
+    else if (sscanf(datetime, "%4d-%2d-%2d %2d:%2d", &y, &m, &d, &h, &min) != 5) {
+        // printf("2. 형식 에러\n");
+        // getchar(); // 버퍼 제거
+        return 0;
+    }
+
+    // 날짜 범위 검사
+    if ((y < 1900 || y > 2100) || (m < 1 || m > 12) || (d < 1 || d > 31)) return 0;
+
+    // 월별 최대 일자 확인 (윤년 고려)
+    if ((y % 4 == 0 && y % 100 != 0) || y % 400 == 0) {
+        daysInMonth[1] = 29;  // 윤년
+    }
+    if (d > daysInMonth[m - 1]) return 0;
+
+    // 시간 범위 검사
+    if ((h < 0 || h > 23) || (min < 0 || min > 59)) return 0;
+
+
+return 1; // 유효한 날짜+시간
+}
+
+void inputTitle(char *title) {
+    while (1) {
+        printf("제목 : "); 
+        // scanf("%s", s->title);
+        fgets(title, TITLE_SIZE, stdin);
+        // title[strlen(title) - 1] = '\0';
+        title[strcspn(title, "\n")] = 0;
+
+        if (strlen(title) >= TITLE_SIZE - 1) {
+            printf("제목이 너무 깁니다.\n최대 %d 까지 가능 합니다.\n다시 입력해주세요.\n", TITLE_SIZE - 1);
+        } 
+        else if (strlen(title) == 0) {
+            printf("제목이 비어있습니다. 다시 입력하세요.\n");
+        } 
+        else break;
+    }
+}
+
+void inputSDT(char *sdt) {
+    char sitme[6] = "";
+
+    while (1) {
+        printf("예정 날짜(YYYY-MM-DD) : "); 
+        scanf("%s", sdt);
+        
+        printf("-> 예정 시간(HH:MM) : ");
+        scanf("%s", sitme);
+        strcat(sdt, " ");
+        strcat(sdt, sitme);
+        
+        /* printf("예정 날짜(YYYY-MM-DD HH:MM) : ");
+        fgets(sdt, DT_SIZE, stdin);
+        // sdt[strlen(sdt) - 1] = '\0';
+        sdt[strcspn(sdt, "\n")] = 0; */
+
+        if (isValidDateTime(sdt)) break;
+        else printf("유효하지 않은 날짜 형식입니다.\n");
+    }
+
+    // getchar(); // 버퍼 제거
+}
+
+void inputEDT(char *edt) {
+    char eitme[6] = "";
+
+     while (1) {
+        printf("종료 날짜(YYYY-MM-DD) or x: "); 
+        scanf("%s", edt);
+        
+        /* printf("종료 날짜(YYYY-MM-DD HH:MM) or x : ");
+        fgets(edt, DT_SIZE, stdin);
+        // edt[strlen(edt) - 1] = '\0';
+        edt[strcspn(edt, "\n")] = 0; */
+        
+        if (strcmp(edt, "x") == 0 || strcmp(edt, "X") == 0) {
+            strcpy(edt, "NULL");
+            break;
+        }
+        else {
+            printf("-> 종료 시간(HH:MM) : ");
+            scanf("%s", eitme);
+            strcat(edt, " ");
+            strcat(edt, eitme);
+            
+            if (isValidDateTime(edt)) break;
+            else printf("유효하지 않은 날짜 형식입니다.\n");
+        }
+    }
+/* 
+    int in_x = -1;
+    printf("종료 날짜(YYYY-MM-DD or x) : ");
+    scanf("%s", s->end_date_time);
+    
+    in_x = (strcmp(s->end_date_time, "x") == 0 || strcmp(s->end_date_time, "X") == 0) ? 1 : 0;
+    
+    if (in_x == 1) {
+        strcpy(s->end_date_time, "NULL");
+        break;
+    }
+
+    else if (in_x == 0) {
+        printf("-> 종료 시간(HH:MM) : ");
+        scanf("%s", eitme);
+        strcat(s->end_date_time, " ");
+        strcat(s->end_date_time, eitme);
+        break;
+    }
+
+    else printf("Input Error\n"); */
+}
+
+void inputTag(char *tag) {
+    while (1) {
+        printf("태그 : "); 
+        scanf("%s", tag);
+
+        if (strlen(tag) >= TAG_SIZE - 1) {
+            printf("태그가 너무 깁니다.\n최대 %d 까지 가능 합니다.\n다시 입력해주세요.\n", TAG_SIZE - 1);
+        } 
+        else if (strlen(tag) == 0) {
+            printf("태그가 비어있습니다.\n다시 입력하세요.\n");
+        } 
+        else break;
+    }
+}
+
+int inputPriority() {
+    int priority = 0;
+
+    while (1) {
+        printf("우선순위(0:없음, 1:낮음, 2:중간, 3:높음) : "); 
+        scanf("%d", &priority);
+
+        if (priority >= 0 && priority <= 3) break;
+        else printf("%d 은 입력 범위가 아닙니다.\n", priority);
+    }
+
+    return priority;
+}
+
+/* --------------------------------------------------------- */

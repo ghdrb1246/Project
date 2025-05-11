@@ -23,4 +23,10 @@ int updateScheduleStatus(Schedule *s, int id);
  */
 static time_t parseTime(const char *datetime_str);
 
+/**
+ * @brief 버퍼 제거(앞 : scanf("%d"), 뒤 : fgets() -> 필수)
+ * 
+ */
+void clearInputBuffer();
+
 #endif

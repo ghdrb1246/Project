@@ -28,3 +28,8 @@ static time_t parseTime(const char *datetime_str) {
 
     return mktime(&tm);
 }
+
+void clearInputBuffer() {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+}
