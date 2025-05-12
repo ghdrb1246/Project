@@ -20,6 +20,11 @@ int DBO(const char *filename);
  */
 void DBC();
 
+/**
+ * @brief 현재 DB 파일에 테이블 생성 여부 검사
+ * 
+ * @return int 테이블이 존재하지 않으면 0, 존재하면 1를 반환
+ */
 int tableExists();
 
 /**
@@ -96,16 +101,8 @@ void updateStatus(const char *status, int id);
  */
 void viewAllByTag();
 
-/* 
-// 특정 인덱스 tag 반환
-char *tagIndexToId(int user_no);
-
-// tag 건수 반환
-int tagCount(char *tag);
-*/
-
 /**
- * @brief 특정 번호에 태그와 해당 태그 계수 반환(tagIndexToId() + tagCount())
+ * @brief 특정 번호에 태그와 해당 태그 계수 반환
  * 
  * @param user_no 특정 사용자 번호
  * @return TagCount *

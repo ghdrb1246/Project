@@ -188,7 +188,7 @@ MenuState scheduleRegistrationMenu() {
 MenuState calendarViewMenu() {
     int meunNumber = 0;
     
-    P_MENU_END;
+    // P_MENU_END;
 
     while (1) {
         P_MENU_TITLE("    일정  조회    ");
@@ -774,7 +774,6 @@ MenuState scheduleByTagMenu() {
         }
         else if (strcmp(str, "N") == 0 || strcmp(str, "n") == 0) { 
             printf("\n취소.\n\n");
-            break;
         }
         else printf("%s은 잘못 된 입력입니다.\n", str);
     }
