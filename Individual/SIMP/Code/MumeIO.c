@@ -8,8 +8,9 @@
 
 static const char *CSTATUS[3] = { "TODO", "DOING", "DONE" };
 static int deleteStatusNumer = 0;
-/* --------------------- 메뉴 입출력 모듈 --------------------- */
+/* ================== 메뉴 입출력 모듈 ================== */
 
+/* ----------------- Output 관련 함수 ----------------- */
 void runMenu() {
     if (DBO("Schedule")) return;
 
@@ -37,7 +38,7 @@ MenuState mainMenu() {
     int meunNumber = 0;
    
     // 상태 변경 확인
-    // checkScheduleStatus();
+    checkScheduleStatus();
     
     while(1) {
         P_MENU_TITLE("일정 관리 프로그램");
@@ -220,7 +221,7 @@ MenuState scheduleViewByStatusMenu() {
     int statusNumer = 0, meunNumber = 0;
     
     // 상태 변경 확인
-    // checkScheduleStatus();
+    checkScheduleStatus();
 
     P_MENU_END;
 
@@ -557,7 +558,7 @@ MenuState scheduleCompleteMenu() {
     int meunNumber = 0, id = 0;
 
     // 상태 변경 확인
-    // checkScheduleStatus();
+    checkScheduleStatus();
     
     P_MENU_SB_S("일정 완료", "---");
     // printf("[ 일정 완료 --------------------------------------------- ]\n");
@@ -651,20 +652,22 @@ MenuState schedulePostponedMenu() {
 
         switch (meunNumber) {
             case 1:
-                printf("예정 날짜/시간(YYYY-MM-DD HH:MM) : \n");  
+                /* printf("예정 날짜/시간(YYYY-MM-DD HH:MM) : \n");  
                 printf("%s -> ", old_s->scheduled_date_time); 
                 scanf("%s %s", new_s->scheduled_date_time, sitme);
                 strcat(new_s->scheduled_date_time, " ");
-                strcat(new_s->scheduled_date_time, sitme);
+                strcat(new_s->scheduled_date_time, sitme); */
+                inputSDT(old_s->scheduled_date_time);
                 strcpy(old_s->scheduled_date_time, new_s->scheduled_date_time);
             break;
             
             case 2:
-                printf("종료 날짜/시간(YYYY-MM-DD HH:MM) : \n"); 
+                /* printf("종료 날짜/시간(YYYY-MM-DD HH:MM) : \n"); 
                 printf("%s -> ", old_s->end_date_time); 
                 scanf("%s %s", new_s->end_date_time, eitme);
                 strcat(new_s->end_date_time, " ");
-                strcat(new_s->end_date_time, eitme);
+                strcat(new_s->end_date_time, eitme); */
+                inputEDT(old_s->end_date_time);
                 strcpy(old_s->end_date_time, new_s->end_date_time);
             break;
 
@@ -783,7 +786,6 @@ MenuState scheduleByTagMenu() {
     tcfree(tc);
     return TVM;
 }
-
 /* --------------------------------------------------------- */
 
 /* --------------------- Input 관련 함수 --------------------- */
@@ -941,5 +943,4 @@ int inputPriority() {
 
     return priority;
 }
-
 /* --------------------------------------------------------- */
