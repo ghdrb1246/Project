@@ -1,4 +1,4 @@
-# SIMP
+# Project
 
 Project DB - https://github.com/ghdrb1246/Project.git
 -----
@@ -8,7 +8,7 @@ Project DB - https://github.com/ghdrb1246/Project.git
 
 @Individual
 
-*ToDoList*
+*SIMP*
 - <...>
 - ~~'25.05.12::V1.1|SIMP~~
 - '25.05.12::V1.2|SIMP
