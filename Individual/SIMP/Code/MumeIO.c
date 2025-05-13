@@ -53,8 +53,7 @@ MenuState mainMenu() {
         
         printf("메뉴 선택 : ");
         scanf("%d", &meunNumber);
-        // getchar(); // 버퍼 제거
-        clearInputBuffer();
+        clearInputBuffer(); // 버퍼 제거
         
         P_MENU_IN;
         P_MENU_END;
@@ -396,7 +395,7 @@ MenuState scheduleModificationMenu() {
         
         printf("메뉴 선택 : ");
         scanf("%d", &meunNumber);
-        getchar(); // 버퍼 제거
+        clearInputBuffer(); // 버퍼 제거
 
         P_MENU_IN;
         // printf("---------------------------------------------------------\n");
@@ -648,6 +647,7 @@ MenuState schedulePostponedMenu() {
 
         P_MENU_IN;
         scanf("%d", &meunNumber);
+        clearInputBuffer(); // 퍼버 제거
         P_MENU_SB;
 
         switch (meunNumber) {
@@ -795,15 +795,11 @@ int isValidDateTime(char *datetime) {
     
     // "YYYY-MM-DD HH:MM" → 총 16자 (문자열 + 널 포함 17바이트)
     if (strlen(datetime) != 16 || datetime[4] != '-' || datetime[7] != '-' || datetime[10] != ' ' || datetime[13] != ':') {
-        // printf("1. 형식 에러\n");
-        // getchar(); // 버퍼 제거
         return 0;
     }
 
     // 날짜와 시간 추출
     else if (sscanf(datetime, "%4d-%2d-%2d %2d:%2d", &y, &m, &d, &h, &min) != 5) {
-        // printf("2. 형식 에러\n");
-        // getchar(); // 버퍼 제거
         return 0;
     }
 
@@ -861,8 +857,6 @@ void inputSDT(char *sdt) {
         if (isValidDateTime(sdt)) break;
         else printf("유효하지 않은 날짜 형식입니다.\n");
     }
-
-    // getchar(); // 버퍼 제거
 }
 
 void inputEDT(char *edt) {
@@ -942,5 +936,7 @@ int inputPriority() {
 
     return priority;
 }
+
+// 확인할 "%s" 번호 선택 함수
 
 /* --------------------------------------------------------- */
