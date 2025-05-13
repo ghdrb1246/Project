@@ -88,9 +88,9 @@ int statusIndexToId(const char *status, int user_no);
 Schedule *idToStatusView(int id);
 
 /**
- * @brief 특정 상태 변경 (TODO -> DOING -> DONE)
+ * @brief 특정 상태 변경 (TODO <-> DOING -> DONE)
  * 
- * @param status 변경할 상태 (DOING, DONE)
+ * @param status 변경할 상태 (TODO, DOING, DONE)
  * @param id 특정 일정 id
  */
 void updateStatus(const char *status, int id);

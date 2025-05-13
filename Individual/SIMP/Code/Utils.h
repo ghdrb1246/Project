@@ -29,4 +29,20 @@ static time_t parseTime(const char *datetime_str);
  */
 void clearInputBuffer();
 
+/**
+ * @brief 날짜/시간 유효성 검사
+ * 
+ * @param datetime 날짜 + 시간된 문자열
+ * @return int 0: 유효성 X, 1: 유효성 O
+ */
+int validDateTime(char *datetime);
+
+/**
+ * @brief 예정, 종료 날짜/시간 비교 | (예정 <= 종료) 형식이여야함
+ * 
+ * @param s 확인할 일정 구조체
+ * @return int 예정이 작다면 1, 종료가 작으면 2, 에러는 -1를 반횐
+ */
+int compareDateTimeSize(Schedule *s);
+
 #endif

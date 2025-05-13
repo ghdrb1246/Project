@@ -245,3 +245,21 @@ FROM schedules WHERE id = 2; */
     status
 FROM schedules
 WHERE tag = '수업1'; */
+
+SELECT ROW_NUMBER() 
+    OVER (ORDER BY priority DESC, scheduled_date_time ASC, id ASC) AS no, 
+    id,
+    CASE
+        WHEN priority = 1 THEN '! ' || title
+        WHEN priority = 2 THEN '!! ' || title
+        WHEN priority = 3 THEN '!!! ' || title
+        ELSE title
+    END AS priority_title,
+    scheduled_date_time,
+    end_date_time,
+    tag,
+    status
+FROM schedules
+WHERE status = 'TODO';
+
+SELECT id FROM (SELECT ROW_NUMBER() OVER (ORDER BY priority DESC, scheduled_date_time ASC, id ASC) AS no, id FROM schedules WHERE status = 'TODO') WHERE no = 4;

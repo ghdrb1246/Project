@@ -146,7 +146,7 @@ void checkScheduleStatus() {
 
     if (rc == SQLITE_OK) {
         while (sqlite3_step(stmt) == SQLITE_ROW) {
-            printf("100\n");  
+            // printf("100\n");  
             int id = sqlite3_column_int(stmt, 0);
             const unsigned char *title = sqlite3_column_text(stmt, 1);
             const unsigned char *sdt = sqlite3_column_text(stmt, 2);
@@ -165,16 +165,16 @@ void checkScheduleStatus() {
 
             id_c = updateScheduleStatus(s, id);
             if (id_c > 0) {
-                printf("%d\n", id_c);
+                // printf("%d\n", id_c);
                 updateStatus("DOING", id_c);
             }
-            printf("%d\n", id_c);
+            // printf("%d\n", id_c);
             // printf("ID: %d, title: %s, sdt: %s, edt: %s, tag: %s, priority %d\n", id, title, sdt, edt, tag, priority);
         }
         
         // SQL문이 NULL일때 동적 할당 해제 에러 방지
         if (sqlite3_step(stmt) == SQLITE_ROW) {
-            printf("101\n");
+            // printf("101\n");
             sqlite3_finalize(stmt);
             sqlite3_free(sql);
         }
@@ -215,8 +215,8 @@ int viewAllByStatus(const char *status) {
     return run;
 }
 
-int statusIndexToId(const char *status, int user_no) {
-    char *sql = sqlite3_mprintf("SELECT id FROM (SELECT ROW_NUMBER() OVER (ORDER BY scheduled_date_time) AS no, id FROM schedules WHERE status = '%s') WHERE no = %d;", status, user_no);
+int statusIndexToId(const char *status, int user_no) {  
+    char *sql = sqlite3_mprintf("SELECT id FROM (SELECT ROW_NUMBER() OVER (ORDER BY priority DESC, scheduled_date_time ASC, id ASC) AS no, id FROM schedules WHERE status = '%s') WHERE no = %d;", status, user_no);
     sqlite3_stmt *stmt;
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
     int real_id = -1;

@@ -95,14 +95,6 @@ MenuState scheduleByTagMenu();
 /* --------------------- Input 관련 함수 --------------------- */
 
 /**
- * @brief 날짜/시간 유효성 검사
- * 
- * @param datetime 날짜 + 시간된 문자열
- * @return int 0: 유효성 X, 1: 유효성 O
- */
-int isValidDateTime(char *datetime);
-
-/**
  * @brief 제목 입력
  * 
  * @param title 제목 문자열
