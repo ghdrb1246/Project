@@ -246,7 +246,7 @@ FROM schedules WHERE id = 2; */
 FROM schedules
 WHERE tag = '수업1'; */
 
-SELECT ROW_NUMBER() 
+/* SELECT ROW_NUMBER() 
     OVER (ORDER BY priority DESC, scheduled_date_time ASC, id ASC) AS no, 
     id,
     CASE
@@ -260,6 +260,8 @@ SELECT ROW_NUMBER()
     tag,
     status
 FROM schedules
-WHERE status = 'TODO';
+WHERE status = 'TODO'; */
 
-SELECT id FROM (SELECT ROW_NUMBER() OVER (ORDER BY priority DESC, scheduled_date_time ASC, id ASC) AS no, id FROM schedules WHERE status = 'TODO') WHERE no = 4;
+-- SELECT id FROM (SELECT ROW_NUMBER() OVER (ORDER BY priority DESC, scheduled_date_time ASC, id ASC) AS no, id FROM schedules WHERE status = 'TODO') WHERE no = 4;
+
+SELECT title, scheduled_date_time, end_date_time, tag, priority FROM schedules WHERE id = 15;

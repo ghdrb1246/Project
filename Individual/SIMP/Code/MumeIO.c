@@ -350,7 +350,7 @@ MenuState scheduleModificationMenu() {
 
         switch (meunNumber) {
             case 1:
-                printf("원본: %s \n", old_s->title);
+                // printf("원본: %s \n", old_s->title);
                 inputTitle(new_s->title);
                 strcpy(old_s->title, new_s->title);
             break;
@@ -368,13 +368,13 @@ MenuState scheduleModificationMenu() {
             break;
     
             case 4:
-                printf("원본: %s \n", old_s->tag);
+                // printf("원본: %s \n", old_s->tag);
                 inputTag(new_s->tag);
                 strcpy(old_s->tag, new_s->tag);
             break;
     
             case 5:
-                printf("원본: %d \n", old_s->priority);
+                // printf("원본: %d \n", old_s->priority);
                 new_s->priority = inputPriority();
                 old_s->priority = new_s->priority;
             break;
@@ -583,8 +583,11 @@ MenuState schedulePostponedMenu() {
         printf("3. 저장\n");
 
         P_MENU_IN;
+
+        printf("메뉴 선택 : ");
         scanf("%d", &meunNumber);
         clearInputBuffer(); // 퍼버 제거
+        
         P_MENU_SB;
 
         switch (meunNumber) {

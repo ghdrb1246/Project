@@ -34,7 +34,7 @@ int tableExists();
 void tableDB();
 
 /**
- * @brief DB에 구조체 저장
+ * @brief DB에 일정 저장
  * 
  * @param s 일정 정보 구조체
  */

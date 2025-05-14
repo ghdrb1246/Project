@@ -240,7 +240,7 @@ int statusIndexToId(const char *status, int user_no) {
 Schedule *idToStatusView(int id) {
     sqlite3_stmt *stmt;
     Schedule *s = smalloc();
-    char *sql = sqlite3_mprintf("SELECT CASE WHEN priority = 1 THEN '! ' || title WHEN priority = 2 THEN '!! ' || title WHEN priority = 3 THEN '!!! ' || title ELSE title END AS priority_title, scheduled_date_time, end_date_time, tag FROM schedules WHERE id = %d;", id);
+    char *sql = sqlite3_mprintf("SELECT title, scheduled_date_time, end_date_time, tag, priority FROM schedules WHERE id = %d;", id);
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
 
     if (rc == SQLITE_OK) {
@@ -249,13 +249,14 @@ Schedule *idToStatusView(int id) {
             const unsigned char *sdt = sqlite3_column_text(stmt, 1);
             const unsigned char *edt = sqlite3_column_text(stmt, 2);
             const unsigned char *tag = sqlite3_column_text(stmt, 3);
+            int priority = sqlite3_column_int(stmt, 4);
         
             // NULL 체크 필요
             strcpy(s->title, (((char*)title) != NULL) ? (char*)title : "NULL");
             strcpy(s->scheduled_date_time, (((char*)sdt) != NULL) ? (char*)sdt : "NULL");
             strcpy(s->end_date_time, (((char*)edt) != NULL) ? (char*)edt : "NULL");
             strcpy(s->tag, (((char*)tag) != NULL) ? (char*)tag : "NULL");
-            
+            s->priority = priority;
         }
         
         // SQL문이 NULL일때 동적 할당 해제 에러 방지
@@ -348,8 +349,9 @@ void viewTagByschedule(char *tag) {
             const unsigned char *sdt = sqlite3_column_text(stmt, 2);
             const unsigned char *edt = sqlite3_column_text(stmt, 3);
             const unsigned char *tag = sqlite3_column_text(stmt, 4);
+            const unsigned char *status = sqlite3_column_text(stmt, 5);
 
-            printf("%2d | %s | %s | %s | %s\n", id, title, sdt, edt, tag);
+            printf("%2d | %s | %s | %s | %s | %s\n", id, title, sdt, edt, tag, status);
         }
 
         // SQL문이 NULL일때 동적 할당 해제 에러 방지
