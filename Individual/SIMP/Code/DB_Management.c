@@ -101,8 +101,8 @@ void tableDB() {
 }
 
 void saveDB(Schedule *s) {
-    // ((s.end_date_time != "x") ? s.end_date_time : "NULL")?
     char *sql = sqlite3_mprintf("INSERT INTO schedules (title, scheduled_date_time, end_date_time, tag, priority) VALUES ('%s', '%s', '%s', '%s', %d);", s->title, s->scheduled_date_time, s->end_date_time, s->tag, s->priority);
+
     char *err_msg = 0;
     
     int rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
@@ -111,7 +111,7 @@ void saveDB(Schedule *s) {
         fprintf(stderr, "데이터 저장 오류: %s\n", err_msg);
         sqlite3_free(err_msg);
     }
-    else sqlite3_free(sql);
+    sqlite3_free(sql);
 }
 
 void updateDB(Schedule *s, int id) {
@@ -123,7 +123,7 @@ void updateDB(Schedule *s, int id) {
         fprintf(stderr, "데이터 업데이트 오류: %s\n", err_msg);
         sqlite3_free(err_msg);
     } 
-    else sqlite3_free(sql);
+    sqlite3_free(sql);
 }
 
 void deleteDB(int id) {
@@ -135,7 +135,7 @@ void deleteDB(int id) {
         fprintf(stderr, "데이터 삽입 오류: %s\n", err_msg);
         sqlite3_free(err_msg);
     }
-    else sqlite3_free(sql);
+    sqlite3_free(sql);
 }
 
 void checkScheduleStatus() {
@@ -279,7 +279,7 @@ void updateStatus(const char *status, int id) {
         fprintf(stderr, "데이터 업데이트 오류: %s\n", err_msg);
         sqlite3_free(err_msg);
     }
-    else sqlite3_free(sql);
+    sqlite3_free(sql);
 }
 
 void viewAllByTag() {

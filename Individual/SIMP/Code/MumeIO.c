@@ -624,7 +624,7 @@ MenuState schedulePostponedMenu() {
                     }
 
                     if (strcmp(str, "Y") == 0 || strcmp(str, "y") == 0) {
-                        updateDB(old_s, id);
+                        updateDB(old_s, id);   
                         // 일정을 연기 시 상태 "DOING -> TODO"으로 변경
                         if (strcmp(old_s->status, "DOING") == 0) updateStatus("TODO", id);
                         

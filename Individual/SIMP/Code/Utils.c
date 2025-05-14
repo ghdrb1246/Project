@@ -10,14 +10,12 @@
 int updateScheduleStatus(Schedule *s, int id) {
     int new_id = -1;
     time_t now = time(NULL);
-    time_t start = (strcmp(s->scheduled_date_time, "NULL") != 0 || s->scheduled_date_time != NULL) ? parseTime(s->scheduled_date_time) : 0;
-    time_t end = (strcmp(s->end_date_time, "NULL") != 0 || s->end_date_time != NULL) ? parseTime(s->end_date_time) : 0;
+    time_t start = (strcmp(s->scheduled_date_time, "NULL") != 0 && s->scheduled_date_time != NULL) ? parseTime(s->scheduled_date_time) : 0;
+    time_t end = (strcmp(s->end_date_time, "NULL") != 0 && s->end_date_time != NULL) ? arseTime(s->end_date_time) : 0;
     time_t t = (start >= end) ? start : end;
 
     // TODO → DOING
-    // if (strcmp(s->status, "TODO") == 0 && (now >= start || (end > 0 && now >= end))) {
     if (strcmp(s->status, "TODO") == 0 && (now >= t)) {
-        // printf("id : %d, now(%lf), start(%lf), end(%lf) | s: %s -> DOING\n", id, (double)now, (double)start, (double)end, s->status);
         new_id = id;
     }
     
