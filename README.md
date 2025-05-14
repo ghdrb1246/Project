@@ -10,8 +10,8 @@ Project DB - https://github.com/ghdrb1246/Project.git
 
 *SIMP*
 - <...>
-- ~~'25.05.14::V1.3|SIMP~~
-- '25.05.14::V1.3.5|SIMP
+- ~~'25.05.14::V1.3.5|SIMP~~
+- '25.05.14::V1.4|SIMP
 
 @Team
 - <...>
