@@ -57,7 +57,7 @@
                 "./UserStructure.c",
                 "./Utils.c",
                 "-o",
-                "${fileDirname}/SIMP.exe",
+                "${fileDirname}/SLMP.exe",
                 "-lsqlite3"
             ],
             "options": {
@@ -83,7 +83,7 @@
         {
             "type": "shell",
             "label": "Run SQLite3 code source code",
-            "command": "./SIMP.exe",
+            "command": "./SLMP.exe",
             "options": {
                 "cwd": "${fileDirname}"
             },
