@@ -185,8 +185,8 @@ void checkScheduleStatus() {
 
 int viewAllByStatus(const char *status) {
     sqlite3_stmt *stmt;
-    // char *sql = sqlite3_mprintf("SELECT ROW_NUMBER() OVER (ORDER BY scheduled_date_time) AS no, title, scheduled_date_time, end_date_time, tag, priority, status FROM schedules WHERE status = '%s';", status);
-    char *sql = sqlite3_mprintf("SELECT ROW_NUMBER() OVER (ORDER BY priority DESC, scheduled_date_time ASC, id ASC) AS no, CASE WHEN priority = 1 THEN '! ' || title WHEN priority = 2 THEN '!! ' || title WHEN priority = 3 THEN '!!! ' || title ELSE title END AS priority_title, scheduled_date_time, end_date_time, tag, status FROM schedules WHERE status = '%s';", status);
+    char *sql = sqlite3_mprintf("SELECT ROW_NUMBER() OVER (ORDER BY priority DESC, CASE WHEN end_date_time IS NOT NULL AND end_date_time != 'NULL' THEN end_date_time ELSE scheduled_date_time END ASC, id ASC) AS no, id, CASE WHEN priority = 1 THEN '! ' || title WHEN priority = 2 THEN '!! ' || title WHEN priority = 3 THEN '!!! ' || title ELSE title END AS priority_title, scheduled_date_time, end_date_time, tag, status FROM schedules WHERE status = '%s';", status);
+
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0), run = 0;
 
     if (rc == SQLITE_OK) {
@@ -216,7 +216,7 @@ int viewAllByStatus(const char *status) {
 }
 
 int statusIndexToId(const char *status, int user_no) {  
-    char *sql = sqlite3_mprintf("SELECT id FROM (SELECT ROW_NUMBER() OVER (ORDER BY priority DESC, scheduled_date_time ASC, id ASC) AS no, id FROM schedules WHERE status = '%s') WHERE no = %d;", status, user_no);
+    char *sql = sqlite3_mprintf("SELECT id FROM (SELECT ROW_NUMBER() OVER (ORDER BY priority DESC, CASE WHEN end_date_time IS NOT NULL AND end_date_time != 'NULL' THEN end_date_time ELSE scheduled_date_time END ASC, id ASC) AS no, id FROM schedules WHERE status = '%s') WHERE no = %d;", status, user_no);
     sqlite3_stmt *stmt;
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
     int real_id = -1;
@@ -338,8 +338,7 @@ TagCount *indexToTagCount(int user_no) {
 
 void viewTagByschedule(char *tag) {
     sqlite3_stmt *stmt;
-    // char *sql = sqlite3_mprintf("SELECT * FROM schedules WHERE tag = '%s';", tag);
-    char *sql = sqlite3_mprintf("SELECT ROW_NUMBER() OVER (ORDER BY priority DESC, scheduled_date_time ASC, id ASC) AS no, CASE WHEN priority = 1 THEN '! ' || title WHEN priority = 2 THEN '!! ' || title WHEN priority = 3 THEN '!!! ' || title ELSE title END AS priority_title, scheduled_date_time, end_date_time, tag, status FROM schedules WHERE tag = '%s';", tag);
+    char *sql = sqlite3_mprintf("SELECT ROW_NUMBER() OVER (ORDER BY priority DESC, CASE WHEN end_date_time IS NOT NULL AND end_date_time != 'NULL' THEN end_date_time ELSE scheduled_date_time END ASC, id ASC) AS no, CASE WHEN priority = 1 THEN '! ' || title WHEN priority = 2 THEN '!! ' || title WHEN priority = 3 THEN '!!! ' || title ELSE title END AS priority_title, scheduled_date_time, end_date_time, tag, status FROM schedules WHERE tag = '%s';", tag);
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
 
     if (rc == SQLITE_OK) {
