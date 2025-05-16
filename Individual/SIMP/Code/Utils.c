@@ -11,7 +11,7 @@ int updateScheduleStatus(Schedule *s, int id) {
     int new_id = -1;
     time_t now = time(NULL);
     time_t start = (strcmp(s->scheduled_date_time, "NULL") != 0 && s->scheduled_date_time != NULL) ? parseTime(s->scheduled_date_time) : 0;
-    time_t end = (strcmp(s->end_date_time, "NULL") != 0 && s->end_date_time != NULL) ? arseTime(s->end_date_time) : 0;
+    time_t end = (strcmp(s->end_date_time, "NULL") != 0 && s->end_date_time != NULL) ? parseTime(s->end_date_time) : 0;
     time_t t = (start >= end) ? start : end;
 
     // TODO → DOING
