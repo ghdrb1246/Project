@@ -11,8 +11,8 @@ Project DB - https://github.com/ghdrb1246/Project.git
 *SLMP*
 - <...>
 
-- ~~'25.05.14::V1.4|SLMP~~
-- '25.05.14::V1.5|SLMP
+- ~~'25.05.14::V1.5|SLMP~~
+- '25.05.17::V1.6|SLMP
 
 @Team
 - <...>
