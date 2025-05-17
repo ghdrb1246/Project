@@ -8,26 +8,29 @@
 // 날짜/시간 비교 함수
 
 int updateScheduleStatus(Schedule *s, int id) {
-    int new_id = -1;
-    time_t now = time(NULL);
-    time_t start = (strcmp(s->scheduled_date_time, "NULL") != 0 && s->scheduled_date_time != NULL) ? parseTime(s->scheduled_date_time) : 0;
-    time_t end = (strcmp(s->end_date_time, "NULL") != 0 && s->end_date_time != NULL) ? parseTime(s->end_date_time) : 0;
-    time_t t = (start >= end) ? start : end;
+    int new_id = -1;    // 상태 변경 대상 없음을 기본값으로 설정
+    time_t now = time(NULL);    // 현재 시각
+    time_t start = (strcmp(s->scheduled_date_time, "NULL") != 0 && s->scheduled_date_time != NULL) ? 
+        parseTime(s->scheduled_date_time) : 0;   // 유효한 예정 날짜/시간 이면 파싱하여 시작 시간
+    time_t end = (strcmp(s->end_date_time, "NULL") != 0 && s->end_date_time != NULL) ? 
+        parseTime(s->end_date_time) : 0;    // 유효한 종료 날짜/시간이면 파싱하여 종료 시간
+    time_t t = (start >= end) ? start : end;    // 시작과 종료 중 더 늦은 시간 선택
 
     // TODO → DOING
+    // 상태가 "TODO"이고, 기준 시간이 현재보다 과거라면 상태 변경
     if (strcmp(s->status, "TODO") == 0 && (now >= t)) {
         new_id = id;
     }
     
-    return new_id;
+    return new_id;  // 조건 만족 시 id 반환, 아니면 -1
 }
 
 static time_t parseTime(const char *datetime_str) {
-    struct tm tm;
-    memset(&tm, 0, sizeof(struct tm));
-    strptime(datetime_str, "%Y-%m-%d %H:%M", &tm);
+    struct tm tm;   // 시간 형식 구조체
+    memset(&tm, 0, sizeof(struct tm));  // 구조체 초기화
+    strptime(datetime_str, "%Y-%m-%d %H:%M", &tm);  // 문자열을 tm 구조체에 파싱
 
-    return mktime(&tm);
+    return mktime(&tm); // tm 구조체를 time_t 값으로 변환하여 반환
 }
 
 void clearInputBuffer() {

@@ -101,17 +101,16 @@ void tableDB() {
 }
 
 void saveDB(Schedule *s) {
+    // 구조체 데이터를 SQL문으로 포맷
     char *sql = sqlite3_mprintf("INSERT INTO schedules (title, scheduled_date_time, end_date_time, tag, priority) VALUES ('%s', '%s', '%s', '%s', %d);", s->title, s->scheduled_date_time, s->end_date_time, s->tag, s->priority);
-
-    char *err_msg = 0;
+    char *err_msg = 0; // 에러 메시지
+    int rc = sqlite3_exec(db, sql, 0, 0, &err_msg); // SQL 실행
     
-    int rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
-    
-    if (rc != SQLITE_OK) {
+    if (rc != SQLITE_OK) {  // 실행 실패 시 오류 메시지 출력
         fprintf(stderr, "데이터 저장 오류: %s\n", err_msg);
-        sqlite3_free(err_msg);
+        sqlite3_free(err_msg);  // 에러 메시지 메모리 해제
     }
-    sqlite3_free(sql);
+    sqlite3_free(sql);  // SQL 문자열 메모리 해제
 }
 
 void updateDB(Schedule *s, int id) {
