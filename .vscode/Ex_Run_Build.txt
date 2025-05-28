@@ -1,0 +1,9 @@
+# Header + SQL
+
+@ Build
+    MacOS : gcc ./filename.c ... -o filename_ -lsqlite3
+    Win   : gcc filename.c ... -o filename_.exe -lsqlite3
+
+@ Run
+    MacOS : ./filename_
+    Win   : filename_.exe

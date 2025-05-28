@@ -1,0 +1,8 @@
+
+# Build
+    MacOS : gcc ./main.c ./MumeIO.c ./DB_Management.c ./UserStructure.c ./Utils.c -o SLMP -lsqlite3
+    Win   : gcc main.c MumeIO.c DB_Management.c UserStructure.c Utils.c -o SLMP.exe -lsqlite3
+
+#Run
+    MacOS : ./SLMP
+    Win   : SLMP.exe

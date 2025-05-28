@@ -1,6 +1,0 @@
-# Header + SQL
-1. gcc ./filename.c ... -o filename_ -lsqlite3
-2. ./filename_
-
-gcc ./main.c ./MumeIO.c ./DB_Management.c UserStructure.c ./Utils.c -o SIMP.exe -lsqlite3
-./SIMP.exe
