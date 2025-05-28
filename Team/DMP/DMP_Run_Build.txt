@@ -1,0 +1,17 @@
+# Server 
+    - Build
+        MacSO : gcc ./mainServer.c ./DBM.c -o Server -lsqlite3
+        Win   : gcc mainServer.c DBM.c -o Server.exe -lsqlite3
+
+    - Run
+        MacSO : ./Server
+        Win   : Server.exe
+
+# Client
+    - Build
+        MacSO : gcc ./meunClient.c -o Client
+        Win   : gcc meunClient.c -o Client.exe
+    
+    -Run
+        MacSO : ./Client
+        Win   : Client.exe
