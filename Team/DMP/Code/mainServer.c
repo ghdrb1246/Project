@@ -22,13 +22,14 @@ void handleClient(SOCKET clientSock);
 void processRequest(char *request, char *response);
 
 int main() {
-#ifdef _WIN32
-    WSADATA wsa;
-    WSAStartup(MAKEWORD(2, 2), &wsa);
-#endif
+    #ifdef _WIN32
+        WSADATA wsa;
+        WSAStartup(MAKEWORD(2, 2), &wsa);
+    #endif
 
     SOCKET serverSock, clientSock;
     struct sockaddr_in server, client;
+    
     socklen_t clientSize = sizeof(client);
 
     serverSock = socket(AF_INET, SOCK_STREAM, 0);
@@ -56,10 +57,10 @@ int main() {
     
     CLOSESOCKET(serverSock);
 
-#ifdef _WIN32
-    WSACleanup();
-#endif
-    return 0;
+    #ifdef _WIN32
+        WSACleanup();
+    #endif
+        return 0;
 }
 
 void handleClient(SOCKET clientSock) {

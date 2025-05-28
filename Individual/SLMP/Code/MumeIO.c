@@ -8,6 +8,7 @@
 
 static const char *CSTATUS[3] = { "TODO", "DOING", "DONE" };
 static int deleteStatusNumer = 0;
+
 /* ================== 메뉴 입출력 모듈 ================== */
 
 /* ----------------- Output 관련 함수 ----------------- */

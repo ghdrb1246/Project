@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include "UserStructure.h"
 
-
 #define P_MENU_TITLE(s)     printf("================= [ %s ] =================\n", s)
 #define P_MENU_IN           printf("----------------------------------------------------------\n")
 #define P_MENU_END          printf("==========================================================\n\n")
