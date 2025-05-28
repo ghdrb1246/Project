@@ -15,4 +15,7 @@ Project DB - https://github.com/ghdrb1246/Project.git
 - '25.05.17::V1.6|SLMP
 
 @Team
+
+*DMP*
 - <...>
+- '25.05.28::V0.1|DMP
