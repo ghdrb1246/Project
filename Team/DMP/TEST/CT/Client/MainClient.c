@@ -15,7 +15,6 @@
 #endif
 
 #include "MenuIO.h"
-#include "InputHandler.h"
 #include "ClientController.h"
 #include "MenuState.h"
 
@@ -46,9 +45,9 @@ int main() {
     MenuState state = STATE_MAIN_MENU;
     while (state != STATE_EXIT) {
         switch (state) {
-            case STATE_MAIN_MENU: mainMenu(); state = handleMainMenu(sock); break;
-            case STATE_USER_MENU:             state = handleUserMenu(sock); break;
-            default: state = STATE_EXIT;                                    break;
+            case STATE_MAIN_MENU :             state = handleMainMenu(sock); break;
+            case STATE_USER_MENU :             state = handleUserMenu(sock); break;
+            default: state = STATE_EXIT;                                     break;
         }
     }
 

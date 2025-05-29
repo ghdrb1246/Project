@@ -9,8 +9,8 @@
 
 # Client
     - Build
-        MacSO : gcc ./client.c ./ClientController.c ./InputHandler.c ./MenuIO.c -o Client
-        Win   : gcc client.c ClientController.c InputHandler.c MenuIO.c -o Client.exe
+        MacSO : gcc ./Mainclient.c ./ClientController.c ./MenuIO.c -o Client
+        Win   : gcc Mainclient.c ClientController.c InputHandler.c MenuIO.c -o Client.exe
     
     -Run
         MacSO : ./Client
