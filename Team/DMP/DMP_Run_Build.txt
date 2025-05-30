@@ -1,16 +1,16 @@
 # Server 
     - Build
-        MacSO : gcc -I ./MainServer.c ./DBM.c ./UserInfo.c -o Server -lsqlite3
-        Win   : gcc MainServer.c DBM.c UserInfo.c -o Server.exe -lsqlite3
+        MacSO : gcc -I. -I./Client Server/MainServer.c Server/DBM.c UserInfo.c -o server_Run -lsqlite3
+        Win   : gcc -I. -I./Client Server/MainServer.c Server/DBM.c UserInfo.c -o server_Run.exe -lsqlite3
     - Run
-        MacSO : ./Server
-        Win   : Server.exe
+        MacSO : ./server_Run
+        Win   : server_Run.exe
 
 # Client
     - Build
-        MacSO : gcc ./Mainclient.c ./ClientController.c ./MenuIO.c -I../UserInfo.c -o Client
-        Win   : gcc Mainclient.c ClientController.c InputHandler.c MenuIO.c UserInfo.c -o Client.exe
+        MacSO : gcc -I. -I./Server Client/MainClient.c Client/MenuIO.c Client/ClientController.c UserInfo.c -o Client_Run
+        Win   : gcc  -I. -I/Serve Client/MainClient.c Client/MenuIO.c Client/ClientController.c UserInfo.c -o Client_Run.exe
     
     -Run
-        MacSO : ./Client
-        Win   : Client.exe
+        MacSO : ./Client_Run
+        Win   : Client_Run.exe

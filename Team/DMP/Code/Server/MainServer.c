@@ -81,6 +81,11 @@ void processRequest(char *request, char *response) {
     char cmd[16], arg1[32], arg2[32];
     UserSignupInfo *USI = USImalloc();
 
+   /*  if (!USI) {
+        printf("메모리 할당 실패!\n");
+        return;
+    } */
+
     sscanf(request, "%s %s %s", cmd, arg1, arg2);
 
     // 회원가입 처리

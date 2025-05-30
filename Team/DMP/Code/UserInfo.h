@@ -3,7 +3,7 @@
 
 #define ID_SIZE 50
 #define PW_SIZE 50
-#define GENDER_SIZE 3
+#define GENDER_SIZE 5
 
 struct UserSignupInfo {
     char *id;

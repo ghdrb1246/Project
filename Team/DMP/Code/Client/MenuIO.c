@@ -55,15 +55,17 @@ ID : _
 */
 
 // 97378 bus error  ./client_app
+
 void signupMenu(UserSignupInfo *USI) {
     P_MENU_TITLE("회원가입");
     P_MENU_IN;
     P_MENU_SB_S("입력", "----");
     
-    inputLine("ID 입력: ", USI->id, 50);
-    inputLine("PW 입력: ", USI->pw, 50);
-    inputLine("성별 (남/여): ", USI->gender, 10);
-
+    inputLine("ID 입력: ", USI->id, ID_SIZE);
+    inputLine("PW 입력: ", USI->pw, PW_SIZE);
+    inputLine("성별 (남/여): ", USI->gender, GENDER_SIZE);
+    getchar();
+    
     printf("나이: ");
     scanf("%d", &USI->age); getchar();
 
@@ -368,8 +370,9 @@ void deleteIdMenu(const char *id) {
 
 void inputLine(const char *prompt, char *buf, int size) {
     printf("%s", prompt);
-    fgets(buf, size, stdin);
-    buf[strcspn(buf, "\n")] = '\0';  // 개행 제거
+    if (fgets(buf, size, stdin) != NULL) {
+        buf[strcspn(buf, "\n")] = '\0';  // 개행 문자 제거
+    }
 }
 
 int inputStr(const char *prompt, const char *type) {

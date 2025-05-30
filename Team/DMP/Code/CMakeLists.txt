@@ -9,7 +9,7 @@ include_directories(${CMAKE_SOURCE_DIR})
 
 # 클라이언트 빌드
 add_executable(
-    client
+    client_
     Client/MainClient.c
     ßClient/ClientController.c
     Client/MenuIO.c
@@ -18,7 +18,7 @@ add_executable(
 
 # 서버 빌드
 add_executable(
-    server
+    server_
     Server/MainServer.c
     Server/DBM.c
     ${COMMON_SRC}

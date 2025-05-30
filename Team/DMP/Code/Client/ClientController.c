@@ -39,8 +39,14 @@ MenuState handleMainMenu(int sock) {
     int meunNumber = mainMenu();
     char sendBuf[1024];
     char id[50], pw[50];
-    UserSignupInfo *USI = USImalloc();
 
+    UserSignupInfo *USI = USImalloc();
+    
+  /*   if (!USI) {
+        printf("메모리 할당 실패!\n");
+        return;
+    }
+     */
     switch (meunNumber) {
         case 1:
             signupMenu(USI);
