@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "MenuIO.h"
-
+#include "UserInfo.h"
 /* OUT */
 
 /* 
@@ -31,7 +31,7 @@ int mainMenu() {
 
     P_MENU_IN;
 
-    meunNumber = inputMenu("메뉴 선택 : ", "%d");
+    meunNumber = inputStr("메뉴 선택 : ", "%d");
     
     P_MENU_IN;
     
@@ -45,46 +45,36 @@ int mainMenu() {
 -----------------------------------------------------------
 ID : _
 비밀번호 : _
-성별 : _
+성별 (남/여) : _
 나이 : _ 
-초기 체중 : _
-목표 체중 : _
------------------------------------------------------------
-회원가입을 하시겠습니까?[Y/N] : _
------------------------------------------------------------
-Y : 회원가입가 완료 되었습니다.
-N : 취소.
-D : Input Error
+키 (cm) : 
+초기 체중 (kg) : _
+목표 체중 (kg) : _
 -----------------------------------------------------------
 ===========================================================
 */
 
-void signupMenu(char *id, char *pw) {
-    //  int *age, char *gender, float *height, float *initialWeight, float *goalWeight
+// 97378 bus error  ./client_app
+void signupMenu(UserSignupInfo *USI) {
     P_MENU_TITLE("회원가입");
     P_MENU_IN;
     P_MENU_SB_S("입력", "----");
     
-    inputLine("ID 입력: ", id, 50);
-    inputLine("PW 입력 ", pw, 50);
+    inputLine("ID 입력: ", USI->id, 50);
+    inputLine("PW 입력: ", USI->pw, 50);
+    inputLine("성별 (남/여): ", USI->gender, 10);
 
-    /* 
     printf("나이: ");
-    scanf("%d", age);
-    getchar();
-    printf("성별 ");
-    fgets(gender, sizeof(gender), stdin);
-    gender[strcspn(gender, "\n")] = 0;
+    scanf("%d", &USI->age); getchar();
 
-    printf("키 : ");
-    scanf("%f", height);
-
-    printf("초기 체중 : ");
-    scanf("%f", initialWeight);
+    printf("키 (cm): ");
+    scanf("%f", &USI->height); getchar();
     
-    printf("목표 체중 : ");
-    scanf("%f", goalWeight); 
-    */
+    printf("초기 체중 (kg): ");
+    scanf("%f", &USI->initialWeight); getchar();
+    
+    printf("목표 체중 (kg): ");
+    scanf("%f", &USI->goalWeight); getchar();
 
     P_MENU_IN;
     P_MENU_END;
@@ -97,10 +87,6 @@ ID : _
 비밀번호 : _
 -----------------------------------------------------------
 로그인 하시겠습니까?[Y/N] : _
------------------------------------------------------------
-Y : 로그인이 완료 되었습니다. / 로그인이 실패 되었습니다.
-N : 취소.
-D : Input Error
 -----------------------------------------------------------
 ===========================================================
 */
@@ -132,7 +118,7 @@ void loginMenu(char *id, char *pw) {
 8. 회원탈퇴
 D : Input Error
 -----------------------------------------------------------
-메뉴 선택 : 
+메뉴 선택 : _
 -----------------------------------------------------------
 ===========================================================
 */
@@ -142,6 +128,7 @@ int userMenu(char *id) {
 
     P_MENU_TITLE("사용자 메뉴");
     printf("%s 님 안녕하세요\n", id);
+
     P_MENU_IN;
     P_MENU_SB_S("선택", "---");
     
@@ -157,7 +144,7 @@ int userMenu(char *id) {
     
     P_MENU_IN;
     
-    meunNumber = inputMenu("메뉴 선택 : ", "%d");
+    meunNumber = inputStr("메뉴 선택 : ", "%d");
     
     P_MENU_IN;
     P_MENU_END;
@@ -173,10 +160,6 @@ int userMenu(char *id) {
 섭취량(g) : _
 -----------------------------------------------------------
 식단을 저장 하시겠습니까?[Y/N] : _
------------------------------------------------------------
-Y : 식단이 저장 되었습니다.
-N : 취소.
-D : Input Error
 -----------------------------------------------------------
 ===========================================================
 */
@@ -205,10 +188,6 @@ void mealMenu(char *mealDateTime, char *foodName, float *gram) {
 -----------------------------------------------------------
 운동을 저장 하시겠습니까?[Y/N] : _
 -----------------------------------------------------------
-Y : 운동이 저장 되었습니다.
-N : 취소.
-D : Input Error
------------------------------------------------------------
 ===========================================================
 */
 
@@ -232,10 +211,6 @@ void workOutMenu(char *workOutDateTime, char *workOutname, float *Time) {
 체중 : _
 -----------------------------------------------------------
 체중을 저장 하시겠습니까?[Y/N] : _
------------------------------------------------------------
-Y : 체중이 저장 되었습니다.
-N : 취소.
-D : Input Error
 -----------------------------------------------------------
 ===========================================================
 */
@@ -287,7 +262,7 @@ void viewRecordsByDateMenu() {
 
     P_MENU_IN;
     P_MENU_SB_S("선택", "---");
-    inputMenu("확인할 날짜 선택 :", "%d");
+    inputStr("확인할 날짜 선택 :", "%d");
     
     P_MENU_IN;
     printf("DateTiem의 기록\n");
@@ -355,11 +330,7 @@ void feedBackMenu(const float weight, const float kcal) {
 /* 
 =================== [     로그 아웃     ] ===================
 -----------------------------------------------------------
-(사용자 ID)를 로그아웃 하시겠습니까?[Y/N]
------------------------------------------------------------
-Y : 로그아웃 되었습니다.
-N : 취소.
-D : Input Error
+(사용자 ID) 이/가 로그아웃 되었습니다.
 -----------------------------------------------------------
 ===========================================================
 */
@@ -368,7 +339,7 @@ void logOutMenu(const char *id) {
     P_MENU_TITLE("로그 아웃");
     P_MENU_IN;
 
-    printf("%s 이/가 로그아웃 되었습니다.", id);
+    printf("%s 이/가 로그아웃 되었습니다.\n", id);
 
     P_MENU_IN;
     P_MENU_END;
@@ -377,11 +348,7 @@ void logOutMenu(const char *id) {
 /* 
 =================== [     회원 탈퇴     ] ===================
 -----------------------------------------------------------
-(사용자 ID)를 회원탈퇴를 하시겠습니까?[Y/N]
------------------------------------------------------------
-Y : 회원탈퇴 처리 되었습니다.
-N : 취소.
-D : Input Error
+(사용자 ID) 이/가 회원 탈퇴 처리 되었습니다.
 -----------------------------------------------------------
 ===========================================================
 */
@@ -392,6 +359,7 @@ void deleteIdMenu(const char *id) {
 
     printf("%s 이/가 회원 탈퇴 처리 되었습니다.\n", id);
     printf("DB에서 해당 id 삭제\n");
+
     P_MENU_IN;
     P_MENU_END;
 }
@@ -404,7 +372,7 @@ void inputLine(const char *prompt, char *buf, int size) {
     buf[strcspn(buf, "\n")] = '\0';  // 개행 제거
 }
 
-int inputMenu(const char *prompt, const char *type) {
+int inputStr(const char *prompt, const char *type) {
     int meunNumber;
 
     printf("%s", prompt);

@@ -1,6 +1,8 @@
 #ifndef MENU_IO_H
 #define MENU_IO_H
 
+#include "UserInfo.h"
+
 #define P_MENU_TITLE(s)     printf("================= [ %s ] =================\n", s)
 #define P_MENU_IN           printf("----------------------------------------------------------\n")
 #define P_MENU_END          printf("==========================================================\n\n")
@@ -9,7 +11,7 @@
 /* OUT */
 
 int mainMenu();
-void signupMenu(char *id, char *pw);
+void signupMenu(UserSignupInfo *USI);
 void loginMenu(char *id, char *pw);
 int userMenu(char *id);
 void mealMenu(char *mealDateTime, char *foodName, float *gram);
@@ -24,6 +26,6 @@ void deleteIdMenu(const char *id);
 /* In */
 
 void inputLine(const char *prompt, char *buf, int size);
-int inputMenu(const char *prompt, const char *type);
+int inputStr(const char *prompt, const char *type);
 
 #endif

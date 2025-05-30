@@ -2,9 +2,10 @@
 #define CLIENT_CONTROLLER_H
 #include "MenuState.h"
 
+void sendRequest(int sock, const char *message);
+int sendRequestWithResponse(int sock, const char *message, char *response);
+
 MenuState handleMainMenu(int sock);
 MenuState handleUserMenu(int sock);
-
-void sendRequest(int sock, const char *message);
 
 #endif
