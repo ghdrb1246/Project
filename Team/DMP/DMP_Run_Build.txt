@@ -1,7 +1,7 @@
 # Server 
     - Build
         MacSO : gcc -I. -I./Client Server/MainServer.c Server/DBM.c UserInfo.c -o server_Run -lsqlite3
-        Win   : gcc -I. -I./Client Server/MainServer.c Server/DBM.c UserInfo.c -o server_Run.exe -lsqlite3
+        Win   : gcc -I. -I./Client Server/MainServer.c Server/DBM.c UserInfo.c -L. -o server_Run.exe -lsqlite3 -lws2_32
     - Run
         MacSO : ./server_Run
         Win   : server_Run.exe
@@ -9,7 +9,7 @@
 # Client
     - Build
         MacSO : gcc -I. -I./Server Client/MainClient.c Client/MenuIO.c Client/ClientController.c UserInfo.c -o Client_Run
-        Win   : gcc  -I. -I/Serve Client/MainClient.c Client/MenuIO.c Client/ClientController.c UserInfo.c -o Client_Run.exe
+        Win   : gcc  -I. -I/Serve Client/MainClient.c Client/MenuIO.c Client/ClientController.c UserInfo.c -o Client_Run.exe -lws2_32
     
     -Run
         MacSO : ./Client_Run

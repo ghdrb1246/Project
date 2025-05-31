@@ -2,7 +2,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <sys/stat.h> // mkdir
-
 #include "sqlite/sqlite3.h"
 #include "DBM.h"
 
@@ -22,7 +21,7 @@
 static sqlite3 *db;
 
 int DBO(const char *filename) {
-    const char *foldername = "DB";  // 폴더 이름
+    const char *foldername = "Server/DB";  // 폴더 이름
     char path[256];                 // 파일 경로 생성 문자열
     int mode = 0755;                // 생성하려는 디렉터리에 대한 접근 권한 설정 값
     
@@ -60,7 +59,9 @@ int DBO(const char *filename) {
     // 테이블이 존재하지 않으면 0, 존재하면 1를 반환
     //  if (tableExists("users") != 1) usersTableDB();
 
-    usersTableDB();
+    usersTable();
+    usersDietsTable();
+    usersDietRecordsTable();
 
     return 0; // 성공
 }
@@ -91,10 +92,35 @@ int tableExists(const char *tableName) {
     return real_id;
 }
 
-void usersTableDB() {
+void usersTable() {
     // CREATE TABLE IF NOT EXISTS [TABLE]
     // 테이블이 없다면 테이블을 추가 -> 따라서 tableExists()로 해당 테이블 확인할 필요 없다
     char *sql = "CREATE TABLE IF NOT EXISTS users(userId TEXT PRIMARY KEY, userPw TEXT NOT NULL);";
+    char *err_msg = 0;
+
+    int rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+    if (rc != SQLITE_OK) { 
+        fprintf(stderr, "테이블 생성 오류: %s\n", err_msg);
+        sqlite3_free(err_msg);
+    }
+}
+void usersDietsTable() {
+    // CREATE TABLE IF NOT EXISTS [TABLE]
+    // 테이블이 없다면 테이블을 추가 -> 따라서 tableExists()로 해당 테이블 확인할 필요 없다
+    char *sql = "CREATE TABLE IF NOT EXISTS user_diets (user_id TEXT PRIMARY KEY, height REAL, initial_weight REAL, goal_weight REAL, FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE);";
+    char *err_msg = 0;
+
+    int rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+    if (rc != SQLITE_OK) { 
+        fprintf(stderr, "테이블 생성 오류: %s\n", err_msg);
+        sqlite3_free(err_msg);
+    }
+}
+
+void usersDietRecordsTable() {
+    // CREATE TABLE IF NOT EXISTS [TABLE]
+    // 테이블이 없다면 테이블을 추가 -> 따라서 tableExists()로 해당 테이블 확인할 필요 없다
+    char *sql = "CREATE TABLE IF NOT EXISTS diet_records (record_id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT, date TEXT, meal TEXT, meal_gram REAL, workout TEXT, workout_duration REAL, weight REAL, FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE);";
     char *err_msg = 0;
 
     int rc = sqlite3_exec(db, sql, 0, 0, &err_msg);

@@ -31,7 +31,11 @@ int tableExists(const char *tableName);
  * @brief DB 테이블 생성
  * 
  */
-void usersTableDB();
+void usersTable();
+
+void usersDietsTable();
+
+void usersDietRecordsTable();
 
 /**
  * @brief 사용자 id가 존재하는지 확인
