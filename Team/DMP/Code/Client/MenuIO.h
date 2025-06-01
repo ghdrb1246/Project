@@ -1,7 +1,7 @@
 #ifndef MENU_IO_H
 #define MENU_IO_H
 
-#include "UserInfo.h"
+#include "InputInfo.h"
 
 #define P_MENU_TITLE(s)     printf("================= [ %s ] =================\n", s)
 #define P_MENU_IN           printf("----------------------------------------------------------\n")
@@ -14,9 +14,9 @@ int mainMenu();
 void signupMenu(UserSignupInfo *USI);
 void loginMenu(char *id, char *pw);
 int userMenu(char *id);
-void mealMenu(char *mealDateTime, char *foodName, float *gram);
-void workOutMenu(char *workOutDateTime, char *workOutname, float *Time);
-void weightMenu(char *weightDateTime, float *weight);
+void mealMenu(MealInputInfo *MII);
+void workOutMenu(WorkOutInputInfo *WOII);
+void weightMenu(WeightInputInfo *WII);
 void viewRecordsByDateMenu();
 void checkWeightLossProgressMenu(const float initialWeight, const float goalWeight, const float currentWeight);
 void feedBackMenu(const float weight, const float kcal);
@@ -26,6 +26,9 @@ void deleteIdMenu(const char *id);
 /* In */
 
 void inputLine(const char *prompt, char *buf, int size);
-int inputStr(const char *prompt, const char *type);
+int inputMeunNum(const char *prompt);
+void inputDateTime(char *dateTime);
+
+int validDateTime(char *datetime);
 
 #endif

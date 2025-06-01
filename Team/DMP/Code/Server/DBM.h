@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
+#include "InputInfo.h"
 // DB 관리 모듈
 
 /**
@@ -40,27 +40,27 @@ void usersDietRecordsTable();
 /**
  * @brief 사용자 id가 존재하는지 확인
  * 
- * @param userId 확인할 id
+ * @param id 확인할 id
  * @return int | 성공 1, 실패 0
  */
-int userExists(const char *userId);
+int userExists(const char *id);
 
 /**
  * @brief 회인가입
  * 
- * @param userId 사용자 id
- * @param userPw 시용자 pw
+ * @param USI 사용자 가입 정보
  * @return int | 성공 1, 실패 0
  */
-int signupUser(const char *userId, const char *userPw);
+int signupUser(UserSignupInfo *USI);
 
 /**
  * @brief 로그인
  * 
- * @param userId 사용자 id
- * @param userPw 시용자 pw
+ * @param id  사용자 id
+ * @param pw  사용자 pw
+ * 
  * @return int | 성공 1, 실패 0
  */
-int loginUser(const char *userId, const char *userPw);
+int loginUser(const char *id, const char *pw);
 
 #endif

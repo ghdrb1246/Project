@@ -36,6 +36,7 @@
     "C_Cpp.errorSquiggles": "disabled",
     "cmake.configureOnOpen": true,
     "java.debug.settings.onBuildFailureProceed": true,
-    "terminal.integrated.fontFamily": "monospace, MesloLGS NF",
-    "cmake.sourceDirectory": "/Users/yunhong-gyu/Desktop/CODE/Project/Team/DMP/Code"
+    "terminal.integrated.fontFamily": "monospace, MesloLGS NF"
+    // "cmake.sourceDirectory": "/Users/yunhong-gyu/Desktop/CODE/Project/Team/DMP/Code",
+    // "makefile.makefilePath": "/Users/yunhong-gyu/Desktop/CODE/Project/Team/DMP/Code/Make/"
 }

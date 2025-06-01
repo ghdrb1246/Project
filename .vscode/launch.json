@@ -6,31 +6,6 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "java",
-            "name": "ExRun",
-            "request": "launch",
-            "mainClass": "Code_languages.Java.UJP.D0421.ExRun",
-            "projectName": "JUS_562fca16"
-        },
-        {
-            "type": "java",
-            "name": "MyClass",
-            "request": "launch",
-            "mainClass": "Code_languages.Java.UJP.D0414.MyClass",
-            "projectName": "JUS_562fca16"
-        },
-        {
-            "type": "java",
-            "name": "MyClass",
-            "request": "launch",
-            "mainClass": "Code_languages.Java.UJP.D0407.MyClass",
-            "projectName": "JUS_562fca16",
-            "args": [
-                "hon",
-                "stu"
-            ]
-        },
-        {
             "name": "gcc - 활성 파일 빌드 및 디버그",
             "type": "cppdbg",
             "request": "launch",

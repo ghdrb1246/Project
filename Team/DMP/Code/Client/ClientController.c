@@ -2,7 +2,7 @@
 #include <string.h>
 #include "MenuIO.h"
 #include "ClientController.h"
-#include "UserInfo.h"
+#include "InputInfo.h"
 
 #ifdef _WIN32
     #include <winsock2.h>
@@ -52,19 +52,17 @@ MenuState handleMainMenu(int sock) {
             signupMenu(USI);
             sprintf(
                 sendBuf, 
-                "SIGNUP %s %s %s %d %.1f %.1f %.1f", 
+                "SIGNUP/%s/%s/%s/%d/%f/%f/%f", 
                 USI->id, USI->pw, USI->gender, USI->age,
                 USI->height, USI->initialWeight, USI->goalWeight
-            );
+            ); 
 
             sendRequest(sock, sendBuf);
         return STATE_MAIN_MENU;
         
-        // 수정 필요 | 로그인 성공 : STATE_USER_MENU, 실패 : STATE_MAIN_MENU
-        
         case 2:
             loginMenu(id, pw);
-            sprintf(sendBuf, "LOGIN %s %s", id, pw);
+            sprintf(sendBuf, "LOGIN/%s/%s", id, pw);
 
             char response[1024];
             if (sendRequestWithResponse(sock, sendBuf, response)) {
@@ -89,7 +87,7 @@ MenuState handleMainMenu(int sock) {
         return STATE_EXIT;
         
         default:
-            sprintf(sendBuf, "MENU %d", meunNumber);
+            sprintf(sendBuf, "MENU/%d", meunNumber);
             sendRequest(sock, sendBuf);
         return STATE_MAIN_MENU;
     }
@@ -100,23 +98,25 @@ MenuState handleUserMenu(int sock) {
     char id[50] = "user1"; // 로그인된 사용자 ID (추후 연동)
     int choice = userMenu(id);
     char sendBuf[256];
-    char input1[50], input2[50];
-    float value;
+    
+    MealInputInfo *MII = MIImalloc();
+    WorkOutInputInfo *WOII = WOIImalloc();
+    WeightInputInfo *WII = WIImalloc();
 
     switch (choice) {
         case 1: 
-            mealMenu(input1, input2, &value);
-            sprintf(sendBuf, "INPUT_MEAL %s %s %.2f", input1, input2, value);
+            mealMenu(MII);
+            sprintf(sendBuf, "INPUT_MEAL/%s/%s/%f", MII->dateTime, MII->foodName, MII->gram);
         break;
         
         case 2: 
-            workOutMenu(input1, input2, &value);
-            sprintf(sendBuf, "INPUT_WORKOUT %s %s %.2f", input1, input2, value);
+            workOutMenu(WOII);
+            sprintf(sendBuf, "INPUT_WORKOUT/%s/%s/%f", WOII->dateTime, WOII->workOutName, WOII->duration);
         break;
         
         case 3: 
-            weightMenu(input1, &value);
-            sprintf(sendBuf, "INPUT_WEIGHT %s %.2f", input1, value);
+            weightMenu(WII);
+            sprintf(sendBuf, "INPUT_WEIGHT/%s/%f", WII->date, WII->weight);
         break;
         
         case 4: 
@@ -136,12 +136,12 @@ MenuState handleUserMenu(int sock) {
 
         case 7: 
             logOutMenu(id);
-            sprintf(sendBuf, "LOGOUT %s", id); 
+            sprintf(sendBuf, "LOGOUT/%s", id); 
         return STATE_MAIN_MENU;
 
         case 8: 
             deleteIdMenu(id);
-            sprintf(sendBuf, "DELETE_ID %s", id); 
+            sprintf(sendBuf, "DELETE_ID/%s", id); 
         return STATE_MAIN_MENU;
         
         default:
@@ -150,5 +150,10 @@ MenuState handleUserMenu(int sock) {
     }
 
     sendRequest(sock, sendBuf);
+
+    MIIfree(MII);
+    WOIIfree(WOII);
+    WIIfree(WII);
+
     return STATE_USER_MENU;
 }

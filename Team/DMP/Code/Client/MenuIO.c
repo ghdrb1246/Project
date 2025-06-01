@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "MenuIO.h"
-#include "UserInfo.h"
+#include "InputInfo.h"
 /* OUT */
 
 /* 
@@ -31,7 +31,7 @@ int mainMenu() {
 
     P_MENU_IN;
 
-    meunNumber = inputStr("메뉴 선택 : ", "%d");
+    meunNumber = inputMeunNum("메뉴 선택 : ");
     
     P_MENU_IN;
     
@@ -64,7 +64,6 @@ void signupMenu(UserSignupInfo *USI) {
     inputLine("ID 입력: ", USI->id, ID_SIZE);
     inputLine("PW 입력: ", USI->pw, PW_SIZE);
     inputLine("성별 (남/여): ", USI->gender, GENDER_SIZE);
-    getchar();
     
     printf("나이: ");
     scanf("%d", &USI->age); getchar();
@@ -94,12 +93,12 @@ ID : _
 */
 
 void loginMenu(char *id, char *pw) {
-    P_MENU_TITLE("회원가입");
+    P_MENU_TITLE("로그인");
     P_MENU_IN;
     P_MENU_SB_S("입력", "----");
     
-    inputLine("ID 입력: ", id, 50);
-    inputLine("PW 입력 ", pw, 50);
+    inputLine("ID 입력 : ", id, 50);
+    inputLine("PW 입력 : ", pw, 50);
 
     P_MENU_IN;
     P_MENU_END;
@@ -146,7 +145,7 @@ int userMenu(char *id) {
     
     P_MENU_IN;
     
-    meunNumber = inputStr("메뉴 선택 : ", "%d");
+    meunNumber = inputMeunNum("메뉴 선택 : ");
     
     P_MENU_IN;
     P_MENU_END;
@@ -161,21 +160,47 @@ int userMenu(char *id) {
 음식명 : _
 섭취량(g) : _
 -----------------------------------------------------------
-식단을 저장 하시겠습니까?[Y/N] : _
------------------------------------------------------------
 ===========================================================
 */
-
-void mealMenu(char *mealDateTime, char *foodName, float *gram) {
+/* 
+void mealMenu(MealInputInfo *MII) {
     P_MENU_TITLE("식단 입력");
     P_MENU_IN;
 
-    inputLine("날짜/시간(YYYY-MM-DD HH:MM) : ", mealDateTime, 16);
-    inputLine("음식명 : ", foodName, 50);
+    inputLine("날짜/시간(YYYY-MM-DD-HH:MM) : ", MII->dateTime, 16);
+    inputLine("음식명 : ", MII->foodName, 50);
+    
     getchar();
     
     printf("섭취량(g) : ");
-    scanf("%f", gram);
+    scanf("%f", &MII->gram);
+
+    P_MENU_IN;
+    P_MENU_END;
+} */
+
+void mealMenu(MealInputInfo *MII) {
+    P_MENU_TITLE("식단 입력");
+    P_MENU_IN;
+    
+   /*  printf("날짜 (YYYY-MM-DD): ");
+    scanf("%10s", date);
+
+    printf("시간 (HH:MM): ");
+    scanf("%5s", time);
+
+    // 날짜/시간 합치기
+    snprintf(MII->dateTime, DATETIME_SIZE, "%s %s", date, time); */
+
+    inputDateTime(MII->dateTime);
+
+    // 음식명 입력
+    inputLine("음식명: ", MII->foodName, FOODNAME_SIZE);
+
+    // 섭취량 입력
+    printf("섭취량(g): ");
+    scanf("%f", &MII->gram);
+    getchar();  // 개행 제거
 
     P_MENU_IN;
     P_MENU_END;
@@ -193,14 +218,20 @@ void mealMenu(char *mealDateTime, char *foodName, float *gram) {
 ===========================================================
 */
 
-void workOutMenu(char *workOutDateTime, char *workOutname, float *Time) {
+void workOutMenu(WorkOutInputInfo *WOII) {
     P_MENU_TITLE("운동 입력");
     P_MENU_IN;
 
-    inputLine("날짜/시간(YYYY-MM-DD HH:MM) : ", workOutDateTime, 16);
-    inputLine("운동명 : ", workOutname, 50);
+    inputDateTime(WOII->dateTime);
+
+    // 운동명 입력
+    inputLine("운동명: ", WOII->workOutName, FOODNAME_SIZE);
+    //입력한 운동명이 DB에 있는지 여부
+
+    // 시간(H) 입력
     printf("시간(H) : ");
-    scanf("%f", Time);
+    scanf("%f", &WOII->duration);
+    getchar();  // 개행 제거
 
     P_MENU_IN;
     P_MENU_END;
@@ -217,13 +248,22 @@ void workOutMenu(char *workOutDateTime, char *workOutname, float *Time) {
 ===========================================================
 */
 
-void weightMenu(char *weightDateTime, float *weight) {
+void weightMenu(WeightInputInfo *WII) {
     P_MENU_TITLE("체중 입력");
     P_MENU_IN;
 
-    inputLine("날짜/시간(YYYY-MM-DD HH:MM) : ", weightDateTime, 16);
-    printf("체중 : ");
-    scanf("%f", weight);
+    while (1) {
+        printf("날짜 (YYYY-MM-DD): ");
+        scanf("%10s", WII->date);
+    
+        if (validDateTime(WII->date)) break;
+        else printf("잘 못된 형식입니다.\n");
+    }
+
+    // 체중 입력
+    printf("체중(kg): ");
+    scanf("%f", &WII->weight);
+    getchar();  // 개행 제거
 
     P_MENU_IN;
     P_MENU_END;
@@ -260,16 +300,20 @@ void viewRecordsByDateMenu() {
     P_MENU_IN;
     P_MENU_SB_S("기록", "---");
 
-    printf("날짜 전체 출력..");
+    printf("날짜 전체 출력..\n");
 
     P_MENU_IN;
     P_MENU_SB_S("선택", "---");
-    inputStr("확인할 날짜 선택 :", "%d");
+    inputMeunNum("확인할 날짜 선택 :");
     
     P_MENU_IN;
     printf("DateTiem의 기록\n");
     printf("식단 : %s | 운동 : %s | 체중 : %f", "1", "2", 38.0);
     
+    P_MENU_IN;
+
+    // 뒤로 가기 [y/n]
+
     P_MENU_IN;
     P_MENU_END;
 }
@@ -294,10 +338,14 @@ void checkWeightLossProgressMenu(const float initialWeight, const float goalWeig
     P_MENU_IN;
 
     // 초기 / 목표 / 현재 체중 + 달성률(%) 출력
-    printf("초기 체중 : %f", initialWeight);
-    printf("목표 체중 : %f", goalWeight);
-    printf("현재 체중 : %f", currentWeight);
-    printf("달성률 : %f", achievementRate);
+    printf("초기 체중 : %f\n", initialWeight);
+    printf("목표 체중 : %f\n", goalWeight);
+    printf("현재 체중 : %f\n", currentWeight);
+    printf("달성률 : %f\n", achievementRate);
+
+    P_MENU_IN;
+
+    // 뒤로 가기 [y/n]
 
     P_MENU_IN;
     P_MENU_END;
@@ -310,10 +358,6 @@ void checkWeightLossProgressMenu(const float initialWeight, const float goalWeig
 -----------------------------------------------------------
 뒤로 가기[Y/N] : 
 -----------------------------------------------------------
-Y : 뒤로 갑니다.
-N : 취소.
-D : Input Error
------------------------------------------------------------
 ===========================================================
 */
 
@@ -325,6 +369,10 @@ void feedBackMenu(const float weight, const float kcal) {
     printf("%f | %f\n", weight, kcal);
     printf("음식 API\n");
 
+    P_MENU_IN;
+
+    // 뒤로 가기 [y/n]
+    
     P_MENU_IN;
     P_MENU_END;
 }
@@ -370,17 +418,94 @@ void deleteIdMenu(const char *id) {
 
 void inputLine(const char *prompt, char *buf, int size) {
     printf("%s", prompt);
-    if (fgets(buf, size, stdin) != NULL) {
+    /* if (fgets(buf, size, stdin) != NULL) {
         buf[strcspn(buf, "\n")] = '\0';  // 개행 문자 제거
-    }
+    } */
+
+    fgets(buf, size, stdin);
+    buf[strcspn(buf, "\n")] = '\0'; 
 }
 
-int inputStr(const char *prompt, const char *type) {
+int inputMeunNum(const char *prompt) {
     int meunNumber;
 
     printf("%s", prompt);
-    scanf(type, &meunNumber);
+    scanf("%d", &meunNumber);
     getchar(); // 남은 개행 제거
 
     return meunNumber;
+}
+
+void inputDateTime(char *dateTime) {
+    char date[11];
+    char time[6];
+
+    while (1) {
+        printf("날짜 (YYYY-MM-DD): ");
+        scanf("%10s", date);
+    
+        printf("시간 (HH:MM): ");
+        scanf("%5s", time);
+    
+        // 날짜/시간 합치기
+        snprintf(dateTime, DATETIME_SIZE, "%s %s", date, time);
+    
+        if (validDateTime(dateTime)) break;
+        else printf("잘 못된 형식입니다.\n");
+    }
+
+    getchar();  // scanf 개행 제거
+}
+
+int validDateTime(char *datetime) {
+    int y, m, d, h, min;
+    int daysInMonth[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+    
+    if (strlen(datetime) >= 16) {
+        printf("YYYY-MM-DD HH:MM\n");
+        // "YYYY-MM-DD HH:MM" → 총 16자 (문자열 + 널 포함 17바이트)
+        if (strlen(datetime) != 16 || datetime[4] != '-' || datetime[7] != '-' || datetime[10] != ' ' || datetime[13] != ':') {
+            return 0;
+        }
+        
+        // 날짜와 시간 추출
+        else if (sscanf(datetime, "%4d-%2d-%2d %2d:%2d", &y, &m, &d, &h, &min) != 5) {
+            return 0;
+        }
+        
+        // 날짜 범위 검사
+        if ((y < 1900 || y > 2100) || (m < 1 || m > 12) || (d < 1 || d > 31)) return 0;
+        
+        // 월별 최대 일자 확인 (윤년 고려)
+        if ((y % 4 == 0 && y % 100 != 0) || y % 400 == 0) {
+            daysInMonth[1] = 29;  // 윤년
+        }
+        if (d > daysInMonth[m - 1]) return 0;
+        
+        // 시간 범위 검사
+        if ((h < 0 || h > 23) || (min < 0 || min > 59)) return 0;
+    }
+    else {
+        printf("YYYY-MM-DD\n");
+         // "YYYY-MM-DD" → 총 10자 (문자열 + 널 포함 11바이트)
+        if (strlen(datetime) != 10 || datetime[4] != '-' || datetime[7] != '-') {
+            return 0;
+        }
+        
+        // 날짜와 시간 추출
+        else if (sscanf(datetime, "%4d-%2d-%2d", &y, &m, &d) != 3) {
+            return 0;
+        }
+        
+        // 날짜 범위 검사
+        if ((y < 1900 || y > 2100) || (m < 1 || m > 12) || (d < 1 || d > 31)) return 0;
+        
+        // 월별 최대 일자 확인 (윤년 고려)
+        if ((y % 4 == 0 && y % 100 != 0) || y % 400 == 0) {
+            daysInMonth[1] = 29;  // 윤년
+        }
+        if (d > daysInMonth[m - 1]) return 0;
+    }
+
+    return 1; // 유효한 날짜+시간
 }
