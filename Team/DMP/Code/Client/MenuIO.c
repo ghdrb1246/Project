@@ -71,7 +71,7 @@ void signupMenu(UserSignupInfo *USI) {
     printf("키 (cm): ");
     scanf("%f", &USI->height); getchar();
     
-    printf("초기 체중 (kg): ");
+    printf("현재 체중 (kg): ");
     scanf("%f", &USI->initialWeight); getchar();
     
     printf("목표 체중 (kg): ");
@@ -162,36 +162,11 @@ int userMenu(char *id) {
 -----------------------------------------------------------
 ===========================================================
 */
-/* 
-void mealMenu(MealInputInfo *MII) {
-    P_MENU_TITLE("식단 입력");
-    P_MENU_IN;
-
-    inputLine("날짜/시간(YYYY-MM-DD-HH:MM) : ", MII->dateTime, 16);
-    inputLine("음식명 : ", MII->foodName, 50);
-    
-    getchar();
-    
-    printf("섭취량(g) : ");
-    scanf("%f", &MII->gram);
-
-    P_MENU_IN;
-    P_MENU_END;
-} */
 
 void mealMenu(MealInputInfo *MII) {
     P_MENU_TITLE("식단 입력");
     P_MENU_IN;
     
-   /*  printf("날짜 (YYYY-MM-DD): ");
-    scanf("%10s", date);
-
-    printf("시간 (HH:MM): ");
-    scanf("%5s", time);
-
-    // 날짜/시간 합치기
-    snprintf(MII->dateTime, DATETIME_SIZE, "%s %s", date, time); */
-
     inputDateTime(MII->dateTime);
 
     // 음식명 입력

@@ -31,7 +31,7 @@ int tableExists(const char *tableName);
  * @brief DB 테이블 생성
  * 
  */
-void usersTable();
+void tableAdd();
 
 void usersDietsTable();
 
