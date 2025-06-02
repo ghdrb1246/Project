@@ -200,12 +200,12 @@ void workOutMenu(WorkOutInputInfo *WOII) {
     inputDateTime(WOII->dateTime);
 
     // 운동명 입력
-    inputLine("운동명: ", WOII->workOutName, FOODNAME_SIZE);
+    inputLine("운동명: ", WOII->exerciseName, EXERCISENAME_SIZE);
     //입력한 운동명이 DB에 있는지 여부
 
     // 시간(H) 입력
     printf("시간(H) : ");
-    scanf("%f", &WOII->duration);
+    scanf("%f", &WOII->hour);
     getchar();  // 개행 제거
 
     P_MENU_IN;
@@ -437,7 +437,7 @@ int validDateTime(char *datetime) {
     int daysInMonth[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
     
     if (strlen(datetime) >= 16) {
-        printf("YYYY-MM-DD HH:MM\n");
+        // printf("YYYY-MM-DD HH:MM\n");
         // "YYYY-MM-DD HH:MM" → 총 16자 (문자열 + 널 포함 17바이트)
         if (strlen(datetime) != 16 || datetime[4] != '-' || datetime[7] != '-' || datetime[10] != ' ' || datetime[13] != ':') {
             return 0;
@@ -461,7 +461,7 @@ int validDateTime(char *datetime) {
         if ((h < 0 || h > 23) || (min < 0 || min > 59)) return 0;
     }
     else {
-        printf("YYYY-MM-DD\n");
+        // printf("YYYY-MM-DD\n");
          // "YYYY-MM-DD" → 총 10자 (문자열 + 널 포함 11바이트)
         if (strlen(datetime) != 10 || datetime[4] != '-' || datetime[7] != '-') {
             return 0;

@@ -99,7 +99,7 @@ void tableAdd() {
     char *users_sql = "CREATE TABLE IF NOT EXISTS user (id TEXT PRIMARY KEY, password TEXT, gender TEXT, age INTEGER, height REAL, current_weight REAL, goal_weight REAL);";
     char *msal_sql = "CREATE TABLE IF NOT EXISTS meal (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT, datetime TEXT, food_name TEXT, gram REAL, kcal REAL, FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE);";
     char *workout_sql = "CREATE TABLE IF NOT EXISTS workout (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT, datetime TEXT, exercise_name TEXT, hour REAL, kcal REAL, FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE);";
-    char *weight_sql = "CREATE TABLE IF NOT EXISTS weight (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT, date TEXT, weight REAL, FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE);";
+    char *weightrecord_sql = "CREATE TABLE IF NOT EXISTS weightRecord (user_id TEXT, date TEXT, weight REAL, PRIMARY KEY (user_id, date), FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE);";
     char *err_msg = NULL;
 
     // user 테이블
@@ -124,38 +124,10 @@ void tableAdd() {
     }
     
     // 체중 테이블
-    if (sqlite3_exec(db, weight_sql, 0, 0, &err_msg) != SQLITE_OK) {
+    if (sqlite3_exec(db, weightrecord_sql, 0, 0, &err_msg) != SQLITE_OK) {
         printf("체중 테이블 생성 실패: %s\n", err_msg);
         sqlite3_free(err_msg);
         return;
-    }
-}
-
-void usersDietsTable() {
-    // 유저 다이어트 정보
-    // CREATE TABLE IF NOT EXISTS [TABLE]
-    // 테이블이 없다면 테이블을 추가 -> 따라서 tableExists()로 해당 테이블 확인할 필요 없다
-    char *sql = "CREATE TABLE IF NOT EXISTS user_diets (user_id TEXT PRIMARY KEY, height REAL, initial_weight REAL, goal_weight REAL, FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE);";
-    char *err_msg = 0;
-
-    int rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
-    if (rc != SQLITE_OK) { 
-        fprintf(stderr, "테이블 생성 오류: %s\n", err_msg);
-        sqlite3_free(err_msg);
-    }
-}
-
-void usersDietRecordsTable() {
-    // 유저 다이어트 기록
-    // CREATE TABLE IF NOT EXISTS [TABLE]
-    // 테이블이 없다면 테이블을 추가 -> 따라서 tableExists()로 해당 테이블 확인할 필요 없다
-    char *sql = "CREATE TABLE IF NOT EXISTS diet_records (record_id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT, date TEXT, meal TEXT, meal_gram REAL, workout TEXT, workout_duration REAL, weight REAL, FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE);";
-    char *err_msg = 0;
-
-    int rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
-    if (rc != SQLITE_OK) { 
-        fprintf(stderr, "테이블 생성 오류: %s\n", err_msg);
-        sqlite3_free(err_msg);
     }
 }
 
@@ -217,4 +189,74 @@ int loginUser(const char *id, const char *pw) {
     sqlite3_finalize(stmt);
 
     return result;
+}
+
+void insertMeal(MealInputInfo *MII) {
+    const char *sql = "INSERT INTO meal (user_id, datetime, food_name, gram, kcal) VALUES (?, ?, ?, ?, ?);";
+    sqlite3_stmt *stmt;
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+        printf("SQL 준비 실패: %s\n", sqlite3_errmsg(db));
+        return;
+    }
+
+    sqlite3_bind_text(stmt, 1, MII->userId, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, MII->dateTime, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 3, MII->foodName, -1, SQLITE_STATIC);
+    sqlite3_bind_double(stmt, 4, MII->gram);
+    sqlite3_bind_double(stmt, 5, MII->kcal);
+
+    if (sqlite3_step(stmt) != SQLITE_DONE) {
+        printf("식단 INSERT 실패: %s\n", sqlite3_errmsg(db));
+    } else {
+        printf("식단 입력 완료!\n");
+    }
+
+    sqlite3_finalize(stmt);
+}
+
+void insertWorkout(WorkOutInputInfo *WOII) {
+    const char *sql = "INSERT INTO workout (user_id, datetime, exercise_name, hour, kcal) VALUES (?, ?, ?, ?, ?);";
+    sqlite3_stmt *stmt;
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+        printf("SQL 준비 실패: %s\n", sqlite3_errmsg(db));
+        return;
+    }
+
+    sqlite3_bind_text(stmt, 1, WOII->userId, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, WOII->dateTime, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 3, WOII->exerciseName, -1, SQLITE_STATIC);
+    sqlite3_bind_double(stmt, 4, WOII->hour);
+    sqlite3_bind_double(stmt, 5, WOII->kcal);
+
+    if (sqlite3_step(stmt) != SQLITE_DONE) {
+        printf("운동 INSERT 실패: %s\n", sqlite3_errmsg(db));
+    } else {
+        printf("운동 입력 완료!\n");
+    }
+
+    sqlite3_finalize(stmt);
+}
+
+void insertWeight(WeightInputInfo *WII) {
+    const char *sql = "INSERT OR REPLACE INTO weightrecord (user_id, date, weight) VALUES (?, ?, ?);";
+    sqlite3_stmt *stmt;
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+        printf("SQL 준비 실패: %s\n", sqlite3_errmsg(db));
+        return;
+    }
+
+    sqlite3_bind_text(stmt, 1, WII->userId, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, WII->date, -1, SQLITE_STATIC);
+    sqlite3_bind_double(stmt, 3, WII->weight);
+
+    if (sqlite3_step(stmt) != SQLITE_DONE) {
+        printf("체중 INSERT 실패: %s\n", sqlite3_errmsg(db));
+    } else {
+        printf("체중 입력/갱신 완료!\n");
+    }
+
+    sqlite3_finalize(stmt);
 }

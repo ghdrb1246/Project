@@ -33,10 +33,6 @@ int tableExists(const char *tableName);
  */
 void tableAdd();
 
-void usersDietsTable();
-
-void usersDietRecordsTable();
-
 /**
  * @brief 사용자 id가 존재하는지 확인
  * 
@@ -62,5 +58,26 @@ int signupUser(UserSignupInfo *USI);
  * @return int | 성공 1, 실패 0
  */
 int loginUser(const char *id, const char *pw);
+
+/**
+ * @brief 식단 저장
+ * 
+ * @param MII 식단 입력 데이터
+ */
+void insertMeal(MealInputInfo *MII);
+
+/**
+ * @brief 운동 저장
+ * 
+ * @param WOII 운동 입력 데이터
+ */
+void insertWorkout(WorkOutInputInfo *WOII);
+
+/**
+ * @brief 체중 저장
+ * 
+ * @param WII 체중 입력 데이터
+ */
+void insertWeight(WeightInputInfo *WII);
 
 #endif

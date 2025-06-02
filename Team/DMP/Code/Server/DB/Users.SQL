@@ -1,7 +1,7 @@
 -- drop table user;
 -- drop table meal;
 -- drop table workout;
--- drop table weight;
+-- drop table weightRecord;
 
 /* CREATE TABLE IF NOT EXISTS users (
     id TEXT PRIMARY KEY,
@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS weight (
 
 -- SELECT * FROM users;
 
-INSERT INTO user(
+/* INSERT INTO user(
     id, 
     pw, 
     gender, 
@@ -62,4 +62,19 @@ INSERT INTO user(
     current_weight, 
     goal_weight
 )
-VALUES('gh1', '1234', 'ska', 24, 160, 45, 42);
+VALUES('gh1', '1234', 'ska', 24, 160, 45, 42); */
+
+-- DELETE FROM weight WHERE date = 'gh1';
+
+CREATE TABLE IF NOT EXISTS weightRecord (
+    user_id TEXT,
+    date TEXT,            
+    weight REAL,
+    PRIMARY KEY (user_id, date),
+    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
+);
+
+INSERT OR REPLACE INTO weightRecord (user_id, date, weight)
+VALUES ('user1', '2025-06-07', 51.0);
+
+SELECT * FROM weightRecord;

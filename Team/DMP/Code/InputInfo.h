@@ -6,7 +6,7 @@
 #define GENDER_SIZE 5
 #define DATETIME_SIZE 17
 #define FOODNAME_SIZE 50
-#define WORKOUTNAME_SIZE 50
+#define EXERCISENAME_SIZE 50
 
 // 회원가입 구조체
 /**
@@ -34,41 +34,51 @@ typedef struct {
 /**
  * @brief 식단 정보
  * 
+ * @param userId 사용자 id
  * @param dateTime 날짜/시간
  * @param foodName 음식명
  * @param gram 음식량(g)
+ * @param kcal 음식 칼로리
  * 
  */
 typedef struct {
+    char *userId;
     char *dateTime;
     char *foodName;
     float gram;
+    float kcal;
 } MealInputInfo;
 
 // 운동 입력 구조체
 /**
  * @brief 식단 정보
  * 
+ * @param userId 사용자 id
  * @param dateTime 날짜/시간
- * @param workOutName 운동명
- * @param duration 운동 시간(H)
+ * @param exerciseName 운동명
+ * @param hour 운동 시간(H)
+ * @param kcal 운동 칼로리
  * 
  */
 typedef struct {
+    char *userId;
     char *dateTime;
-    char *workOutName;
-    float duration;
+    char *exerciseName;
+    float hour;
+    float kcal;
 } WorkOutInputInfo;
 
 // 체중 입력 구조체
 /**
  * @brief 체중 정보
  * 
+ * @param userId 사용자 id
  * @param dateTime 날짜/시간
  * @param weight 체중 
  * 
  */
 typedef struct {
+    char *userId;
     char *date;
     float weight;
 } WeightInputInfo;

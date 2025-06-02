@@ -28,7 +28,6 @@ void deleteIdMenu(const char *id);
 void inputLine(const char *prompt, char *buf, int size);
 int inputMeunNum(const char *prompt);
 void inputDateTime(char *dateTime);
-
 int validDateTime(char *datetime);
 
 #endif

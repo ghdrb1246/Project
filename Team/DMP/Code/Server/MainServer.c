@@ -136,23 +136,25 @@ void processRequest(char *request, char *response) {
     else if (strcmp(cmd, "INPUT_MEAL") == 0) {
         sscanf(
             request, 
-            "INPUT_MEAL/%[^/]/%[^/]/%f", 
-            MII->dateTime, MII->foodName, &MII->gram
+            "INPUT_MEAL/%[^/]/%[^/]/%[^/]/%f", 
+            MII->userId, MII->dateTime, MII->foodName, &MII->gram
         );
 
-        printf("식단 입력 치리 -> %s %s %.1f\n", MII->dateTime, MII->foodName, MII->gram);
-        
+        printf("식단 입력 치리 -> %s %s %s %.1f\n", MII->userId, MII->dateTime, MII->foodName, MII->gram);
+        insertMeal(MII);
+
         MIIfree(MII);
     } 
     // 운동 입력
     else if (strcmp(cmd, "INPUT_WORKOUT") == 0) {
         sscanf(
             request,
-            "INPUT_WORKOUT/%[^/]/%[^/]/%f",
-            WOII->dateTime, WOII->workOutName, &WOII->duration
+            "INPUT_WORKOUT/%[^/]/%[^/]/%[^/]/%f",
+            WOII->userId, WOII->dateTime, WOII->exerciseName, &WOII->hour
         );
 
-        printf("운동 입력 치리 -> %s %s %.1f\n", WOII->dateTime, WOII->workOutName, WOII->duration);
+        printf("운동 입력 치리 -> %s %s %s %.1f\n", WOII->userId ,WOII->dateTime, WOII->exerciseName, WOII->hour);
+        insertWorkout(WOII);
 
         WOIIfree(WOII);
     } 
@@ -160,11 +162,13 @@ void processRequest(char *request, char *response) {
     else if (strcmp(cmd, "INPUT_WEIGHT") == 0) {
         sscanf(
             request,
-            "INPUT_WEIGHT/%[^/]/%f",
-            WII->date, &WII->weight
+            "INPUT_WEIGHT/%[^/]/%[^/]/%f",
+            WII->userId, WII->date, &WII->weight
         );
 
-        printf("체중 입력 치리 -> %s %.1f\n", WII->date, WII->weight);
+        printf("체중 입력 치리 -> %s %s %.1f\n", WII->userId, WII->date, WII->weight);
+        insertWeight(WII);
+
         WIIfree(WII);
     } 
     

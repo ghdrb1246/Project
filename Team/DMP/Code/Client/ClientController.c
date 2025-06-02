@@ -38,7 +38,7 @@ int sendRequestWithResponse(int sock, const char *message, char *response) {
 MenuState handleMainMenu(int sock) {
     int meunNumber = mainMenu();
     char sendBuf[1024];
-    char id[50], pw[50];
+    char id[ID_SIZE], pw[PW_SIZE];
 
     UserSignupInfo *USI = USImalloc();
     
@@ -70,6 +70,8 @@ MenuState handleMainMenu(int sock) {
                 if (strstr(response, "성공")) {
                     printf("[응답] %s\n", response);
                     // 로그인 성공 → 사용자 메뉴
+                    strcpy(loggedInUserId, id);
+
                     return STATE_USER_MENU;
                 }
                 else {
@@ -80,7 +82,6 @@ MenuState handleMainMenu(int sock) {
             }
             printf("로그인 중 오류 발생\n");
         return STATE_MAIN_MENU;
-
 
         case 3:
             printf("프로그램을 종료합니다.\n");
@@ -95,7 +96,8 @@ MenuState handleMainMenu(int sock) {
 }
 
 MenuState handleUserMenu(int sock) {
-    char id[50] = "user1"; // 로그인된 사용자 ID (추후 연동)
+    char id[50];
+    strcpy(id, loggedInUserId);
     int choice = userMenu(id);
     char sendBuf[256];
     
@@ -106,17 +108,17 @@ MenuState handleUserMenu(int sock) {
     switch (choice) {
         case 1: 
             mealMenu(MII);
-            sprintf(sendBuf, "INPUT_MEAL/%s/%s/%f", MII->dateTime, MII->foodName, MII->gram);
+            sprintf(sendBuf, "INPUT_MEAL/%s/%s/%s/%f", id, MII->dateTime, MII->foodName, MII->gram);
         break;
         
         case 2: 
             workOutMenu(WOII);
-            sprintf(sendBuf, "INPUT_WORKOUT/%s/%s/%f", WOII->dateTime, WOII->workOutName, WOII->duration);
+            sprintf(sendBuf, "INPUT_WORKOUT/%s/%s/%s/%f", id, WOII->dateTime, WOII->exerciseName, WOII->hour);
         break;
         
         case 3: 
             weightMenu(WII);
-            sprintf(sendBuf, "INPUT_WEIGHT/%s/%f", WII->date, WII->weight);
+            sprintf(sendBuf, "INPUT_WEIGHT/%s/%s/%f", id, WII->date, WII->weight);
         break;
         
         case 4: 
