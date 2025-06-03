@@ -222,7 +222,7 @@ void processRequest(char *request, char *response) {
         sscanf(request, "DELETE_ID/%s", id);
 
         printf("회원 탈퇴 처리 -> %s\n", id);
-        deleteUserData(id);
+        // deleteUserData(id);
     }
     
     else {
