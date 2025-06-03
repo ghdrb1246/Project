@@ -146,7 +146,8 @@ MenuState handleUserMenu(int sock) {
         case 7: 
             logOutMenu(id);
             sprintf(sendBuf, "LOGOUT/%s", id); 
-        return STATE_MAIN_MENU;
+        break;
+        // return STATE_MAIN_MENU;
 
         case 8: 
             deleteIdMenu(id);

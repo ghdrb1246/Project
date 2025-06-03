@@ -213,16 +213,18 @@ void processRequest(char *request, char *response) {
     } 
     // 로그아웃 처리
     else if (strcmp(cmd, "LOGOUT") == 0) {
-        printf("로그아웃 처리\n");
+        char id[ID_SIZE];
+        sscanf(request, "DELETE_ID/%s", id);
+        printf("%s 님이 로그아웃 처리 되었습니다.\n", id);
     } 
     // 회원 탈퇴 처리
     else if (strcmp(cmd, "DELETE_ID") == 0) {
-        char *id;
+        char id[ID_SIZE];
         // printf("회원 탈퇴 처리 해당 사용자 DB 삭제\n");
         sscanf(request, "DELETE_ID/%s", id);
 
         printf("회원 탈퇴 처리 -> %s\n", id);
-        // deleteUserData(id);
+        deleteUserData(id);
     }
     
     else {

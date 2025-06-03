@@ -291,16 +291,17 @@ float selectWeight(const char *id) {
     return weight;
 }
 
-
-//???????????
-
 // 사용자 ID로 연관 데이터 삭제 함수
 void deleteUserData(const char *userId) {
     sqlite3_stmt *stmt;
 
     // meal 테이블 삭제
     const char *sqlMeal = "DELETE FROM meal WHERE user_id = 'gh2'";
-    if (sqlite3_prepare_v2(db, sqlMeal, -1, &stmt, NULL) != SQLITE_OK) {
+    printf("prepare 전\n");
+    int rc = sqlite3_prepare_v2(db, sqlMeal, -1, &stmt, NULL);
+    printf("prepare 후: rc=%d\n", rc);
+
+    if (rc != SQLITE_OK) {
         printf("sqlMeal SQL 준비 실패: %s\n", sqlite3_errmsg(db));
         return;
     }
@@ -312,7 +313,7 @@ void deleteUserData(const char *userId) {
         printf("회원탈퇴 실패: %s\n", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
-/* 
+
     // workout 테이블 삭제
     const char *sqlWorkout = "DELETE FROM workout WHERE user_id = ?;";
     if (sqlite3_prepare_v2(db, sqlWorkout, -1, &stmt, NULL) != SQLITE_OK) {
@@ -347,5 +348,5 @@ void deleteUserData(const char *userId) {
     else {
         printf("회원탈퇴 실패: %s\n", sqlite3_errmsg(db));
     }
-    sqlite3_finalize(stmt); */
+    sqlite3_finalize(stmt); 
 }
