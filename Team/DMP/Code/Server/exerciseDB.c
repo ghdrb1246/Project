@@ -1,0 +1,122 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include "sqlite/sqlite3.h"
+#include "exerciseDB.h"
+
+// CSV 최신화 필요 여부 검사
+int needConvert(const char *csv, const char *db) {
+    struct stat csvStat, dbStat;
+
+    if (stat(csv, &csvStat) != 0) {
+        printf("CSV 파일 확인 실패!\n");
+        return 0;
+    }
+    if (stat(db, &dbStat) != 0) {
+        printf("DB 파일이 없으므로 변환 필요!\n");
+        return 1;
+    }
+    if (csvStat.st_mtime > dbStat.st_mtime) {
+        printf("CSV가 최신입니다. 변환 필요!\n");
+        return 1;
+    }
+    printf("DB가 최신 상태입니다. 변환 스킵!\n");
+    return 0;
+}
+
+// CSV → DB 변환 (기존 DB 삭제 후 새로 생성)
+void convertCSVtoDB() {
+    printf("기존 DB를 삭제하고 새로 생성합니다.\n");
+
+    // DB 파일 삭제
+    remove(DB_FILE);
+
+    // 새 DB 연결
+    sqlite3 *db;
+    if (sqlite3_open(DB_FILE, &db)) {
+        printf("DB 열기 실패: %s\n", sqlite3_errmsg(db));
+        return;
+    }
+
+    // 테이블 생성
+    const char *createTableSQL = "CREATE TABLE exercise (name TEXT PRIMARY KEY, met REAL);";
+    sqlite3_exec(db, createTableSQL, 0, 0, 0);
+
+    // CSV 읽기 & INSERT
+    FILE *fp = fopen(CSV_FILE, "r");
+    sqlite3_stmt *stmt;
+    
+    if (!fp) {
+        printf("CSV 열기 실패!\n");
+        sqlite3_close(db);
+        return;
+    }
+
+    sqlite3_prepare_v2(db, "INSERT INTO exercise (name, met) VALUES (?, ?);", -1, &stmt, NULL);
+
+    char line[128];
+    fgets(line, sizeof(line), fp);  // 헤더 skip
+
+    while (fgets(line, sizeof(line), fp)) {
+        char *name = strtok(line, ",\n");
+        char *metStr = strtok(NULL, ",\n");
+        float met = atof(metStr);
+
+        sqlite3_bind_text(stmt, 1, name, -1, SQLITE_STATIC);
+        sqlite3_bind_double(stmt, 2, met);
+
+        sqlite3_step(stmt);
+        sqlite3_reset(stmt);
+    }
+
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+    fclose(fp);
+
+    printf("CSV → DB 최신화 완료!\n");
+}
+
+float inputWorkoutAndCalc(char *exercise) {
+    sqlite3 *db;
+    if (sqlite3_open(DB_FILE, &db)) {
+        printf("DB 열기 실패: %s\n", sqlite3_errmsg(db));
+        return -1;
+    }
+    
+    sqlite3_stmt *stmt;
+    float met = -1;
+    // DBO("exercise");
+
+    // DB에서 운동 찾기
+    const char *sql = "SELECT met FROM exercise WHERE name = ?;";
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+        printf("SQL 준비 실패: %s\n", sqlite3_errmsg(db));
+        return -1;
+    }
+    sqlite3_bind_text(stmt, 1, exercise, -1, SQLITE_STATIC);
+
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        met = (float)sqlite3_column_double(stmt, 0);
+        sqlite3_finalize(stmt);
+    } 
+
+    else {
+        sqlite3_finalize(stmt);
+    }
+    
+    sqlite3_close(db);
+    
+    return met;
+}
+
+float METM(float met, float minutes, float user_weight) {
+    float kcal;
+    float hours = minutes / 60.0f;
+
+    // MET 계산법: kcal = MET × 체중(kg) × 시간(h)
+    kcal = met * user_weight * hours;
+
+    return kcal;
+}

@@ -80,4 +80,19 @@ void insertWorkout(WorkOutInputInfo *WOII);
  */
 void insertWeight(WeightInputInfo *WII);
 
+/**
+ * @brief 체중 조회
+ * 
+ * @param id 사용자 id
+ * @return float 조회한 체중 반횐
+ */
+float selectWeight(const char *id);
+
+/**
+ * @brief 회원탈퇴
+ * 
+ * @param id 사용자 id
+ */
+void deleteUserData(const char *id);
+
 #endif

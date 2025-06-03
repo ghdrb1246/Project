@@ -1,7 +1,7 @@
 -- drop table user;
 -- drop table meal;
 -- drop table workout;
--- drop table weightRecord;
+-- drop table weightReco/rd;
 
 /* CREATE TABLE IF NOT EXISTS users (
     id TEXT PRIMARY KEY,
@@ -66,7 +66,7 @@ VALUES('gh1', '1234', 'ska', 24, 160, 45, 42); */
 
 -- DELETE FROM weight WHERE date = 'gh1';
 
-CREATE TABLE IF NOT EXISTS weightRecord (
+/* CREATE TABLE IF NOT EXISTS weightRecord (
     user_id TEXT,
     date TEXT,            
     weight REAL,
@@ -77,4 +77,39 @@ CREATE TABLE IF NOT EXISTS weightRecord (
 INSERT OR REPLACE INTO weightRecord (user_id, date, weight)
 VALUES ('user1', '2025-06-07', 51.0);
 
-SELECT * FROM weightRecord;
+SELECT * FROM weightRecord; */
+
+-- SELECT weight FROM weightRecord WHERE user_id = 'gh1' ORDER BY date DESC LIMIT 1;
+
+-- DELETE FROM user WHERE user_id = 'gh1';
+-- DELETE FROM meal WHERE iuser_id = 'gh1';
+-- DELETE FROM workout WHERE id = 'gh1';
+-- DELETE FROM weightRecord WHERE user_id = 'gh1';
+
+/* CREATE TABLE IF NOT EXISTS workout (
+    id INTEGER PRIMARY KEY AUTOINCREMENT, 
+    user_id TEXT,
+    datetime TEXT,
+    exercise_name TEXT,
+    minutes REAL,
+    kcal REAL,
+    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
+);
+*/
+ 
+/* 
+INSERT INTO user (user_id, password, gender, age, height, exercise_weight, goal_weight) VALUES ('gh3', '1234', 'M', 24, 162, 50, 43);
+INSERT INTO meal (user_id, datetime, food_name, gram, kcal) VALUES ('gh3', '2025-06-03 09:00', 'A', 100, 10);
+INSERT INTO workout (user_id, datetime, exercise_name, minutes, kcal) VALUES ('gh1', '2025-06-02 09:00', '요가', 40, 10.32);
+INSERT INTO workout (user_id, datetime, exercise_name, minutes, kcal) VALUES ('gh1', '2025-06-03 11:45', 'test', 41, 10.32);
+INSERT INTO workout (user_id, datetime, exercise_name, minutes, kcal) VALUES ('gh2', '2025-06-02 12:45', 'test', 50, 10.32);
+INSERT INTO workout (user_id, datetime, exercise_name, minutes, kcal) VALUES ('gh3', '2025-06-03 09:45', 'test', 40, 10.32);
+INSERT INTO weightRecord (user_id, date, weight) VALUES ('gh3', '2025-06-02', 50);
+*/
+
+-- DELETE FROM user WHERE user_id = 'gh3';
+-- DELETE FROM meal WHERE user_id = 'gh3';
+-- DELETE FROM workout WHERE user_id = 'gh3';
+-- DELETE FROM weightRecord WHERE user_id = 'gh3';
+
+DELETE FROM meal WHERE user_id = 'gh2'

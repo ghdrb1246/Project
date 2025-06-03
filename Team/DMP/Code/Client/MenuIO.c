@@ -72,7 +72,7 @@ void signupMenu(UserSignupInfo *USI) {
     scanf("%f", &USI->height); getchar();
     
     printf("현재 체중 (kg): ");
-    scanf("%f", &USI->initialWeight); getchar();
+    scanf("%f", &USI->exerciseWeight); getchar();
     
     printf("목표 체중 (kg): ");
     scanf("%f", &USI->goalWeight); getchar();
@@ -204,8 +204,8 @@ void workOutMenu(WorkOutInputInfo *WOII) {
     //입력한 운동명이 DB에 있는지 여부
 
     // 시간(H) 입력
-    printf("시간(H) : ");
-    scanf("%f", &WOII->hour);
+    printf("시간 (m) : ");
+    scanf("%f", &WOII->minutes);
     getchar();  // 개행 제거
 
     P_MENU_IN;
@@ -307,7 +307,7 @@ D : Input Error
 ===========================================================
 */
 
-void checkWeightLossProgressMenu(const float initialWeight, const float goalWeight, const float currentWeight) {
+void checkWeightLossProgressMenu(const float initialWeight, const float goalWeight, const float exerciseWeight) {
     float achievementRate = 0;
     P_MENU_TITLE("감량 진행률 조회");
     P_MENU_IN;
@@ -315,7 +315,7 @@ void checkWeightLossProgressMenu(const float initialWeight, const float goalWeig
     // 초기 / 목표 / 현재 체중 + 달성률(%) 출력
     printf("초기 체중 : %f\n", initialWeight);
     printf("목표 체중 : %f\n", goalWeight);
-    printf("현재 체중 : %f\n", currentWeight);
+    printf("현재 체중 : %f\n", exerciseWeight);
     printf("달성률 : %f\n", achievementRate);
 
     P_MENU_IN;
@@ -383,11 +383,12 @@ void deleteIdMenu(const char *id) {
     P_MENU_IN;
 
     printf("%s 이/가 회원 탈퇴 처리 되었습니다.\n", id);
-    printf("DB에서 해당 id 삭제\n");
+    // printf("DB에서 해당 id 삭제\n");
 
     P_MENU_IN;
     P_MENU_END;
 }
+
 
 /* In */
 

@@ -16,7 +16,7 @@
  * @param pw pw
  * @param gender 남/여
  * @param height 키
- * @param initialWeight 초기 체중
+ * @param exerciseWeight 현재 체중
  * @param goalWeight 목표 체중
  */
 typedef struct {
@@ -25,7 +25,7 @@ typedef struct {
     char *gender;
     int age;
     float height;
-    float initialWeight;
+    float exerciseWeight;
     float goalWeight;
 } UserSignupInfo;
 
@@ -56,7 +56,7 @@ typedef struct {
  * @param userId 사용자 id
  * @param dateTime 날짜/시간
  * @param exerciseName 운동명
- * @param hour 운동 시간(H)
+ * @param minutes 운동 시간(m)
  * @param kcal 운동 칼로리
  * 
  */
@@ -64,7 +64,7 @@ typedef struct {
     char *userId;
     char *dateTime;
     char *exerciseName;
-    float hour;
+    float minutes;
     float kcal;
 } WorkOutInputInfo;
 

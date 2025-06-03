@@ -3,6 +3,7 @@
 #include <string.h>
 #include "DBM.h"
 #include "InputInfo.h"
+#include "exerciseDB.h"
 
 #ifdef _WIN32
     #include <winsock2.h>
@@ -61,7 +62,7 @@ int main() {
 
     #ifdef _WIN32
         WSACleanup();
-    #endif
+    #endif 
         return 0;
 }
 
@@ -80,6 +81,7 @@ void handleClient(SOCKET clientSock) {
 
 void processRequest(char *request, char *response) {
     char cmd[16];
+    float met;
     UserSignupInfo *USI = USImalloc();
     MealInputInfo *MII = MIImalloc();
     WeightInputInfo *WII = WIImalloc();
@@ -98,10 +100,10 @@ void processRequest(char *request, char *response) {
             request, 
             "SIGNUP/%[^/]/%[^/]/%[^/]/%d/%f/%f/%f",
             USI->id, USI->pw, USI->gender, &USI->age,
-           &USI->height, &USI->initialWeight, &USI->goalWeight
+           &USI->height, &USI->exerciseWeight, &USI->goalWeight
         );
 
-        printf("-> %s %s %s %d %f %f %f\n", USI->id, USI->pw, USI->gender, USI->age, USI->height, USI->initialWeight, USI->goalWeight);
+        printf("-> %s %s %s %d %f %f %f\n", USI->id, USI->pw, USI->gender, USI->age, USI->height, USI->exerciseWeight, USI->goalWeight);
 
         if (userExists(USI->id)) {
             sprintf(response, "[실패] 이미 존재하는 ID입니다->");
@@ -150,10 +152,30 @@ void processRequest(char *request, char *response) {
         sscanf(
             request,
             "INPUT_WORKOUT/%[^/]/%[^/]/%[^/]/%f",
-            WOII->userId, WOII->dateTime, WOII->exerciseName, &WOII->hour
+            WOII->userId, WOII->dateTime, WOII->exerciseName, &WOII->minutes
         );
 
-        printf("운동 입력 치리 -> %s %s %s %.1f\n", WOII->userId ,WOII->dateTime, WOII->exerciseName, WOII->hour);
+        printf("운동 입력 치리 -> %s %s %s %.1f\n", WOII->userId ,WOII->dateTime, WOII->exerciseName, WOII->minutes);
+
+        if (needConvert(CSV_FILE, DB_FILE)) {
+            convertCSVtoDB();
+        } 
+        else {
+            printf("최신화 불필요, 기존 DB 사용!\n");
+        }
+
+        met = inputWorkoutAndCalc(WOII->exerciseName);
+
+        if (met != -1) {
+            sprintf(response, "[성공] 운동 검사 성공");
+            
+            WOII->kcal = METM(met, WOII->minutes, selectWeight(WOII->userId));
+            // sprintf(response, "[실패] 체중 조회 실패");
+        }
+        else {
+            sprintf(response, "[실패] 검사 실패");
+        }
+
         insertWorkout(WOII);
 
         WOIIfree(WOII);
@@ -195,7 +217,12 @@ void processRequest(char *request, char *response) {
     } 
     // 회원 탈퇴 처리
     else if (strcmp(cmd, "DELETE_ID") == 0) {
-        printf("회원 탈퇴 처리 해당 사용자 DB 삭제\n");
+        char *id;
+        // printf("회원 탈퇴 처리 해당 사용자 DB 삭제\n");
+        sscanf(request, "DELETE_ID/%s", id);
+
+        printf("회원 탈퇴 처리 -> %s\n", id);
+        deleteUserData(id);
     }
     
     else {

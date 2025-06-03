@@ -54,7 +54,7 @@ MenuState handleMainMenu(int sock) {
                 sendBuf, 
                 "SIGNUP/%s/%s/%s/%d/%f/%f/%f", 
                 USI->id, USI->pw, USI->gender, USI->age,
-                USI->height, USI->initialWeight, USI->goalWeight
+                USI->height, USI->exerciseWeight, USI->goalWeight
             ); 
 
             sendRequest(sock, sendBuf);
@@ -113,7 +113,14 @@ MenuState handleUserMenu(int sock) {
         
         case 2: 
             workOutMenu(WOII);
-            sprintf(sendBuf, "INPUT_WORKOUT/%s/%s/%s/%f", id, WOII->dateTime, WOII->exerciseName, WOII->hour);
+            sprintf(sendBuf, "INPUT_WORKOUT/%s/%s/%s/%f", id, WOII->dateTime, WOII->exerciseName, WOII->minutes);
+            
+            char response[1024];
+            if (strstr(response, "실패")) {
+                // 검사 실패 → workOutMenu
+                printf("%s 는/은 제공된 운동 파일에 입력 운동은 없습니다. 다시 입력 해주세요..\n", WOII->exerciseName);
+                workOutMenu(WOII);
+            }
         break;
         
         case 3: 
@@ -144,11 +151,12 @@ MenuState handleUserMenu(int sock) {
         case 8: 
             deleteIdMenu(id);
             sprintf(sendBuf, "DELETE_ID/%s", id); 
-        return STATE_MAIN_MENU;
+        break;
+        // return STATE_MAIN_MENU;
         
         default:
             printf("잘못된 선택입니다.\n");
-        return STATE_USER_MENU;
+        break;
     }
 
     sendRequest(sock, sendBuf);
@@ -157,5 +165,5 @@ MenuState handleUserMenu(int sock) {
     WOIIfree(WOII);
     WIIfree(WII);
 
-    return STATE_USER_MENU;
+    return STATE_MAIN_MENU;
 }
