@@ -81,7 +81,7 @@ void insertWorkout(WorkOutInputInfo *WOII);
 void insertWeight(WeightInputInfo *WII);
 
 /**
- * @brief 체중 조회
+ * @brief 체중 조회 함수
  * 
  * @param id 사용자 id
  * @return float 조회한 체중 반횐
@@ -89,7 +89,7 @@ void insertWeight(WeightInputInfo *WII);
 float selectWeight(const char *id);
 
 /**
- * @brief 회원탈퇴
+ * @brief 사용자 ID로 연관 데이터 삭제 함수
  * 
  * @param id 사용자 id
  */

@@ -42,11 +42,6 @@ MenuState handleMainMenu(int sock) {
 
     UserSignupInfo *USI = USImalloc();
     
-  /*   if (!USI) {
-        printf("메모리 할당 실패!\n");
-        return;
-    }
-     */
     switch (meunNumber) {
         case 1:
             signupMenu(USI);
@@ -85,7 +80,7 @@ MenuState handleMainMenu(int sock) {
 
         case 3:
             printf("프로그램을 종료합니다.\n");
-        return STATE_EXIT;
+        break;
         
         default:
             sprintf(sendBuf, "MENU/%d", meunNumber);
@@ -93,6 +88,8 @@ MenuState handleMainMenu(int sock) {
         return STATE_MAIN_MENU;
     }
     USIfree(USI);
+
+    return STATE_EXIT;
 }
 
 MenuState handleUserMenu(int sock) {
@@ -146,6 +143,7 @@ MenuState handleUserMenu(int sock) {
         case 7: 
             logOutMenu(id);
             sprintf(sendBuf, "LOGOUT/%s", id); 
+            strcpy(loggedInUserId, "");
         break;
         // return STATE_MAIN_MENU;
 

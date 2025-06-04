@@ -131,7 +131,7 @@ void processRequest(char *request, char *response) {
         }
         USIfree(USI);
     } 
-    
+
     /* 입력 함수 -> */
 
     // 식단 입력
@@ -214,7 +214,7 @@ void processRequest(char *request, char *response) {
     // 로그아웃 처리
     else if (strcmp(cmd, "LOGOUT") == 0) {
         char id[ID_SIZE];
-        sscanf(request, "DELETE_ID/%s", id);
+        sscanf(request, "LOGOUT/%s", id);
         printf("%s 님이 로그아웃 처리 되었습니다.\n", id);
     } 
     // 회원 탈퇴 처리

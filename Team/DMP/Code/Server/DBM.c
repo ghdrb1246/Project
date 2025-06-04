@@ -100,8 +100,17 @@ void tableAdd() {
     char *msal_sql = "CREATE TABLE IF NOT EXISTS meal (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT, datetime TEXT, food_name TEXT, gram REAL, kcal REAL, FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE);";
     char *workout_sql = "CREATE TABLE IF NOT EXISTS workout (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT, datetime TEXT, exercise_name TEXT, minutes REAL, kcal REAL, FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE);";
     char *weightrecord_sql = "CREATE TABLE IF NOT EXISTS weightRecord (user_id TEXT, date TEXT, weight REAL, PRIMARY KEY (user_id, date), FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE);";
+    char *sql[4] = { users_sql, msal_sql, weightrecord_sql, weightrecord_sql };
     char *err_msg = NULL;
 
+    for (int i = 0 ; i < 4; i++) {
+        if (sqlite3_exec(db, sql[i], 0, 0, &err_msg) != SQLITE_OK) {
+            printf("%d 인텍스의 테이블 생성 실패: %s\n", i + 1, err_msg);
+            sqlite3_free(err_msg);
+            return;
+        }
+    }
+    /* 
     // user 테이블
     if (sqlite3_exec(db, users_sql, 0, 0, &err_msg) != SQLITE_OK) {
         printf("user 테이블 생성 실패: %s\n", err_msg);
@@ -128,7 +137,8 @@ void tableAdd() {
         printf("체중 테이블 생성 실패: %s\n", err_msg);
         sqlite3_free(err_msg);
         return;
-    }
+    } 
+    */
 }
 
 int userExists(const char *id) {
@@ -291,21 +301,51 @@ float selectWeight(const char *id) {
     return weight;
 }
 
-// 사용자 ID로 연관 데이터 삭제 함수
 void deleteUserData(const char *userId) {
     sqlite3_stmt *stmt;
+    const char *tableNeame[4] = { "meal", "workout", "weightRecord", "user" };
+    int conut = 0;
 
+    for (int i = 0; i < 4; i++) {
+        char *sql = (char*)malloc((strlen(tableNeame[i]) + 32) * sizeof(char));
+        snprintf(sql, (strlen(tableNeame[i]) + 32), "DELETE FROM %s WHERE user_id = ?;", tableNeame[i]);
+        printf("%12s -> %s\n", tableNeame[i], sql);
+
+        if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+            printf("%s 의 SQL 준비 실패: %s\n", tableNeame[i], sqlite3_errmsg(db));
+            return;
+        }
+        
+        sqlite3_bind_text(stmt, 1, userId, -1, SQLITE_STATIC);
+
+        if (sqlite3_step(stmt) == SQLITE_DONE) {
+            printf("%s 테이블의 데이터 모두 삭제 완료!\n", tableNeame[i]);
+            conut++;
+        } 
+        else {
+            printf("%s 테이블 데이터 삭제 실패: %s\n", tableNeame[i], sqlite3_errmsg(db));
+        }
+        sqlite3_finalize(stmt);
+    }
+    
+    if (conut > 3) {
+        printf("회원탈퇴 및 연관 데이터 모두 삭제 완료!\n");
+    } 
+    else {
+        printf("회원탈퇴 실패\n");
+    }
+
+    /* 
     // meal 테이블 삭제
-    const char *sqlMeal = "DELETE FROM meal WHERE user_id = 'gh2'";
-    printf("prepare 전\n");
-    int rc = sqlite3_prepare_v2(db, sqlMeal, -1, &stmt, NULL);
-    printf("prepare 후: rc=%d\n", rc);
+    const char *sqlMeal = "DELETE FROM meal WHERE user_id = ?";
 
-    if (rc != SQLITE_OK) {
+    if (sqlite3_prepare_v2(db, sqlMeal, -1, &stmt, NULL) != SQLITE_OK) {
         printf("sqlMeal SQL 준비 실패: %s\n", sqlite3_errmsg(db));
         return;
     }
-    // ssqlite3_bind_text(stmt, 1, userId, -1, SQLITE_STATIC);
+    
+    sqlite3_bind_text(stmt, 1, userId, -1, SQLITE_STATIC);
+    
     if (sqlite3_step(stmt) == SQLITE_DONE) {
         printf("회원탈퇴 및 연관 데이터 모두 삭제 완료!\n");
     } 
@@ -348,5 +388,6 @@ void deleteUserData(const char *userId) {
     else {
         printf("회원탈퇴 실패: %s\n", sqlite3_errmsg(db));
     }
-    sqlite3_finalize(stmt); 
+    sqlite3_finalize(stmt);  
+    */
 }

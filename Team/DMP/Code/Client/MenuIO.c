@@ -389,7 +389,6 @@ void deleteIdMenu(const char *id) {
     P_MENU_END;
 }
 
-
 /* In */
 
 void inputLine(const char *prompt, char *buf, int size) {

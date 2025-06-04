@@ -97,19 +97,19 @@ SELECT * FROM weightRecord; */
 );
 */
  
-/* 
-INSERT INTO user (user_id, password, gender, age, height, exercise_weight, goal_weight) VALUES ('gh3', '1234', 'M', 24, 162, 50, 43);
-INSERT INTO meal (user_id, datetime, food_name, gram, kcal) VALUES ('gh3', '2025-06-03 09:00', 'A', 100, 10);
-INSERT INTO workout (user_id, datetime, exercise_name, minutes, kcal) VALUES ('gh1', '2025-06-02 09:00', '요가', 40, 10.32);
-INSERT INTO workout (user_id, datetime, exercise_name, minutes, kcal) VALUES ('gh1', '2025-06-03 11:45', 'test', 41, 10.32);
+
+INSERT INTO user (user_id, password, gender, age, height, exercise_weight, goal_weight) VALUES ('gh2', '1234', 'M', 24, 162, 50, 43);
+INSERT INTO meal (user_id, datetime, food_name, gram, kcal) VALUES ('gh2', '2025-06-03 09:00', 'A', 100, 10);
+INSERT INTO workout (user_id, datetime, exercise_name, minutes, kcal) VALUES ('gh3', '2025-06-02 09:00', '요가', 40, 10.32);
+INSERT INTO workout (user_id, datetime, exercise_name, minutes, kcal) VALUES ('gh2', '2025-06-03 11:45', 'test', 41, 10.32);
 INSERT INTO workout (user_id, datetime, exercise_name, minutes, kcal) VALUES ('gh2', '2025-06-02 12:45', 'test', 50, 10.32);
 INSERT INTO workout (user_id, datetime, exercise_name, minutes, kcal) VALUES ('gh3', '2025-06-03 09:45', 'test', 40, 10.32);
-INSERT INTO weightRecord (user_id, date, weight) VALUES ('gh3', '2025-06-02', 50);
-*/
+INSERT INTO weightRecord (user_id, date, weight) VALUES ('gh2', '2025-06-02', 50);
+
 
 -- DELETE FROM user WHERE user_id = 'gh3';
 -- DELETE FROM meal WHERE user_id = 'gh3';
 -- DELETE FROM workout WHERE user_id = 'gh3';
 -- DELETE FROM weightRecord WHERE user_id = 'gh3';
 
-DELETE FROM meal WHERE user_id = 'gh2'
+-- DELETE FROM meal WHERE user_id = 'gh2'
