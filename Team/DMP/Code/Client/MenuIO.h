@@ -62,10 +62,12 @@ void workOutMenu(WorkOutInputInfo *WOII);
 void weightMenu(WeightInputInfo *WII);
 
 /**
- * @brief 날짜별 기록 조회 메뉴
+ * @brief 날짜별 기록 조회 출력 메뉴
  * 
+ * @param rds 기록 데이터 문자열
+ * @param date 기록을 획인할 날짜
  */
-void viewRecordsByDateMenu();
+void viewRecordsByDate_OUT_Menu(char *rds, char *date);
 
 /**
  * @brief 감량 진행률 조회 메뉴
@@ -131,5 +133,12 @@ void inputDateTime(char *dateTime);
  * @return int 
  */
 int validDateTime(char *datetime);
+
+/**
+ * @brief 날짜별 기록 조회 입력 메뉴
+ * 
+ * @param date 기록을 획인할 날짜
+ */
+void viewRecordsByDate_IN_Menu(char *date);
 
 #endif

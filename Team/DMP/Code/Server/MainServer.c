@@ -18,11 +18,8 @@
     #define CLOSESOCKET close
 #endif
 
-#define PORT 12345
-#define BUF_SIZE 1024
-
 void handleClient(SOCKET clientSock);
-void processRequest(char *request, char *response);
+void processRequest(SOCKET clientSock, char *request, char *response);
 
 int main() {
     #ifdef _WIN32
@@ -74,12 +71,14 @@ void handleClient(SOCKET clientSock) {
     while ((len = recv(clientSock, buf, BUF_SIZE - 1, 0)) > 0) {
         buf[len] = '\0';
         printf("[요청] %s\n", buf);
-        processRequest(buf, response);
+        processRequest(clientSock, buf, response);
         send(clientSock, response, strlen(response), 0);
     }
+
+    memset(response, 0, sizeof(response));
 }
 
-void processRequest(char *request, char *response) {
+void processRequest(SOCKET clientSock, char *request, char *response) {
     char cmd[16];
     float met;
     UserSignupInfo *USI = USImalloc();
@@ -112,6 +111,7 @@ void processRequest(char *request, char *response) {
             signupUser(USI);
             sprintf(response, "[성공] 회원가입 완료");
         }
+
         USIfree(USI);
     } 
 
@@ -198,8 +198,17 @@ void processRequest(char *request, char *response) {
 
     // 날짜별 기록 조회
     else if (strcmp(cmd, "GET_RECORD") == 0) {
+        char id[ID_SIZE], date[11], *rds;
+        
         printf("날짜별 기록 조회\n");
+
+        sscanf(request, "GET_RECORD/%[^/]/%s", id, date);
+
+        rds = viewRecordsByDate(id, date);
+        send(clientSock, rds, strlen(rds), 0);
+        // printf("MS : %s\n", rds);
     } 
+    
     // 피드백 추천
     else if (strcmp(cmd, "FEEDBACK") == 0) {
         printf("피드백 추천\n");

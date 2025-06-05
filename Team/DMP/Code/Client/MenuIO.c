@@ -1,3 +1,4 @@
+#define _GNU_SOURCE  // strtok_r 사용
 #include <stdio.h>
 #include <string.h>
 #include "MenuIO.h"
@@ -53,8 +54,6 @@ ID : _
 -----------------------------------------------------------
 ===========================================================
 */
-
-// 97378 bus error  ./client_app
 
 void signupMenu(UserSignupInfo *USI) {
     P_MENU_TITLE("회원가입");
@@ -270,24 +269,83 @@ D : Input Error
 ===========================================================
 */
 
-void viewRecordsByDateMenu() {
+void viewRecordsByDate_IN_Menu(char *date) {
     P_MENU_TITLE("날짜별 기록 조회");
     P_MENU_IN;
-    P_MENU_SB_S("기록", "---");
 
-    printf("날짜 전체 출력..\n");
+    while (1) {
+        printf("날짜 (YYYY-MM-DD): ");
+        scanf("%10s", date);
+    
+        if (validDateTime(date)) break;
+        else printf("잘 못된 형식입니다.\n");
+    }
+}
+
+void viewRecordsByDate_OUT_Menu(char *rds ,char *date) {
+    char *saveptr1, str[2] = "";
+    char *section = strtok_r(rds, "#", &saveptr1);
 
     P_MENU_IN;
-    P_MENU_SB_S("선택", "---");
-    inputMeunNum("확인할 날짜 선택 :");
+    
+    printf("%s 의 기록\n", date);
+
+    P_MENU_IN;
+
+    // printf("Menu : %s\n", rds);
+    
+    while (section) {
+        if (strncmp(section, "MEAL:", 5) == 0) {
+            printf("식단 ----\n");
+            char *data = section + 5;
+            char *saveptr2;
+            char *entry = strtok_r(data, "|", &saveptr2);
+            int mealCount = 1;
+
+            while (entry) {
+                printf("%d. %s\n", mealCount++, entry);
+                entry = strtok_r(NULL, "|", &saveptr2);
+            }
+            printf("-------------------------------\n");
+        }
+
+        else if (strncmp(section, "WORKOUT:", 8) == 0) {
+            printf("운동 ----\n");
+            char *data = section + 8;
+            char *saveptr2;
+            char *entry = strtok_r(data, "|", &saveptr2);
+            int workoutCount = 1;
+            
+            while (entry) {
+                printf("%d. %s\n", workoutCount++, entry);
+                entry = strtok_r(NULL, "|", &saveptr2);
+            }
+            printf("-------------------------------\n");
+        }
+
+        else if (strncmp(section, "WEIGHT:", 7) == 0) {
+            printf("체중 ----\n%s\n", section + 7);
+            printf("-------------------------------\n");
+        }
+        section = strtok_r(NULL, "#", &saveptr1);
+    }
     
     P_MENU_IN;
-    printf("DateTiem의 기록\n");
-    printf("식단 : %s | 운동 : %s | 체중 : %f", "1", "2", 38.0);
-    
-    P_MENU_IN;
 
-    // 뒤로 가기 [y/n]
+    while (1) {
+        printf("확인[Y/N] : ");
+        scanf("%s", str);
+        P_MENU_IN;
+
+        if (strcmp(str, "Y") == 0 || strcmp(str, "y") == 0) {
+            printf("\n뒤로 갑니다.\n\n");
+            break;
+        }
+        else if (strcmp(str, "N") == 0 || strcmp(str, "n") == 0) { 
+            printf("\n취소.\n\n");
+        }
+        else printf("%s은 잘못 된 입력입니다.\n", str);
+    }
 
     P_MENU_IN;
     P_MENU_END;

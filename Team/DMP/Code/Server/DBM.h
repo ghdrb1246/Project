@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "InputInfo.h"
+
 // DB 관리 모듈
 
 /**
@@ -94,5 +95,7 @@ float selectWeight(const char *id);
  * @param id 사용자 id
  */
 void deleteUserData(const char *id);
+
+char *viewRecordsByDate(const char *userId, const char *date);
 
 #endif

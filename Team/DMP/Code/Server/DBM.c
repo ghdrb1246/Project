@@ -391,3 +391,83 @@ void deleteUserData(const char *userId) {
     sqlite3_finalize(stmt);  
     */
 }
+
+char *viewRecordsByDate(const char *userId, const char *date)  {
+    char *rdstr = (char*)malloc(BUF_SIZE * sizeof(char));
+    sqlite3_stmt *stmt;
+
+    // 식단 기록
+    strcat(rdstr, "MEAL:");
+    const char *sqlMeal = "SELECT time(datetime), food_name, gram, kcal FROM meal WHERE user_id=? AND date(datetime)=?;";
+    if (sqlite3_prepare_v2(db, sqlMeal, -1, &stmt, NULL) == SQLITE_OK) {
+        sqlite3_bind_text(stmt, 1, userId, -1, SQLITE_STATIC);
+        sqlite3_bind_text(stmt, 2, date, -1, SQLITE_STATIC);
+
+        int first = 1;
+        while (sqlite3_step(stmt) == SQLITE_ROW) {
+            if (!first) strcat(rdstr, "|");
+            char entry[128];
+            snprintf(entry, sizeof(entry), "%s %s %.1fg %.1fkcal",
+                sqlite3_column_text(stmt, 0),
+                sqlite3_column_text(stmt, 1),
+                sqlite3_column_double(stmt, 2),
+                sqlite3_column_double(stmt, 3));
+            strcat(rdstr, entry);
+            first = 0;
+        }
+        sqlite3_finalize(stmt);
+    }
+    else {
+        printf("Err\n");
+    }
+
+    strcat(rdstr, "#");
+
+    // 운동 기록
+    strcat(rdstr, "WORKOUT:");
+    const char *sqlWorkout = "SELECT time(datetime), exercise_name, minutes, kcal FROM workout WHERE user_id=? AND date(datetime)=?;";
+    if (sqlite3_prepare_v2(db, sqlWorkout, -1, &stmt, NULL) == SQLITE_OK) {
+        sqlite3_bind_text(stmt, 1, userId, -1, SQLITE_STATIC);
+        sqlite3_bind_text(stmt, 2, date, -1, SQLITE_STATIC);
+
+        int first = 1;
+        while (sqlite3_step(stmt) == SQLITE_ROW) {
+            if (!first) strcat(rdstr, "|");
+            char entry[128];
+            snprintf(entry, sizeof(entry), "%s %s %.1fh %.1fkcal",
+                sqlite3_column_text(stmt, 0),
+                sqlite3_column_text(stmt, 1),
+                sqlite3_column_double(stmt, 2),
+                sqlite3_column_double(stmt, 3));
+            strcat(rdstr, entry);
+            first = 0;
+        }
+        sqlite3_finalize(stmt);
+    }
+    else {
+        printf("Err\n");
+    }
+    strcat(rdstr, "#");
+
+    // 체중 기록
+    strcat(rdstr, "WEIGHT:");
+    const char *sqlWeight = "SELECT weight FROM weightRecord WHERE user_id=? AND date=?;";
+    if (sqlite3_prepare_v2(db, sqlWeight, -1, &stmt, NULL) == SQLITE_OK) {
+        sqlite3_bind_text(stmt, 1, userId, -1, SQLITE_STATIC);
+        sqlite3_bind_text(stmt, 2, date, -1, SQLITE_STATIC);
+
+        if (sqlite3_step(stmt) == SQLITE_ROW) {
+            char entry[32];
+            snprintf(entry, sizeof(entry), "%.1fkg", sqlite3_column_double(stmt, 0));
+            strcat(rdstr, entry);
+        } else {
+            strcat(rdstr, "기록없음");
+        }
+        sqlite3_finalize(stmt);
+    }
+    else {
+        printf("Err\n");
+    }
+
+    return rdstr;
+}

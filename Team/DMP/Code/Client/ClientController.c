@@ -14,32 +14,41 @@
 #endif
 
 void sendRequest(int sock, const char *message) {
-    char recvBuf[1024];
+    char recvBuf[BUF_SIZE];
     send(sock, message, strlen(message), 0);
-    int len = recv(sock, recvBuf, 1023, 0);
+    int len = recv(sock, recvBuf, BUF_SIZE - 1, 0);
     if (len > 0) {
         recvBuf[len] = '\0';
-        printf("[응답] %s\n", recvBuf);
+        printf("\n\n[응답] %s\n\n", recvBuf);
     }
+    memset(recvBuf, 0, sizeof(recvBuf));
 }
 
 int sendRequestWithResponse(int sock, const char *message, char *response) {
-    char recvBuf[1024];
+    char recvBuf[BUF_SIZE];
     send(sock, message, strlen(message), 0);
-    int len = recv(sock, recvBuf, 1023, 0);
+    int len = recv(sock, recvBuf, BUF_SIZE - 1, 0);
     if (len > 0) {
         recvBuf[len] = '\0';
         strcpy(response, recvBuf);
         return 1;
     }
+    memset(recvBuf, 0, sizeof(recvBuf));
+
     return 0;
 }
 
 MenuState handleMainMenu(int sock) {
     int meunNumber = mainMenu();
-    char sendBuf[1024];
+    char sendBuf[BUF_SIZE];
     char id[ID_SIZE], pw[PW_SIZE];
+    char response[BUF_SIZE];
 
+    memset(sendBuf, 0, sizeof(sendBuf));
+    memset(id, 0, sizeof(id));
+    memset(pw, 0, sizeof(pw));
+    memset(response, 0, sizeof(response));
+    
     UserSignupInfo *USI = USImalloc();
     
     switch (meunNumber) {
@@ -59,7 +68,6 @@ MenuState handleMainMenu(int sock) {
             loginMenu(id, pw);
             sprintf(sendBuf, "LOGIN/%s/%s", id, pw);
 
-            char response[1024];
             if (sendRequestWithResponse(sock, sendBuf, response)) {
                 // 서버 응답에 \"성공\"이 포함되면
                 if (strstr(response, "성공")) {
@@ -74,6 +82,7 @@ MenuState handleMainMenu(int sock) {
                     // 실패 → 다시 메인 메뉴
                     return STATE_MAIN_MENU;
                 }
+                
             }
             printf("로그인 중 오류 발생\n");
         return STATE_MAIN_MENU;
@@ -87,17 +96,26 @@ MenuState handleMainMenu(int sock) {
             sendRequest(sock, sendBuf);
         return STATE_MAIN_MENU;
     }
+    
     USIfree(USI);
-
+    
     return STATE_EXIT;
 }
 
 MenuState handleUserMenu(int sock) {
-    char id[50];
-    strcpy(id, loggedInUserId);
-    int choice = userMenu(id);
-    char sendBuf[256];
+    char id[ID_SIZE];
+    char sendBuf[BUF_SIZE], recvBuf[BUF_SIZE], response[BUF_SIZE];
+    char date[11] = "";
     
+    memset(id, 0, sizeof(id));
+    memset(sendBuf, 0, sizeof(sendBuf));
+    memset(recvBuf, 0, sizeof(recvBuf));
+    memset(response, 0, sizeof(response));
+    
+    strcpy(id, loggedInUserId);
+    
+    int choice = userMenu(id);
+
     MealInputInfo *MII = MIImalloc();
     WorkOutInputInfo *WOII = WOIImalloc();
     WeightInputInfo *WII = WIImalloc();
@@ -112,7 +130,6 @@ MenuState handleUserMenu(int sock) {
             workOutMenu(WOII);
             sprintf(sendBuf, "INPUT_WORKOUT/%s/%s/%s/%f", id, WOII->dateTime, WOII->exerciseName, WOII->minutes);
             
-            char response[1024];
             if (strstr(response, "실패")) {
                 // 검사 실패 → workOutMenu
                 printf("%s 는/은 제공된 운동 파일에 입력 운동은 없습니다. 다시 입력 해주세요..\n", WOII->exerciseName);
@@ -125,10 +142,22 @@ MenuState handleUserMenu(int sock) {
             sprintf(sendBuf, "INPUT_WEIGHT/%s/%s/%f", id, WII->date, WII->weight);
         break;
         
-        case 4: 
-            viewRecordsByDateMenu(); 
-            sprintf(sendBuf, "GET_RECORD"); 
-        break;
+        case 4:
+            // printf("1CC : %s\n", recvBuf);
+            // char response[BUF_SIZE];
+
+            viewRecordsByDate_IN_Menu(date); 
+            snprintf(sendBuf, sizeof(sendBuf), "GET_RECORD/%s/%s", id, date);
+            send(sock, sendBuf, strlen(sendBuf), 0);
+
+            int len = recv(sock, recvBuf, sizeof(recvBuf) - 1, 0);
+            recvBuf[len] = '\0';
+
+            // printf("2CC : %s\n", recvBuf);
+
+            viewRecordsByDate_OUT_Menu(recvBuf, date);
+
+        return STATE_USER_MENU;
 
         case 5: 
             checkWeightLossProgressMenu(60.2, 50, 60);
@@ -144,14 +173,16 @@ MenuState handleUserMenu(int sock) {
             logOutMenu(id);
             sprintf(sendBuf, "LOGOUT/%s", id); 
             strcpy(loggedInUserId, "");
-        break;
-        // return STATE_MAIN_MENU;
+            sendRequest(sock, sendBuf);
+        // break;
+        return STATE_MAIN_MENU;
 
         case 8: 
             deleteIdMenu(id);
             sprintf(sendBuf, "DELETE_ID/%s", id); 
-        break;
-        // return STATE_MAIN_MENU;
+            sendRequest(sock, sendBuf);
+        // break;
+        return STATE_MAIN_MENU;
         
         default:
             printf("잘못된 선택입니다.\n");
@@ -164,5 +195,5 @@ MenuState handleUserMenu(int sock) {
     WOIIfree(WOII);
     WIIfree(WII);
 
-    return STATE_MAIN_MENU;
+    return STATE_USER_MENU;
 }

@@ -7,6 +7,11 @@
 #define DATETIME_SIZE 17
 #define FOODNAME_SIZE 50
 #define EXERCISENAME_SIZE 50
+#define BUF_SIZE 4096
+#define PORT 12345
+
+// #define SEND_BUFFER_SIZE 1024
+// #define RECV_BUFFER_SIZE 4096
 
 // 회원가입 구조체
 /**
