@@ -141,12 +141,12 @@ void tableAdd() {
     */
 }
 
-int userExists(const char *id) {
+int userExists(const char *userId) {
     sqlite3_stmt *stmt;
     const char *sql = "SELECT * FROM user WHERE id = ?;";
 
     sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
-    sqlite3_bind_text(stmt, 1, id, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 1, userId, -1, SQLITE_STATIC);
     
     int result = (sqlite3_step(stmt) == SQLITE_ROW);
     
@@ -186,12 +186,12 @@ int signupUser(UserSignupInfo *USI) {
     return 1;
 }
 
-int loginUser(const char *id, const char *pw) {
+int loginUser(const char *userId, const char *pw) {
     sqlite3_stmt *stmt;
     char *sql = "SELECT * FROM user WHERE user_id = ? AND password = ?;";
     
     sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
-    sqlite3_bind_text(stmt, 1, id, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 1, userId, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 2, pw, -1, SQLITE_STATIC);
     
     int result = (sqlite3_step(stmt) == SQLITE_ROW);
@@ -274,7 +274,7 @@ void insertWeight(WeightInputInfo *WII) {
     sqlite3_finalize(stmt);
 }
 
-float selectWeight(const char *id) {
+float selectWeight(const char *userId) {
     const char *sql = "SELECT weight FROM weightRecord WHERE user_id = ? ORDER BY date DESC LIMIT 1;";
     float weight = -1;
     sqlite3_stmt *stmt;
@@ -284,7 +284,7 @@ float selectWeight(const char *id) {
         return -1;
     }
 
-    sqlite3_bind_text(stmt, 1, id, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 1, userId, -1, SQLITE_STATIC);
 
     if (sqlite3_step(stmt) == SQLITE_ROW) {
         printf("체중 조회 완료!\n");
@@ -334,62 +334,6 @@ void deleteUserData(const char *userId) {
     else {
         printf("회원탈퇴 실패\n");
     }
-
-    /* 
-    // meal 테이블 삭제
-    const char *sqlMeal = "DELETE FROM meal WHERE user_id = ?";
-
-    if (sqlite3_prepare_v2(db, sqlMeal, -1, &stmt, NULL) != SQLITE_OK) {
-        printf("sqlMeal SQL 준비 실패: %s\n", sqlite3_errmsg(db));
-        return;
-    }
-    
-    sqlite3_bind_text(stmt, 1, userId, -1, SQLITE_STATIC);
-    
-    if (sqlite3_step(stmt) == SQLITE_DONE) {
-        printf("회원탈퇴 및 연관 데이터 모두 삭제 완료!\n");
-    } 
-    else {
-        printf("회원탈퇴 실패: %s\n", sqlite3_errmsg(db));
-    }
-    sqlite3_finalize(stmt);
-
-    // workout 테이블 삭제
-    const char *sqlWorkout = "DELETE FROM workout WHERE user_id = ?;";
-    if (sqlite3_prepare_v2(db, sqlWorkout, -1, &stmt, NULL) != SQLITE_OK) {
-        printf("workout SQL 준비 실패: %s\n", sqlite3_errmsg(db));
-        return;
-    }
-    sqlite3_bind_text(stmt, 1, userId, -1, SQLITE_STATIC);
-    sqlite3_step(stmt);
-    sqlite3_finalize(stmt);
-
-    // weightRecord 테이블 삭제
-    const char *sqlWeightRecord = "DELETE FROM weightRecord WHERE user_id = ?;";
-    if (sqlite3_prepare_v2(db, sqlWeightRecord, -1, &stmt, NULL) != SQLITE_OK) {
-        printf("sqlWeightRecord SQL 준비 실패: %s\n", sqlite3_errmsg(db));
-        return;
-    }
-    sqlite3_bind_text(stmt, 1, userId, -1, SQLITE_STATIC);
-    sqlite3_step(stmt);
-    sqlite3_finalize(stmt);
-
-    // user 테이블 삭제
-    const char *sqlUser = "DELETE FROM user WHERE user_id = ?;";
-    if (sqlite3_prepare_v2(db, sqlUser, -1, &stmt, NULL) != SQLITE_OK) {
-        printf("sqlUser SQL 준비 실패: %s\n", sqlite3_errmsg(db));
-        return;
-    }
-    sqlite3_bind_text(stmt, 1, userId, -1, SQLITE_STATIC);
-
-    if (sqlite3_step(stmt) == SQLITE_DONE) {
-        printf("회원탈퇴 및 연관 데이터 모두 삭제 완료!\n");
-    } 
-    else {
-        printf("회원탈퇴 실패: %s\n", sqlite3_errmsg(db));
-    }
-    sqlite3_finalize(stmt);  
-    */
 }
 
 char *viewRecordsByDate(const char *userId, const char *date)  {
@@ -418,7 +362,7 @@ char *viewRecordsByDate(const char *userId, const char *date)  {
         sqlite3_finalize(stmt);
     }
     else {
-        printf("Err\n");
+        printf("식단 조회 실패: %s\n", sqlite3_errmsg(db));
     }
 
     strcat(rdstr, "#");
@@ -445,7 +389,7 @@ char *viewRecordsByDate(const char *userId, const char *date)  {
         sqlite3_finalize(stmt);
     }
     else {
-        printf("Err\n");
+        printf("운동 조회 실패: %s\n", sqlite3_errmsg(db));
     }
     strcat(rdstr, "#");
 
@@ -460,14 +404,89 @@ char *viewRecordsByDate(const char *userId, const char *date)  {
             char entry[32];
             snprintf(entry, sizeof(entry), "%.1fkg", sqlite3_column_double(stmt, 0));
             strcat(rdstr, entry);
-        } else {
+        } 
+        else {
             strcat(rdstr, "기록없음");
         }
         sqlite3_finalize(stmt);
     }
     else {
-        printf("Err\n");
+        printf("체중 조회 실패: %s\n", sqlite3_errmsg(db));
     }
 
     return rdstr;
+}
+
+char *checkWeightLossProgress(char *userId) {
+    sqlite3_stmt *stmt;
+    char *cwlpstr = (char*)malloc(BUF_SIZE * sizeof(char));
+    float progress = 0.0f, initialWeight = -1.0f, goalWeight = -1.0f, currentWeight = -1.0f;
+    
+    // 1) 초기/목표 체중
+     const char *dietQuery = "SELECT exercise_weight, goal_weight FROM user WHERE user_id = ?;";
+    if (sqlite3_prepare_v2(db, dietQuery, -1, &stmt, NULL) == SQLITE_OK) {
+        sqlite3_bind_text(stmt, 1, userId, -1, SQLITE_STATIC);
+
+        if (sqlite3_step(stmt) == SQLITE_ROW) {
+            initialWeight = (float)sqlite3_column_double(stmt, 0);
+            goalWeight = (float)sqlite3_column_double(stmt, 1);
+        }
+        else {
+            strcat(cwlpstr, "초기/목표 체중 데이터 없음");
+        }
+        sqlite3_finalize(stmt);
+    }
+    else {
+        printf("초기/목표 체중 조회 실패: %s\n", sqlite3_errmsg(db));
+    }
+
+    // 2) 최신 체중
+    const char *weightQuery = "SELECT weight FROM weightRecord WHERE user_id = ? ORDER BY date DESC LIMIT 1;";
+    if (sqlite3_prepare_v2(db, weightQuery, -1, &stmt, NULL) == SQLITE_OK) {
+        sqlite3_bind_text(stmt, 1, userId, -1, SQLITE_STATIC);
+
+        if (sqlite3_step(stmt) == SQLITE_ROW) {
+            currentWeight = (float)sqlite3_column_double(stmt, 0);
+        }
+        else {
+            strcat(cwlpstr, "최신 체중 데이터 없음");
+        }
+
+        sqlite3_finalize(stmt);
+    }
+    else {
+        printf("최신 체중 조회 실패: %s\n", sqlite3_errmsg(db));
+    }
+
+
+    progress = ((initialWeight - currentWeight) / (initialWeight - goalWeight)) * 100.0f;
+    if (progress < 0) progress = 0.0f;  // 음수 보정
+
+    // 5) 결과 출력
+    snprintf(
+        cwlpstr, 
+        BUF_SIZE,
+        "progress:%.1f|initialWeight:%.1fkg|goalWeight:%.1fkg|currentWeight:%.1fkg",
+        progress, initialWeight, goalWeight, currentWeight
+    );
+/* 
+    // 3) 값이 유효한지 확인
+    if (initialWeight < 0 || goalWeight < 0 || currentWeight < 0) {
+        snprintf(cwlpstr, BUF_SIZE, "[오류] 진행률 계산에 필요한 데이터가 없습니다.");
+    }
+    else {
+        // 4) 진행률 계산
+        float progress = ((initialWeight - currentWeight) / (initialWeight - goalWeight)) * 100.0f;
+        if (progress < 0) progress = 0.0f;  // 음수 보정
+    
+        // 5) 결과 출력
+        snprintf(
+            cwlpstr, 
+            BUF_SIZE,
+            "progress:%.1f|initialWeight:%.1fkg|goalWeight:%.1fkg|currentWeight:%.1fkg",
+            progress, initialWeight, goalWeight, currentWeight
+        );
+    }
+ */
+    return cwlpstr;
 }

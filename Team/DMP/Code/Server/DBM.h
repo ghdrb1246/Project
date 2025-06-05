@@ -37,10 +37,10 @@ void tableAdd();
 /**
  * @brief 사용자 id가 존재하는지 확인
  * 
- * @param id 확인할 id
+ * @param userId 확인할 id
  * @return int | 성공 1, 실패 0
  */
-int userExists(const char *id);
+int userExists(const char *userId);
 
 /**
  * @brief 회인가입
@@ -53,12 +53,12 @@ int signupUser(UserSignupInfo *USI);
 /**
  * @brief 로그인
  * 
- * @param id  사용자 id
+ * @param userId  사용자 id
  * @param pw  사용자 pw
  * 
  * @return int | 성공 1, 실패 0
  */
-int loginUser(const char *id, const char *pw);
+int loginUser(const char *userId, const char *pw);
 
 /**
  * @brief 식단 저장
@@ -84,18 +84,32 @@ void insertWeight(WeightInputInfo *WII);
 /**
  * @brief 체중 조회 함수
  * 
- * @param id 사용자 id
+ * @param userId 사용자 id
  * @return float 조회한 체중 반횐
  */
-float selectWeight(const char *id);
+float selectWeight(const char *userId);
 
 /**
  * @brief 사용자 ID로 연관 데이터 삭제 함수
  * 
- * @param id 사용자 id
+ * @param userId 사용자 id
  */
-void deleteUserData(const char *id);
+void deleteUserData(const char *userId);
 
+/**
+ * @brief 날짜별 기록 조회
+ * 
+ * @param userId 사용자 id
+ * @param date 획인할 날짜
+ * @return char* 식단:Data|...#운동:Data|...#체중:Data|...
+ */
 char *viewRecordsByDate(const char *userId, const char *date);
 
+/**
+ * @brief 진행률 계산
+ * 
+ * @param userId 사용자 id
+ * @return char* "진행률:Data...|초기 체중:Data...|목표 체중:Data...|현재 체중:Date...
+ */
+char *checkWeightLossProgress(char *userId);
 #endif

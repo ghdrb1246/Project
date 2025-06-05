@@ -208,7 +208,7 @@ void processRequest(SOCKET clientSock, char *request, char *response) {
         send(clientSock, rds, strlen(rds), 0);
         // printf("MS : %s\n", rds);
     } 
-    
+
     // 피드백 추천
     else if (strcmp(cmd, "FEEDBACK") == 0) {
         printf("피드백 추천\n");
@@ -218,7 +218,16 @@ void processRequest(SOCKET clientSock, char *request, char *response) {
 
     // 감량 진행률 계산
     else if (strcmp(cmd, "CHECK_PROGRESS") == 0) {
+        char id[ID_SIZE], *cwlpstr;
+        
         printf("감량 진행률 계산\n");
+
+        sscanf(request, "CHECK_PROGRESS/%s", id);
+
+        cwlpstr = checkWeightLossProgress(id);
+        send(clientSock, cwlpstr, strlen(cwlpstr), 0);
+        printf("MS : %s\n", cwlpstr);
+        
     } 
     // 로그아웃 처리
     else if (strcmp(cmd, "LOGOUT") == 0) {

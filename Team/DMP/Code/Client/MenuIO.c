@@ -91,12 +91,12 @@ ID : _
 ===========================================================
 */
 
-void loginMenu(char *id, char *pw) {
+void loginMenu(char *userId, char *pw) {
     P_MENU_TITLE("로그인");
     P_MENU_IN;
     P_MENU_SB_S("입력", "----");
     
-    inputLine("ID 입력 : ", id, 50);
+    inputLine("ID 입력 : ", userId, 50);
     inputLine("PW 입력 : ", pw, 50);
 
     P_MENU_IN;
@@ -123,11 +123,11 @@ D : Input Error
 ===========================================================
 */
 
-int userMenu(char *id) {
+int userMenu(char *userId) {
     int meunNumber = 0;
 
     P_MENU_TITLE("사용자 메뉴");
-    printf("%s 님 안녕하세요\n", id);
+    printf("%s 님 안녕하세요\n", userId);
 
     P_MENU_IN;
     P_MENU_SB_S("선택", "---");
@@ -365,20 +365,86 @@ D : Input Error
 ===========================================================
 */
 
-void checkWeightLossProgressMenu(const float initialWeight, const float goalWeight, const float exerciseWeight) {
-    float achievementRate = 0;
+void checkWeightLossProgressMenu(char *cwlpstr, char *userId) {
+    char *saveptr1, str[2] = "";
+    // char *section = strtok_r(cwlpstr, "#", &saveptr1);
+    
     P_MENU_TITLE("감량 진행률 조회");
     P_MENU_IN;
 
-    // 초기 / 목표 / 현재 체중 + 달성률(%) 출력
-    printf("초기 체중 : %f\n", initialWeight);
-    printf("목표 체중 : %f\n", goalWeight);
-    printf("현재 체중 : %f\n", exerciseWeight);
-    printf("달성률 : %f\n", achievementRate);
+    printf("%s 님의 진행률\n", userId);
 
     P_MENU_IN;
+    // "progress:%.1f|initialWeight:%.1fkg|goalWeight:%.1fkg|currentWeight:%.1fkg",
+//    "[진행률] %.1f%%\n초기 체중: %.1fkg, 목표 체중: %.1fkg, 현재 체중: %.1fkg\n",
+        /* 
+        if (strncmp(cwlpstr, "progress:", 9) == 0) {
 
-    // 뒤로 가기 [y/n]
+            char *data = cwlpstr + 9;
+            char *saveptr2;
+            char *entry = strtok_r(data, "|", &saveptr2);
+            printf("진행률 : %s\n", entry);
+        }
+
+        else if (strncmp(cwlpstr, "initialWeight:", 14) == 0) {
+            char *data = cwlpstr + 14;
+            char *saveptr2;
+            char *entry = strtok_r(data, "|", &saveptr2);
+            printf("초기 체중 : %s\n", entry);
+        }
+
+        else if (strncmp(cwlpstr, "goalWeight:", 11) == 0) {
+            char *data = cwlpstr + 11;
+            char *saveptr2;
+            char *entry = strtok_r(data, "|", &saveptr2);
+            printf("목표 체중 : %s\n", entry);
+        }
+
+        else if (strncmp(cwlpstr, "currentWeight:", 14) == 0) {
+            printf("현재 체중 : %s\n", cwlpstr + 14);
+        }
+     */
+   char *saveptr;
+    char *token = strtok_r(cwlpstr, "|", &saveptr);
+    while (token) {
+        if (strncmp(token, "progress:", 9) == 0) {
+            float progress;
+            sscanf(token + 9, "%f", &progress);
+            printf("진행률 : %.1f%%\n", progress);
+        } 
+        else if (strncmp(token, "initialWeight:", 14) == 0) {
+            float initial;
+            sscanf(token + 14, "%f", &initial);
+            printf("초기 체중 : %.1fkg\n", initial);
+        } 
+        else if (strncmp(token, "goalWeight:", 11) == 0) {
+            float goal;
+            sscanf(token + 11, "%f", &goal);
+            printf("목표 체중 : %.1fkg\n", goal);
+        } 
+        else if (strncmp(token, "currentWeight:", 14) == 0) {
+            float current;
+            sscanf(token + 14, "%f", &current);
+            printf("현재 체중 : %.1fkg\n", current);
+        }
+        token = strtok_r(NULL, "|", &saveptr);
+    }
+    P_MENU_IN;
+
+    while (1) {
+        printf("확인[Y/N] : ");
+        scanf("%s", str);
+        P_MENU_IN;
+
+        if (strcmp(str, "Y") == 0 || strcmp(str, "y") == 0) {
+            printf("\n뒤로 갑니다.\n\n");
+            break;
+        }
+        else if (strcmp(str, "N") == 0 || strcmp(str, "n") == 0) { 
+            printf("\n취소.\n\n");
+        }
+        else printf("%s은 잘못 된 입력입니다.\n", str);
+    }
 
     P_MENU_IN;
     P_MENU_END;
@@ -418,11 +484,11 @@ void feedBackMenu(const float weight, const float kcal) {
 ===========================================================
 */
 
-void logOutMenu(const char *id) {
+void logOutMenu(const char *userId) {
     P_MENU_TITLE("로그 아웃");
     P_MENU_IN;
 
-    printf("%s 이/가 로그아웃 되었습니다.\n", id);
+    printf("%s 이/가 로그아웃 되었습니다.\n", userId);
 
     P_MENU_IN;
     P_MENU_END;
@@ -436,11 +502,11 @@ void logOutMenu(const char *id) {
 ===========================================================
 */
 
-void deleteIdMenu(const char *id) {
+void deleteIdMenu(const char *userId) {
     P_MENU_TITLE("회원 탈퇴");
     P_MENU_IN;
 
-    printf("%s 이/가 회원 탈퇴 처리 되었습니다.\n", id);
+    printf("%s 이/가 회원 탈퇴 처리 되었습니다.\n", userId);
     // printf("DB에서 해당 id 삭제\n");
 
     P_MENU_IN;

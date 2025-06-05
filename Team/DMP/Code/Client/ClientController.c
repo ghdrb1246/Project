@@ -44,10 +44,8 @@ MenuState handleMainMenu(int sock) {
     char id[ID_SIZE], pw[PW_SIZE];
     char response[BUF_SIZE];
 
-    memset(sendBuf, 0, sizeof(sendBuf));
     memset(id, 0, sizeof(id));
     memset(pw, 0, sizeof(pw));
-    memset(response, 0, sizeof(response));
     
     UserSignupInfo *USI = USImalloc();
     
@@ -62,6 +60,7 @@ MenuState handleMainMenu(int sock) {
             ); 
 
             sendRequest(sock, sendBuf);
+            memset(sendBuf, 0, sizeof(sendBuf));
         return STATE_MAIN_MENU;
         
         case 2:
@@ -75,11 +74,15 @@ MenuState handleMainMenu(int sock) {
                     // 로그인 성공 → 사용자 메뉴
                     strcpy(loggedInUserId, id);
 
+                    memset(sendBuf, 0, sizeof(sendBuf));
+                    memset(response, 0, sizeof(response));
                     return STATE_USER_MENU;
                 }
                 else {
                     printf("[응답] %s\n", response);
                     // 실패 → 다시 메인 메뉴
+                    memset(sendBuf, 0, sizeof(sendBuf));
+                    memset(response, 0, sizeof(response));
                     return STATE_MAIN_MENU;
                 }
                 
@@ -94,6 +97,8 @@ MenuState handleMainMenu(int sock) {
         default:
             sprintf(sendBuf, "MENU/%d", meunNumber);
             sendRequest(sock, sendBuf);
+
+            memset(sendBuf, 0, sizeof(sendBuf));
         return STATE_MAIN_MENU;
     }
     
@@ -108,13 +113,11 @@ MenuState handleUserMenu(int sock) {
     char date[11] = "";
     
     memset(id, 0, sizeof(id));
-    memset(sendBuf, 0, sizeof(sendBuf));
-    memset(recvBuf, 0, sizeof(recvBuf));
-    memset(response, 0, sizeof(response));
     
     strcpy(id, loggedInUserId);
-    
+
     int choice = userMenu(id);
+    int len;
 
     MealInputInfo *MII = MIImalloc();
     WorkOutInputInfo *WOII = WOIImalloc();
@@ -124,6 +127,7 @@ MenuState handleUserMenu(int sock) {
         case 1: 
             mealMenu(MII);
             sprintf(sendBuf, "INPUT_MEAL/%s/%s/%s/%f", id, MII->dateTime, MII->foodName, MII->gram);
+            memset(sendBuf, 0, sizeof(sendBuf));
         break;
         
         case 2: 
@@ -135,38 +139,48 @@ MenuState handleUserMenu(int sock) {
                 printf("%s 는/은 제공된 운동 파일에 입력 운동은 없습니다. 다시 입력 해주세요..\n", WOII->exerciseName);
                 workOutMenu(WOII);
             }
+            memset(sendBuf, 0, sizeof(sendBuf));
         break;
         
         case 3: 
             weightMenu(WII);
             sprintf(sendBuf, "INPUT_WEIGHT/%s/%s/%f", id, WII->date, WII->weight);
+            memset(sendBuf, 0, sizeof(sendBuf));
         break;
         
         case 4:
-            // printf("1CC : %s\n", recvBuf);
-            // char response[BUF_SIZE];
-
             viewRecordsByDate_IN_Menu(date); 
             snprintf(sendBuf, sizeof(sendBuf), "GET_RECORD/%s/%s", id, date);
             send(sock, sendBuf, strlen(sendBuf), 0);
 
-            int len = recv(sock, recvBuf, sizeof(recvBuf) - 1, 0);
+            len = recv(sock, recvBuf, sizeof(recvBuf) - 1, 0);
             recvBuf[len] = '\0';
 
             // printf("2CC : %s\n", recvBuf);
-
             viewRecordsByDate_OUT_Menu(recvBuf, date);
-
+            
+            memset(recvBuf, 0, sizeof(recvBuf));
+            memset(sendBuf, 0, sizeof(sendBuf));
         return STATE_USER_MENU;
 
         case 5: 
-            checkWeightLossProgressMenu(60.2, 50, 60);
-            sprintf(sendBuf, "CHECK_PROGRESS"); 
-        break;
+            sprintf(sendBuf, "CHECK_PROGRESS/%s", id); 
+            send(sock, sendBuf, strlen(sendBuf), 0);
+
+            len = recv(sock, recvBuf, sizeof(recvBuf) - 1, 0);
+            recvBuf[len] = '\0';
+
+            checkWeightLossProgressMenu(recvBuf, id);
+            
+            memset(recvBuf, 0, sizeof(recvBuf));
+            memset(sendBuf, 0, sizeof(sendBuf));
+        return STATE_USER_MENU;
 
         case 6: 
             feedBackMenu(60, 1000);
             sprintf(sendBuf, "FEEDBACK"); 
+
+            memset(sendBuf, 0, sizeof(sendBuf));
         break;
 
         case 7: 
@@ -174,6 +188,8 @@ MenuState handleUserMenu(int sock) {
             sprintf(sendBuf, "LOGOUT/%s", id); 
             strcpy(loggedInUserId, "");
             sendRequest(sock, sendBuf);
+
+            memset(sendBuf, 0, sizeof(sendBuf));
         // break;
         return STATE_MAIN_MENU;
 
@@ -181,6 +197,8 @@ MenuState handleUserMenu(int sock) {
             deleteIdMenu(id);
             sprintf(sendBuf, "DELETE_ID/%s", id); 
             sendRequest(sock, sendBuf);
+
+            memset(sendBuf, 0, sizeof(sendBuf));
         // break;
         return STATE_MAIN_MENU;
         
