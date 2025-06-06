@@ -1,25 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "DBM.h"
-#include "InputInfo.h"
-#include "exerciseDB.h"
-
-#ifdef _WIN32
-    #include <winsock2.h>
-    #pragma comment(lib, "ws2_32.lib")
-    typedef int socklen_t;
-    #define CLOSESOCKET closesocket
-#else
-    #include <unistd.h>
-    #include <arpa/inet.h>
-    #include <sys/socket.h>
-    #define SOCKET int
-    #define CLOSESOCKET close
-#endif
-
-void handleClient(SOCKET clientSock);
-void processRequest(SOCKET clientSock, char *request, char *response);
+#include "MainServer.h"
 
 int main() {
     #ifdef _WIN32
@@ -80,11 +59,10 @@ void handleClient(SOCKET clientSock) {
 
 void processRequest(SOCKET clientSock, char *request, char *response) {
     char cmd[16];
-    float met;
     UserSignupInfo *USI = USImalloc();
     MealInputInfo *MII = MIImalloc();
-    WeightInputInfo *WII = WIImalloc();
     WorkOutInputInfo *WOII = WOIImalloc();
+    WeightInputInfo *WII = WIImalloc();
 
     sscanf(request, "%[^/]", cmd);
 
@@ -143,8 +121,25 @@ void processRequest(SOCKET clientSock, char *request, char *response) {
         );
 
         printf("식단 입력 치리 -> %s %s %s %.1f\n", MII->userId, MII->dateTime, MII->foodName, MII->gram);
-        insertMeal(MII);
+        
+        if (needConvert(FOOD_CSV_FILE, FOOD_DB_FILE)) {
+            foodConvertCSVtoDB();
+        } 
+        else {
+            printf("최신화 불필요, 기존 DB 사용!\n");
+        }
 
+        MII->kcal = inputFoodAndCalc(MII->foodName);
+        printf("%.1f\n", MII->kcal);
+        if (MII->kcal != -1) {
+            sprintf(response, "[성공] 음식 검사 성공");
+            insertMeal(MII);
+            // sprintf(response, "[실패] 체중 조회 실패");
+        }
+        else {
+            sprintf(response, "[실패] 검사 실패");
+        }
+        
         MIIfree(MII);
     } 
     // 운동 입력
@@ -157,27 +152,24 @@ void processRequest(SOCKET clientSock, char *request, char *response) {
 
         printf("운동 입력 치리 -> %s %s %s %.1f\n", WOII->userId ,WOII->dateTime, WOII->exerciseName, WOII->minutes);
 
-        if (needConvert(CSV_FILE, DB_FILE)) {
-            convertCSVtoDB();
+        if (needConvert(EXERCISES_CSV_FILE, EXERCISES_DB_FILE)) {
+            exercisesConvertCSVtoDB();
         } 
         else {
             printf("최신화 불필요, 기존 DB 사용!\n");
         }
 
-        met = inputWorkoutAndCalc(WOII->exerciseName);
+        float met = inputWorkoutAndCalc(WOII->exerciseName);
 
         if (met != -1) {
             sprintf(response, "[성공] 운동 검사 성공");
-            
             WOII->kcal = METM(met, WOII->minutes, selectWeight(WOII->userId));
+            insertWorkout(WOII);
             // sprintf(response, "[실패] 체중 조회 실패");
         }
         else {
             sprintf(response, "[실패] 검사 실패");
         }
-
-        insertWorkout(WOII);
-
         WOIIfree(WOII);
     } 
     // 체중 입력
@@ -211,7 +203,14 @@ void processRequest(SOCKET clientSock, char *request, char *response) {
 
     // 피드백 추천
     else if (strcmp(cmd, "FEEDBACK") == 0) {
+        char id[ID_SIZE], date[11], *fbs;
         printf("피드백 추천\n");
+        
+        sscanf(request, "GET_RECORD/%[^/]/%s", id, date);
+
+        fbs = viewRecordsByDate(id, date);
+        send(clientSock, fbs, strlen(fbs), 0);
+        // printf("MS : %s\n", rds);
     } 
     
     /* 처리 함수 -> */

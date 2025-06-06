@@ -9,9 +9,24 @@
 #define EXERCISENAME_SIZE 50
 #define BUF_SIZE 4096
 #define PORT 12345
+#define SERVER_IP "127.0.0.1"
 
 // #define SEND_BUFFER_SIZE 1024
 // #define RECV_BUFFER_SIZE 4096
+
+enum MenuState {
+    STATE_MAIN_MENU,
+    STATE_SIGNUP,
+    STATE_LOGIN,
+    STATE_USER_MENU,
+    STATE_EXIT
+};
+
+/**
+ * @brief 메뉴 이동
+ * 
+ */
+typedef enum MenuState MenuState;
 
 // 회원가입 구조체
 /**

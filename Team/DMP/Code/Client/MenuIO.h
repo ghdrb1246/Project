@@ -1,12 +1,17 @@
 #ifndef MENU_IO_H
 #define MENU_IO_H
 
-#include "InputInfo.h"
+#define _GNU_SOURCE  // strtok_r 사용
 
 #define P_MENU_TITLE(s)     printf("================= [ %s ] =================\n", s)
 #define P_MENU_IN           printf("----------------------------------------------------------\n")
 #define P_MENU_END          printf("==========================================================\n\n")
 #define P_MENU_SB_S(s, l)   printf("[ %s %s------------------------------------------ ]\n", s, l)
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "InputInfo.h"
 
 /* OUT */
 
@@ -83,7 +88,7 @@ void checkWeightLossProgressMenu(char *cwlpstr, char *userId);
  * @param weight 키
  * @param kcal   칼로리
  */
-void feedBackMenu(const float weight, const float kcal);
+void feedBackMenu(const float latestWeight, const float previousWeight);
 
 /**
  * @brief 로그아웃 메뉴
@@ -139,5 +144,7 @@ int validDateTime(char *datetime);
  * @param date 기록을 획인할 날짜
  */
 void viewRecordsByDate_IN_Menu(char *date);
+
+char *strtok_u(char *__str, const char *__sep, char **__lasts);
 
 #endif

@@ -1,7 +1,7 @@
 # Server 
     - Build
-        MacSO : gcc -I. -I./Server Server/MainServer.c Server/DBM.c Server/exerciseDB.c InputInfo.c -o server_Run -lsqlite3
-        Win   : gcc -I. -I./Server Server/MainServer.c Server/DBM.c Server/exerciseDB.c InputInfo.c -L. -o server_Run.exe -lsqlite3 -lws2_32
+        MacSO : gcc -I. -I./Server Server/MainServer.c Server/DBM.c Server/exerciseDB.c InputInfo.c -o Server_Run -lsqlite3
+        Win   : gcc -I. -I./Server Server/MainServer.c Server/DBM.c Server/exerciseDB.c InputInfo.c -L. -o Server_Run.exe -lsqlite3 -lws2_32
         MacSO : ./server_Run
     - Run
         Win   : server_Run.exe
@@ -16,5 +16,9 @@
         Win   : Client_Run.exe
 
 
-gcc -I. -I./Server Server/TestServer.c -o TSR -lsqlite3
+# Test
+gcc -I. -I./Server Server/test.c -o TSR -lsqlite3   
 gcc  -I. -I/Client Client/testClient.c -o TCR
+
+gcc -I. -I./Server Server/TestAPI_S.c -o TAS -lcurl 
+gcc  -I. -I/Client Client/TestAPI_C.c -o TAC 

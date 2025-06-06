@@ -458,7 +458,6 @@ char *checkWeightLossProgress(char *userId) {
         printf("최신 체중 조회 실패: %s\n", sqlite3_errmsg(db));
     }
 
-
     progress = ((initialWeight - currentWeight) / (initialWeight - goalWeight)) * 100.0f;
     if (progress < 0) progress = 0.0f;  // 음수 보정
 
@@ -489,4 +488,58 @@ char *checkWeightLossProgress(char *userId) {
     }
  */
     return cwlpstr;
+}
+
+char *feedBack(char *userId) {
+    char *fbs = (char*)malloc(BUF_SIZE * sizeof(char));
+    char latestDate[11] = "";
+    float latestWeight, previousWeight;
+
+    sqlite3_stmt *stmt;
+
+    // 1) 최신 체중
+    const char *latestQuery = "SELECT weight, date FROM weightRecord WHERE user_id = ? ORDER BY date DESC LIMIT 1;";
+    if (sqlite3_prepare_v2(db, latestQuery, -1, &stmt, NULL) == SQLITE_OK) {
+        sqlite3_bind_text(stmt, 1, userId, -1, SQLITE_STATIC);
+        
+        if (sqlite3_step(stmt) == SQLITE_ROW) {
+            latestWeight = (float)sqlite3_column_double(stmt, 0);
+            const unsigned char *dateText = sqlite3_column_text(stmt, 1);
+            strncpy(latestDate, (const char*)dateText, sizeof(latestDate));
+        }
+        else {
+            strcat(fbs, "최신 체중 데이터 없음");
+        }
+        sqlite3_finalize(stmt);
+    }
+    else {
+        printf("최신 체중 조회 실패: %s\n", sqlite3_errmsg(db));
+    }
+
+    // 2) 전전 체중
+    const char *prevQuery = "SELECT weight FROM weightRecord WHERE user_id = ? ORDER BY date DESC LIMIT 1 OFFSET 1;";
+    if (sqlite3_prepare_v2(db, prevQuery, -1, &stmt, NULL) == SQLITE_OK) {
+        sqlite3_bind_text(stmt, 1, userId, -1, SQLITE_STATIC);
+        
+        if (sqlite3_step(stmt) == SQLITE_ROW) {
+            previousWeight = (float)sqlite3_column_double(stmt, 0);
+        }
+        else {
+            strcat(fbs, "전전 체중 데이터 없음");
+        }
+        sqlite3_finalize(stmt);
+    }
+    else {
+        printf("전전 체중 조회 실패: %s\n", sqlite3_errmsg(db));
+    }
+    
+    // 3) 결과 출력
+    snprintf(
+        fbs, 
+        BUF_SIZE,
+        "latestWeight:%.1f|previousWeight:%.1f",
+        latestWeight, previousWeight
+    );
+
+    return fbs;
 }

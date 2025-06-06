@@ -127,7 +127,9 @@ SELECT * FROM weightRecord; */
 현재 체중: 75kg 
 */
 
-INSERT INTO user (user_id, password, gender, age, height, exercise_weight, goal_weight) VALUES ('gh3', '1234', 'M', 24, 162, 80, 60);
+-- INSERT INTO user (user_id, password, gender, age, height, exercise_weight, goal_weight) VALUES ('gh3', '1234', 'M', 24, 162, 80, 60);
 -- INSERT INTO meal (user_id, datetime, food_name, gram, kcal) VALUES ('gh1', '2025-06-03 09:00', 'A', 100, 10);
 -- INSERT INTO workout (user_id, datetime, exercise_name, minutes, kcal) VALUES ('gh1', '2025-06-02 09:00', '요가', 40, 10.32);
-INSERT INTO weightRecord (user_id, date, weight) VALUES ('gh3', '2025-06-03', 75);
+-- INSERT INTO weightRecord (user_id, date, weight) VALUES ('gh3', '2025-06-03', 75);
+
+SELECT kcal FROM foods WHERE name = 'test';

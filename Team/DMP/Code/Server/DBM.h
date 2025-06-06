@@ -112,4 +112,13 @@ char *viewRecordsByDate(const char *userId, const char *date);
  * @return char* "진행률:Data...|초기 체중:Data...|목표 체중:Data...|현재 체중:Date...
  */
 char *checkWeightLossProgress(char *userId);
+
+/**
+ * @brief 피드백 
+ * 
+ * @param userId 사용자 id
+ * @return char* "최신 체중:Data...|전전 체중:Data...
+ */
+char *feedBack(char *userId);
+
 #endif

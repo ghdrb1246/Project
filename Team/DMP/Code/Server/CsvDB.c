@@ -3,7 +3,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include "sqlite/sqlite3.h"
-#include "exerciseDB.h"
+#include "CsvDB.h"
 
 // CSV 최신화 필요 여부 검사
 int needConvert(const char *csv, const char *db) {
@@ -26,15 +26,14 @@ int needConvert(const char *csv, const char *db) {
 }
 
 // CSV → DB 변환 (기존 DB 삭제 후 새로 생성)
-void convertCSVtoDB() {
+void exercisesConvertCSVtoDB() {
     printf("기존 DB를 삭제하고 새로 생성합니다.\n");
 
     // DB 파일 삭제
-    remove(DB_FILE);
-
+    remove(EXERCISES_DB_FILE);
     // 새 DB 연결
     sqlite3 *db;
-    if (sqlite3_open(DB_FILE, &db)) {
+    if (sqlite3_open(EXERCISES_DB_FILE, &db)) {
         printf("DB 열기 실패: %s\n", sqlite3_errmsg(db));
         return;
     }
@@ -44,7 +43,7 @@ void convertCSVtoDB() {
     sqlite3_exec(db, createTableSQL, 0, 0, 0);
 
     // CSV 읽기 & INSERT
-    FILE *fp = fopen(CSV_FILE, "r");
+    FILE *fp = fopen(EXERCISES_CSV_FILE, "r");
     sqlite3_stmt *stmt;
     
     if (!fp) {
@@ -52,11 +51,11 @@ void convertCSVtoDB() {
         sqlite3_close(db);
         return;
     }
-
-    sqlite3_prepare_v2(db, "INSERT INTO exercise (name, met) VALUES (?, ?);", -1, &stmt, NULL);
-
+    
     char line[128];
     fgets(line, sizeof(line), fp);  // 헤더 skip
+    
+    sqlite3_prepare_v2(db, "INSERT INTO exercise (name, met) VALUES (?, ?);", -1, &stmt, NULL);
 
     while (fgets(line, sizeof(line), fp)) {
         char *name = strtok(line, ",\n");
@@ -79,7 +78,7 @@ void convertCSVtoDB() {
 
 float inputWorkoutAndCalc(char *exercise) {
     sqlite3 *db;
-    if (sqlite3_open(DB_FILE, &db)) {
+    if (sqlite3_open(EXERCISES_DB_FILE, &db)) {
         printf("DB 열기 실패: %s\n", sqlite3_errmsg(db));
         return -1;
     }
@@ -118,5 +117,90 @@ float METM(float met, float minutes, float user_weight) {
     // MET 계산법: kcal = MET × 체중(kg) × 시간(h)
     kcal = met * user_weight * hours;
 
+    return kcal;
+}
+
+// CSV → DB 변환 (기존 DB 삭제 후 새로 생성)
+void foodConvertCSVtoDB() {
+    printf("기존 DB를 삭제하고 새로 생성합니다.\n");
+
+    // DB 파일 삭제
+    remove(FOOD_DB_FILE);
+    // 새 DB 연결
+    sqlite3 *db;
+    if (sqlite3_open(FOOD_DB_FILE, &db)) {
+        printf("DB 열기 실패: %s\n", sqlite3_errmsg(db));
+        return;
+    }
+
+    // 테이블 생성
+    const char *createTableSQL = "CREATE TABLE IF NOT EXISTS foods (name TEXT PRIMARY KEY, kcal REAL);";
+    sqlite3_exec(db, createTableSQL, 0, 0, 0);
+
+    // CSV 읽기 & INSERT
+    FILE *fp = fopen(FOOD_CSV_FILE, "r");
+    sqlite3_stmt *stmt;
+    
+    if (!fp) {
+        printf("CSV 열기 실패!\n");
+        sqlite3_close(db);
+        return;
+    }
+
+    char line[256];
+    fgets(line, sizeof(line), fp);  // 헤더 라인 skip
+
+    sqlite3_prepare_v2(db, "INSERT INTO foods (name, kcal) VALUES (?, ?);", -1, &stmt, NULL);
+
+    while (fgets(line, sizeof(line), fp)) {
+        char *name = strtok(line, ",\n");
+        char *kcalStr = strtok(NULL, ",\n");
+        float kcal = atof(kcalStr);
+
+        sqlite3_bind_text(stmt, 1, name, -1, SQLITE_STATIC);
+        sqlite3_bind_double(stmt, 2, kcal);
+
+        sqlite3_step(stmt);
+        sqlite3_reset(stmt);
+    }
+
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+    fclose(fp);
+
+    printf("CSV → DB 최신화 완료!\n");
+}
+
+float inputFoodAndCalc(char *food) {
+    sqlite3 *db;
+    if (sqlite3_open(FOOD_DB_FILE, &db)) {
+        printf("DB 열기 실패: %s\n", sqlite3_errmsg(db));
+        return -1;
+    }
+    
+    sqlite3_stmt *stmt;
+    float kcal = -1;
+    // DBO("exercise");
+
+    // DB에서 음식 찾기
+    const char *sql = "SELECT kcal FROM foods WHERE name = ?;";
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+        printf("SQL 준비 실패: %s\n", sqlite3_errmsg(db));
+        return -1;
+    }
+    sqlite3_bind_text(stmt, 1, food, -1, SQLITE_STATIC);
+
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        kcal = (float)sqlite3_column_double(stmt, 0);
+        sqlite3_finalize(stmt);
+    } 
+
+    else {
+        sqlite3_finalize(stmt);
+    }
+    
+    sqlite3_close(db);
+    
     return kcal;
 }

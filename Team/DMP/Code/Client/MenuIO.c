@@ -1,8 +1,5 @@
-#define _GNU_SOURCE  // strtok_r 사용
-#include <stdio.h>
-#include <string.h>
 #include "MenuIO.h"
-#include "InputInfo.h"
+
 /* OUT */
 
 /* 
@@ -21,21 +18,24 @@ D : Input Error
 
 int mainMenu() {
     int meunNumber = 0;
-
-    P_MENU_TITLE("다이어트 관리 프로그램");
-    P_MENU_IN;
-    P_MENU_SB_S("선택", "----");
+    while (1) {
+        P_MENU_TITLE("다이어트 관리 프로그램");
+        P_MENU_IN;
+        P_MENU_SB_S("선택", "----");
+        
+        printf("1. 회원가입\n");
+        printf("2. 로그인\n");
+        printf("3. 프로그램 종료\n");
     
-    printf("1. 회원가입\n");
-    printf("2. 로그인\n");
-    printf("3. 프로그램 종료\n");
-
-    P_MENU_IN;
-
-    meunNumber = inputMeunNum("메뉴 선택 : ");
+        P_MENU_IN;
     
+        meunNumber = inputMeunNum("메뉴 선택 : ");
+        if (meunNumber > 3) {
+            printf("%d 은 메뉴 번호가 아닙니다.\n", meunNumber);    
+        }
+        else break;
+    }
     P_MENU_IN;
-    
     P_MENU_END;
 
     return meunNumber;
@@ -125,27 +125,32 @@ D : Input Error
 
 int userMenu(char *userId) {
     int meunNumber = 0;
-
-    P_MENU_TITLE("사용자 메뉴");
-    printf("%s 님 안녕하세요\n", userId);
-
-    P_MENU_IN;
-    P_MENU_SB_S("선택", "---");
     
-    printf("1. 식단 입력\n");
-    printf("2. 운동 입력\n");
-    printf("3. 체중 입력\n");
-    printf("4. 날짜별 기록 조회\n");
-    printf("5. 감량 진행률 조회\n");
-    printf("6. 피드백 보기\n");
-    printf("7. 로그아웃\n");
-    printf("8. 회원탈퇴\n");
-    // printf("D : Input Error\n");
+    while (1) {
+        P_MENU_TITLE("사용자 메뉴");
+        printf("%s 님 안녕하세요\n", userId);
     
-    P_MENU_IN;
-    
-    meunNumber = inputMeunNum("메뉴 선택 : ");
-    
+        P_MENU_IN;
+        P_MENU_SB_S("선택", "---");
+        
+        printf("1. 식단 입력\n");
+        printf("2. 운동 입력\n");
+        printf("3. 체중 입력\n");
+        printf("4. 날짜별 기록 조회\n");
+        printf("5. 감량 진행률 조회\n");
+        printf("6. 피드백 보기\n");
+        printf("7. 로그아웃\n");
+        printf("8. 회원탈퇴\n");
+        // printf("D : Input Error\n");
+        
+        P_MENU_IN;
+        
+        meunNumber = inputMeunNum("메뉴 선택 : ");
+        if (meunNumber > 8) {
+            printf("%d 은 메뉴 번호가 아닙니다.\n", meunNumber);    
+        }
+        else break;
+    }
     P_MENU_IN;
     P_MENU_END;
 
@@ -282,9 +287,10 @@ void viewRecordsByDate_IN_Menu(char *date) {
     }
 }
 
+/* 
 void viewRecordsByDate_OUT_Menu(char *rds ,char *date) {
     char *saveptr1, str[2] = "";
-    char *section = strtok_r(rds, "#", &saveptr1);
+    char *section = strtok_u(rds, "#", &saveptr1);
 
     P_MENU_IN;
     
@@ -299,12 +305,12 @@ void viewRecordsByDate_OUT_Menu(char *rds ,char *date) {
             printf("식단 ----\n");
             char *data = section + 5;
             char *saveptr2;
-            char *entry = strtok_r(data, "|", &saveptr2);
+            char *entry = strtok_u(data, "|", &saveptr2);
             int mealCount = 1;
 
             while (entry) {
                 printf("%d. %s\n", mealCount++, entry);
-                entry = strtok_r(NULL, "|", &saveptr2);
+                entry = strtok_u(NULL, "|", &saveptr2);
             }
             printf("-------------------------------\n");
         }
@@ -313,12 +319,12 @@ void viewRecordsByDate_OUT_Menu(char *rds ,char *date) {
             printf("운동 ----\n");
             char *data = section + 8;
             char *saveptr2;
-            char *entry = strtok_r(data, "|", &saveptr2);
+            char *entry = strtok_u(data, "|", &saveptr2);
             int workoutCount = 1;
             
             while (entry) {
                 printf("%d. %s\n", workoutCount++, entry);
-                entry = strtok_r(NULL, "|", &saveptr2);
+                entry = strtok_u(NULL, "|", &saveptr2);
             }
             printf("-------------------------------\n");
         }
@@ -327,7 +333,7 @@ void viewRecordsByDate_OUT_Menu(char *rds ,char *date) {
             printf("체중 ----\n%s\n", section + 7);
             printf("-------------------------------\n");
         }
-        section = strtok_r(NULL, "#", &saveptr1);
+        section = strtok_u(NULL, "#", &saveptr1);
     }
     
     P_MENU_IN;
@@ -349,7 +355,106 @@ void viewRecordsByDate_OUT_Menu(char *rds ,char *date) {
 
     P_MENU_IN;
     P_MENU_END;
+} */
+
+void viewRecordsByDate_OUT_Menu(char *rds, char *date) {
+    char str[2] = "";
+
+    P_MENU_IN;
+    printf("%s 의 기록\n", date);
+    P_MENU_IN;
+
+    
+    // 3개의 문자열로 구간별 복사
+    char mealData[BUF_SIZE / 2] = "";
+    char workoutData[BUF_SIZE / 2] = "";
+    char weightData[BUF_SIZE / 2] = "";
+
+    // 첫 번째 레벨: '#'로 구분
+    char *section = strtok(rds, "#");
+    int sectionCount = 0;
+
+    while (section != NULL) {
+        if (sectionCount == 0) {
+            strncpy(mealData, section, sizeof(mealData)-1);
+        } else if (sectionCount == 1) {
+            strncpy(workoutData, section, sizeof(workoutData)-1);
+        } else if (sectionCount == 2) {
+            strncpy(weightData, section, sizeof(weightData)-1);
+        }
+        sectionCount++;
+
+        section = strtok(NULL, "#");
+    }
+
+    // -------------------------------
+    // 식단 데이터 출력
+    if (strlen(mealData) > 0) {
+        printf("식단 ----\n");
+        // ':' 이후 데이터만 분리
+        char *dataPart = strchr(mealData, ':');
+        if (dataPart) {
+            dataPart++;  // ':' 넘기기
+            char *entry = strtok(dataPart, "|");
+            int mealCount = 1;
+            while (entry) {
+                printf("%d. %s\n", mealCount++, entry);
+                entry = strtok(NULL, "|");
+            }
+        }
+        printf("-------------------------------\n");
+    }
+
+    // 운동 데이터 출력
+    if (strlen(workoutData) > 0) {
+        printf("운동 ----\n");
+        char *dataPart = strchr(workoutData, ':');
+        if (dataPart) {
+            dataPart++;
+            char *entry = strtok(dataPart, "|");
+            int workoutCount = 1;
+            while (entry) {
+                printf("%d. %s\n", workoutCount++, entry);
+                entry = strtok(NULL, "|");
+            }
+        }
+        printf("-------------------------------\n");
+    }
+
+    // 체중 데이터 출력
+    if (strlen(weightData) > 0) {
+        printf("체중 ----\n");
+        char *dataPart = strchr(weightData, ':');
+        if (dataPart) {
+            dataPart++;
+            printf("%s\n", dataPart);
+        }
+        printf("-------------------------------\n");
+    }
+
+    P_MENU_IN;
+
+    while (1) {
+        printf("확인[Y/N] : ");
+        scanf("%s", str);
+        // P_MENU_IN;
+
+        if (strcmp(str, "Y") == 0 || strcmp(str, "y") == 0) {
+            printf("\n뒤로 갑니다.\n\n");
+            break;
+        }
+        else if (strcmp(str, "N") == 0 || strcmp(str, "n") == 0) {
+            printf("\n취소.\n\n");
+        }
+        else {
+            printf("%s 은 잘못 된 입력입니다.\n", str);
+        }
+    }
+
+    P_MENU_IN;
+    P_MENU_END;
 }
+
 
 /* 
 ================== [   감량 진행률 조회    ] ==================
@@ -365,9 +470,10 @@ D : Input Error
 ===========================================================
 */
 
+/* 
 void checkWeightLossProgressMenu(char *cwlpstr, char *userId) {
     char *saveptr1, str[2] = "";
-    // char *section = strtok_r(cwlpstr, "#", &saveptr1);
+    // char *section = strtok_u(cwlpstr, "#", saveptr1);
     
     P_MENU_TITLE("감량 진행률 조회");
     P_MENU_IN;
@@ -375,37 +481,9 @@ void checkWeightLossProgressMenu(char *cwlpstr, char *userId) {
     printf("%s 님의 진행률\n", userId);
 
     P_MENU_IN;
-    // "progress:%.1f|initialWeight:%.1fkg|goalWeight:%.1fkg|currentWeight:%.1fkg",
-//    "[진행률] %.1f%%\n초기 체중: %.1fkg, 목표 체중: %.1fkg, 현재 체중: %.1fkg\n",
-        /* 
-        if (strncmp(cwlpstr, "progress:", 9) == 0) {
 
-            char *data = cwlpstr + 9;
-            char *saveptr2;
-            char *entry = strtok_r(data, "|", &saveptr2);
-            printf("진행률 : %s\n", entry);
-        }
-
-        else if (strncmp(cwlpstr, "initialWeight:", 14) == 0) {
-            char *data = cwlpstr + 14;
-            char *saveptr2;
-            char *entry = strtok_r(data, "|", &saveptr2);
-            printf("초기 체중 : %s\n", entry);
-        }
-
-        else if (strncmp(cwlpstr, "goalWeight:", 11) == 0) {
-            char *data = cwlpstr + 11;
-            char *saveptr2;
-            char *entry = strtok_r(data, "|", &saveptr2);
-            printf("목표 체중 : %s\n", entry);
-        }
-
-        else if (strncmp(cwlpstr, "currentWeight:", 14) == 0) {
-            printf("현재 체중 : %s\n", cwlpstr + 14);
-        }
-     */
-   char *saveptr;
-    char *token = strtok_r(cwlpstr, "|", &saveptr);
+    char *saveptr;
+    char *token = strtok_u(cwlpstr, "|", &saveptr);
     while (token) {
         if (strncmp(token, "progress:", 9) == 0) {
             float progress;
@@ -427,7 +505,7 @@ void checkWeightLossProgressMenu(char *cwlpstr, char *userId) {
             sscanf(token + 14, "%f", &current);
             printf("현재 체중 : %.1fkg\n", current);
         }
-        token = strtok_r(NULL, "|", &saveptr);
+        token = strtok_u(NULL, "|", &saveptr);
     }
     P_MENU_IN;
 
@@ -449,6 +527,68 @@ void checkWeightLossProgressMenu(char *cwlpstr, char *userId) {
     P_MENU_IN;
     P_MENU_END;
 }
+*/
+
+void checkWeightLossProgressMenu(char *cwlpstr, char *userId) {
+    char str[2] = "";
+
+    P_MENU_TITLE("감량 진행률 조회");
+    P_MENU_IN;
+
+    printf("%s 님의 진행률\n", userId);
+
+    P_MENU_IN;
+
+    char dataCopy[BUF_SIZE];
+    strncpy(dataCopy, cwlpstr, sizeof(dataCopy)-1);
+    dataCopy[sizeof(dataCopy)-1] = '\0';
+
+    char *token = strtok(dataCopy, "|");
+    while (token != NULL) {
+        if (strncmp(token, "progress:", 9) == 0) {
+            float progress;
+            sscanf(token + 9, "%f", &progress);
+            printf("진행률 : %.1f%%\n", progress);
+        } 
+        else if (strncmp(token, "initialWeight:", 14) == 0) {
+            float initial;
+            sscanf(token + 14, "%f", &initial);
+            printf("초기 체중 : %.1fkg\n", initial);
+        } 
+        else if (strncmp(token, "goalWeight:", 11) == 0) {
+            float goal;
+            sscanf(token + 11, "%f", &goal);
+            printf("목표 체중 : %.1fkg\n", goal);
+        } 
+        else if (strncmp(token, "currentWeight:", 14) == 0) {
+            float current;
+            sscanf(token + 14, "%f", &current);
+            printf("현재 체중 : %.1fkg\n", current);
+        }
+
+        token = strtok(NULL, "|");
+    }
+
+    printf("====================================\n");
+
+    while (1) {
+        printf("확인[Y/N] : ");
+        scanf("%s", str);
+        printf("====================================\n");
+
+        if (strcmp(str, "Y") == 0 || strcmp(str, "y") == 0) {
+            printf("\n뒤로 갑니다.\n\n");
+            break;
+        }
+        else if (strcmp(str, "N") == 0 || strcmp(str, "n") == 0) { 
+            printf("\n취소.\n\n");
+        }
+        else printf("%s 은 잘못 된 입력입니다.\n", str);
+    }
+
+    printf("====================================\n");
+}
+
 
 /* 
 ================== [       피드백       ] ==================
@@ -460,18 +600,53 @@ void checkWeightLossProgressMenu(char *cwlpstr, char *userId) {
 ===========================================================
 */
 
-void feedBackMenu(const float weight, const float kcal) {
+void feedBackMenu(const float latestWeight, const float previousWeight) {
+    const char *exerciseRecommendations[] = {
+        "자전거", "근육트레이닝", "복싱", "런닝머신", "줄넘기", "수영", "요가 스트레칭"
+    };
+    const char *mealRecommendations[] = {
+        "닭가슴살 샐러드", "그릭 요거트", "연어 포케", "두부 샐러드", "삶은 달걀", "계란 스크램블", "베이글(잼X)"
+    };
+    char str[2] = "";
+
     P_MENU_TITLE("피드백");
     P_MENU_IN;
     
-    printf("체중 증가 또는 칼로리 초과시 추천 출력\n");
-    printf("%f | %f\n", weight, kcal);
-    printf("음식 API\n");
+    if (latestWeight < 0 || previousWeight < 0) {
+        printf("[오류] 입력된 몸무게 데이터가 부족합니다.\n");
+    } 
+    else if (latestWeight > previousWeight) {
+        // 운동/음식 추천 배열
+        int exerciseCount = sizeof(exerciseRecommendations) / sizeof(exerciseRecommendations[0]);
+        int mealCount = sizeof(mealRecommendations) / sizeof(mealRecommendations[0]);
 
+        int exerciseIndex = rand() % exerciseCount;
+        int mealIndex = rand() % mealCount;
+
+        printf("[피드백] 최근 체중이 증가했습니다. 식단과 운동을 다시 점검해보세요.\n");
+        printf("추천 운동: %s\n", exerciseRecommendations[exerciseIndex]);
+        printf("추천 음식: %s\n", mealRecommendations[mealIndex]);
+    } 
+    else {
+        printf("[피드백] 다이어트 잘하고 있어요! 계속 힘내세요.\n");
+    }
     P_MENU_IN;
 
-    // 뒤로 가기 [y/n]
-    
+    while (1) {
+        printf("확인[Y/N] : ");
+        scanf("%s", str);
+        P_MENU_IN;
+
+        if (strcmp(str, "Y") == 0 || strcmp(str, "y") == 0) {
+            printf("\n뒤로 갑니다.\n\n");
+            break;
+        }
+        else if (strcmp(str, "N") == 0 || strcmp(str, "n") == 0) { 
+            printf("\n취소.\n\n");
+        }
+        else printf("%s은 잘못 된 입력입니다.\n", str);
+    }
+   
     P_MENU_IN;
     P_MENU_END;
 }
@@ -607,4 +782,14 @@ int validDateTime(char *datetime) {
     }
 
     return 1; // 유효한 날짜+시간
+}
+
+char *strtok_u(char *__str, const char *__sep, char **__lasts) {
+    #ifdef _WIN32
+        char *token = strtok_s(__str, __sep, __lasts);
+    #else
+        char *token = strtok_r(__str, __sep, __lasts);
+    #endif
+
+    return token;
 }
