@@ -145,6 +145,4 @@ int validDateTime(char *datetime);
  */
 void viewRecordsByDate_IN_Menu(char *date);
 
-char *strtok_u(char *__str, const char *__sep, char **__lasts);
-
 #endif

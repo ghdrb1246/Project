@@ -783,13 +783,3 @@ int validDateTime(char *datetime) {
 
     return 1; // 유효한 날짜+시간
 }
-
-char *strtok_u(char *__str, const char *__sep, char **__lasts) {
-    #ifdef _WIN32
-        char *token = strtok_s(__str, __sep, __lasts);
-    #else
-        char *token = strtok_r(__str, __sep, __lasts);
-    #endif
-
-    return token;
-}
