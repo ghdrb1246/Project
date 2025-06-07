@@ -132,4 +132,4 @@ SELECT * FROM weightRecord; */
 -- INSERT INTO workout (user_id, datetime, exercise_name, minutes, kcal) VALUES ('gh1', '2025-06-02 09:00', '요가', 40, 10.32);
 -- INSERT INTO weightRecord (user_id, date, weight) VALUES ('gh3', '2025-06-03', 75);
 
-SELECT kcal FROM foods WHERE name = 'test';
+SELECT kcal FROM foods WHERE name = '사과';

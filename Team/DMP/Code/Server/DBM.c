@@ -216,6 +216,10 @@ void insertMeal(MealInputInfo *MII) {
     sqlite3_bind_double(stmt, 4, MII->gram);
     sqlite3_bind_double(stmt, 5, MII->kcal);
 
+    // 입력 확인
+    // printf("DB 식단 : %s - %lu\n", MII->foodName, strlen(MII->foodName));
+    printf("DB 식단 : %s - 공백 ? : %s(길이|%lu, 공백 위치|%lu)\n", MII->foodName, (strcspn(MII->foodName, "\n") != strlen(MII->foodName)) ? "있음" : "없음", strlen(MII->foodName), strcspn(MII->foodName, "\n"));
+
     if (sqlite3_step(stmt) != SQLITE_DONE) {
         printf("식단 INSERT 실패: %s\n", sqlite3_errmsg(db));
     } 
@@ -240,6 +244,10 @@ void insertWorkout(WorkOutInputInfo *WOII) {
     sqlite3_bind_text(stmt, 3, WOII->exerciseName, -1, SQLITE_STATIC);
     sqlite3_bind_double(stmt, 4, WOII->minutes);
     sqlite3_bind_double(stmt, 5, WOII->kcal);
+
+    // 입력 확인
+    // printf("DB 운동 : %s - %lu\n", WOII->exerciseName, strlen(WOII->exerciseName));
+    printf("DB 운동 : %s - 공백 ? : %s(길이|%lu, 공백 위치|%lu)\n", WOII->exerciseName, (strcspn(WOII->exerciseName, "\n") != strlen(WOII->exerciseName)) ? "있음" : "없음", strlen(WOII->exerciseName), strcspn(WOII->exerciseName, "\n"));
 
     if (sqlite3_step(stmt) != SQLITE_DONE) {
         printf("운동 INSERT 실패: %s\n", sqlite3_errmsg(db));

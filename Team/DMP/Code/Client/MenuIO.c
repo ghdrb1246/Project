@@ -175,7 +175,11 @@ void mealMenu(MealInputInfo *MII) {
 
     // 음식명 입력
     inputLine("음식명: ", MII->foodName, FOODNAME_SIZE);
-
+    
+    // 입력 확인
+    // printf("Meun 식단 : %s - %lu\n", MII->foodName, strlen(MII->foodName));
+    printf("Meun 식단 : %s - 공백 ? : %s(길이|%lu, 공백 위치|%lu)\n", MII->foodName, (strcspn(MII->foodName, "\n") != strlen(MII->foodName)) ? "있음" : "없음", strlen(MII->foodName), strcspn(MII->foodName, "\n"));
+    
     // 섭취량 입력
     printf("섭취량(g): ");
     scanf("%f", &MII->gram);
@@ -205,6 +209,10 @@ void workOutMenu(WorkOutInputInfo *WOII) {
 
     // 운동명 입력
     inputLine("운동명: ", WOII->exerciseName, EXERCISENAME_SIZE);
+
+    // 입력 확인
+    // printf("Meun 운동 : %s - %lu\n", WOII->exerciseName, strlen(WOII->exerciseName));
+    printf("Meun 운동 : %s - 공백 ? : %s(길이|%lu, 공백 위치|%lu)\n", WOII->exerciseName, (strcspn(WOII->exerciseName, "\n") != strlen(WOII->exerciseName)) ? "있음" : "없음", strlen(WOII->exerciseName), strcspn(WOII->exerciseName, "\n"));
     //입력한 운동명이 DB에 있는지 여부
 
     // 시간(H) 입력
@@ -455,7 +463,6 @@ void viewRecordsByDate_OUT_Menu(char *rds, char *date) {
     P_MENU_END;
 }
 
-
 /* 
 ================== [   감량 진행률 조회    ] ==================
 -----------------------------------------------------------
@@ -588,7 +595,6 @@ void checkWeightLossProgressMenu(char *cwlpstr, char *userId) {
 
     printf("====================================\n");
 }
-
 
 /* 
 ================== [       피드백       ] ==================
