@@ -3,10 +3,10 @@
 
 #define _GNU_SOURCE  // strtok_r 사용
 
-#define P_MENU_TITLE(s)     printf("================= [ %s ] =================\n", s)
-#define P_MENU_IN           printf("----------------------------------------------------------\n")
-#define P_MENU_END          printf("==========================================================\n\n")
-#define P_MENU_SB_S(s, l)   printf("[ %s %s------------------------------------------ ]\n", s, l)
+#define P_MENU_TITLE(s)     printf("================= [%s] =================\n", s)
+#define P_MENU_IN           printf("--------------------------------------------------------------\n")
+#define P_MENU_END          printf("==============================================================\n\n")
+#define P_MENU_SB_S(s, l)   printf("[ %s %s------------------------------------------------- ]\n", s, l)
 
 #include <stdio.h>
 #include <stdlib.h>

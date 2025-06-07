@@ -19,7 +19,7 @@ D : Input Error
 int mainMenu() {
     int meunNumber = 0;
     while (1) {
-        P_MENU_TITLE("다이어트 관리 프로그램");
+        P_MENU_TITLE(" 다이어트 관리 프로그램 ");
         P_MENU_IN;
         P_MENU_SB_S("선택", "----");
         
@@ -56,7 +56,7 @@ ID : _
 */
 
 void signupMenu(UserSignupInfo *USI) {
-    P_MENU_TITLE("회원가입");
+    P_MENU_TITLE("      회원 가입      ");
     P_MENU_IN;
     P_MENU_SB_S("입력", "----");
     
@@ -92,7 +92,7 @@ ID : _
 */
 
 void loginMenu(char *userId, char *pw) {
-    P_MENU_TITLE("로그인");
+    P_MENU_TITLE("        로 그 인        ");
     P_MENU_IN;
     P_MENU_SB_S("입력", "----");
     
@@ -127,7 +127,7 @@ int userMenu(char *userId) {
     int meunNumber = 0;
     
     while (1) {
-        P_MENU_TITLE("사용자 메뉴");
+        P_MENU_TITLE("      사용자  메뉴      ");
         printf("%s 님 안녕하세요\n", userId);
     
         P_MENU_IN;
@@ -168,17 +168,17 @@ int userMenu(char *userId) {
 */
 
 void mealMenu(MealInputInfo *MII) {
-    P_MENU_TITLE("식단 입력");
+    P_MENU_TITLE("       식단  입력       ");
     P_MENU_IN;
     
     inputDateTime(MII->dateTime);
 
     // 음식명 입력
     inputLine("음식명: ", MII->foodName, FOODNAME_SIZE);
-    
+    // printf("음식명: "); scanf("%s", MII->foodName);
     // 입력 확인
     // printf("Meun 식단 : %s - %lu\n", MII->foodName, strlen(MII->foodName));
-    printf("Meun 식단 : %s - 공백 ? : %s(길이|%lu, 공백 위치|%lu)\n", MII->foodName, (strcspn(MII->foodName, "\n") != strlen(MII->foodName)) ? "있음" : "없음", strlen(MII->foodName), strcspn(MII->foodName, "\n"));
+    // printf("Meun 식단 : %s - 공백 ? : %s(길이|%lu, 공백 위치|%lu)\n", MII->foodName, (strcspn(MII->foodName, "\n") != strlen(MII->foodName)) ? "있음" : "없음", strlen(MII->foodName), strcspn(MII->foodName, "\n"));
     
     // 섭취량 입력
     printf("섭취량(g): ");
@@ -202,17 +202,17 @@ void mealMenu(MealInputInfo *MII) {
 */
 
 void workOutMenu(WorkOutInputInfo *WOII) {
-    P_MENU_TITLE("운동 입력");
+    P_MENU_TITLE("       운동  입력       ");
     P_MENU_IN;
 
     inputDateTime(WOII->dateTime);
 
     // 운동명 입력
     inputLine("운동명: ", WOII->exerciseName, EXERCISENAME_SIZE);
-
+    // printf("운동명: "); scanf("%s", WOII->exerciseName);
     // 입력 확인
     // printf("Meun 운동 : %s - %lu\n", WOII->exerciseName, strlen(WOII->exerciseName));
-    printf("Meun 운동 : %s - 공백 ? : %s(길이|%lu, 공백 위치|%lu)\n", WOII->exerciseName, (strcspn(WOII->exerciseName, "\n") != strlen(WOII->exerciseName)) ? "있음" : "없음", strlen(WOII->exerciseName), strcspn(WOII->exerciseName, "\n"));
+    // printf("Meun 운동 : %s - 공백 ? : %s(길이|%lu, 공백 위치|%lu)\n", WOII->exerciseName, (strcspn(WOII->exerciseName, "\n") != strlen(WOII->exerciseName)) ? "있음" : "없음", strlen(WOII->exerciseName), strcspn(WOII->exerciseName, "\n"));
     //입력한 운동명이 DB에 있는지 여부
 
     // 시간(H) 입력
@@ -236,8 +236,8 @@ void workOutMenu(WorkOutInputInfo *WOII) {
 */
 
 void weightMenu(WeightInputInfo *WII) {
-    P_MENU_TITLE("체중 입력");
-    P_MENU_IN;
+    P_MENU_TITLE("       체중  입력       ");
+    P_MENU_IN; 
 
     while (1) {
         printf("날짜 (YYYY-MM-DD): ");
@@ -283,7 +283,7 @@ D : Input Error
 */
 
 void viewRecordsByDate_IN_Menu(char *date) {
-    P_MENU_TITLE("날짜별 기록 조회");
+    P_MENU_TITLE("    날짜별 기록 조회    ");
     P_MENU_IN;
 
     while (1) {
@@ -398,7 +398,7 @@ void viewRecordsByDate_OUT_Menu(char *rds, char *date) {
     // -------------------------------
     // 식단 데이터 출력
     if (strlen(mealData) > 0) {
-        printf("식단 ----\n");
+        P_MENU_SB_S("식단", "----");
         // ':' 이후 데이터만 분리
         char *dataPart = strchr(mealData, ':');
         if (dataPart) {
@@ -410,12 +410,13 @@ void viewRecordsByDate_OUT_Menu(char *rds, char *date) {
                 entry = strtok(NULL, "|");
             }
         }
-        printf("-------------------------------\n");
+        P_MENU_IN;
     }
 
     // 운동 데이터 출력
     if (strlen(workoutData) > 0) {
-        printf("운동 ----\n");
+        P_MENU_SB_S("운동", "----");
+
         char *dataPart = strchr(workoutData, ':');
         if (dataPart) {
             dataPart++;
@@ -426,21 +427,20 @@ void viewRecordsByDate_OUT_Menu(char *rds, char *date) {
                 entry = strtok(NULL, "|");
             }
         }
-        printf("-------------------------------\n");
+        P_MENU_IN;
     }
 
     // 체중 데이터 출력
     if (strlen(weightData) > 0) {
-        printf("체중 ----\n");
+        P_MENU_SB_S("체중", "----");
+
         char *dataPart = strchr(weightData, ':');
         if (dataPart) {
             dataPart++;
             printf("%s\n", dataPart);
         }
-        printf("-------------------------------\n");
+        P_MENU_IN;
     }
-
-    P_MENU_IN;
 
     while (1) {
         printf("확인[Y/N] : ");
@@ -539,7 +539,7 @@ void checkWeightLossProgressMenu(char *cwlpstr, char *userId) {
 void checkWeightLossProgressMenu(char *cwlpstr, char *userId) {
     char str[2] = "";
 
-    P_MENU_TITLE("감량 진행률 조회");
+    P_MENU_TITLE("    감량 진행률 조회    ");
     P_MENU_IN;
 
     printf("%s 님의 진행률\n", userId);
@@ -615,7 +615,7 @@ void feedBackMenu(const float latestWeight, const float previousWeight) {
     };
     char str[2] = "";
 
-    P_MENU_TITLE("피드백");
+    P_MENU_TITLE("        피 드 백         ");
     P_MENU_IN;
     
     if (latestWeight < 0 || previousWeight < 0) {
@@ -666,7 +666,7 @@ void feedBackMenu(const float latestWeight, const float previousWeight) {
 */
 
 void logOutMenu(const char *userId) {
-    P_MENU_TITLE("로그 아웃");
+    P_MENU_TITLE("        로그 아웃        ");
     P_MENU_IN;
 
     printf("%s 이/가 로그아웃 되었습니다.\n", userId);
@@ -684,8 +684,8 @@ void logOutMenu(const char *userId) {
 */
 
 void deleteIdMenu(const char *userId) {
-    P_MENU_TITLE("회원 탈퇴");
-    P_MENU_IN;
+    P_MENU_TITLE("        회원 탈퇴        ");
+    P_MENU_IN; 
 
     printf("%s 이/가 회원 탈퇴 처리 되었습니다.\n", userId);
     // printf("DB에서 해당 id 삭제\n");

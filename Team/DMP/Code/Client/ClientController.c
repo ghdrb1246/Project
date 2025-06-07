@@ -6,7 +6,7 @@ void sendRequest(int sock, const char *message) {
     int len = recv(sock, recvBuf, BUF_SIZE - 1, 0);
     if (len > 0) {
         recvBuf[len] = '\0';
-        printf("\n\n[응답] %s\n\n", recvBuf);
+        // printf("\n\n[응답] %s\n\n", recvBuf);
     }
     memset(recvBuf, 0, sizeof(recvBuf));
 }
@@ -31,10 +31,10 @@ MenuState handleMainMenu(int sock) {
     char id[ID_SIZE], pw[PW_SIZE];
     char response[BUF_SIZE];
 
-    memset(id, 0, sizeof(id));
+    /* memset(id, 0, sizeof(id));
     memset(pw, 0, sizeof(pw));
     memset(sendBuf, 0, sizeof(sendBuf));
-    memset(response, 0, sizeof(response));
+    memset(response, 0, sizeof(response)); */
 
     UserSignupInfo *USI = USImalloc();
     
@@ -49,7 +49,7 @@ MenuState handleMainMenu(int sock) {
             ); 
 
             sendRequest(sock, sendBuf);
-            // memset(sendBuf, 0, sizeof(sendBuf));
+            memset(sendBuf, 0, sizeof(sendBuf));
         return STATE_MAIN_MENU;
         
         case 2:
@@ -59,24 +59,25 @@ MenuState handleMainMenu(int sock) {
             if (sendRequestWithResponse(sock, sendBuf, response)) {
                 // 서버 응답에 \"성공\"이 포함되면
                 if (strstr(response, "성공")) {
-                    printf("[응답] %s\n", response);
+                    // printf("[응답] %s\n", response);
                     // 로그인 성공 → 사용자 메뉴
                     strcpy(loggedInUserId, id);
 
-                    // memset(sendBuf, 0, sizeof(sendBuf));
+                    memset(sendBuf, 0, sizeof(sendBuf));
                     memset(response, 0, sizeof(response));
                     return STATE_USER_MENU;
                 }
                 else {
-                    printf("[응답] %s\n", response);
+                    // printf("[응답] %s\n", response);
                     // 실패 → 다시 메인 메뉴
-                    // memset(sendBuf, 0, sizeof(sendBuf));
+                    memset(sendBuf, 0, sizeof(sendBuf));
                     memset(response, 0, sizeof(response));
                     return STATE_MAIN_MENU;
                 }
                 
             }
             printf("로그인 중 오류 발생\n");
+            memset(sendBuf, 0, sizeof(sendBuf));
         return STATE_MAIN_MENU;
 
         case 3:
@@ -93,6 +94,8 @@ MenuState handleMainMenu(int sock) {
     
     USIfree(USI);
     
+    memset(sendBuf, 0, sizeof(sendBuf));
+    memset(response, 0, sizeof(response));
     return STATE_EXIT;
 }
 
@@ -101,10 +104,10 @@ MenuState handleUserMenu(int sock) {
     char sendBuf[BUF_SIZE], recvBuf[BUF_SIZE], response[BUF_SIZE];
     char date[11] = "";
     
-    memset(id, 0, sizeof(id));
+   /*  memset(id, 0, sizeof(id));
     memset(sendBuf, 0, sizeof(sendBuf));
     memset(recvBuf, 0, sizeof(recvBuf));
-    memset(response, 0, sizeof(response));
+    memset(response, 0, sizeof(response)); */
 
     strcpy(id, loggedInUserId);
 
@@ -124,16 +127,15 @@ MenuState handleUserMenu(int sock) {
                 if (sendRequestWithResponse(sock, sendBuf, response)) {
                     // 서버 응답에 \"성공\"이 포함되면
                     if (strstr(response, "성공")) {
-                        printf("[응답] %s\n", response);
+                        // printf("[응답] %s\n", response);
                         break;
                     }
                     else {
-                        printf("[응답] %s\n", response);
-                        printf("%s 는/은 제공된 음식 파일에 입력 운동은 없습니다. 다시 입력 해주세요..\n", MII->foodName);
+                        // printf("[응답] %s\n", response);
+                        printf("%s 는/은 제공된 음식 파일에 입력 식단은 없습니다. 다시 입력 해주세요..\n", MII->foodName);
                     }
                 }
             }
-            // memset(sendBuf, 0, sizeof(sendBuf));
         break;
         
         case 2: 
@@ -144,23 +146,20 @@ MenuState handleUserMenu(int sock) {
                 if (sendRequestWithResponse(sock, sendBuf, response)) {
                     // 서버 응답에 \"성공\"이 포함되면
                     if (strstr(response, "성공")) {
-                        printf("[응답] %s\n", response);
+                        // printf("[응답] %s\n", response);
                         break;
                     }
                     else {
-                        printf("[응답] %s\n", response);
+                        // printf("[응답] %s\n", response);
                         printf("%s 는/은 제공된 운동 파일에 입력 운동은 없습니다. 다시 입력 해주세요..\n", WOII->exerciseName);
                     }
                 }
             }
-
-            // memset(sendBuf, 0, sizeof(sendBuf));
         break;
         
         case 3: 
             weightMenu(WII);
             sprintf(sendBuf, "INPUT_WEIGHT/%s/%s/%f", id, WII->date, WII->weight);
-            // memset(sendBuf, 0, sizeof(sendBuf));
         break;
         
         case 4:
@@ -174,8 +173,8 @@ MenuState handleUserMenu(int sock) {
             // printf("2CC : %s\n", recvBuf);
             viewRecordsByDate_OUT_Menu(recvBuf, date);
             
-            memset(recvBuf, 0, sizeof(recvBuf));
             memset(sendBuf, 0, sizeof(sendBuf));
+            memset(recvBuf, 0, sizeof(recvBuf));
         return STATE_USER_MENU;
 
         case 5: 
@@ -187,8 +186,8 @@ MenuState handleUserMenu(int sock) {
 
             checkWeightLossProgressMenu(recvBuf, id);
             
-            memset(recvBuf, 0, sizeof(recvBuf));
             memset(sendBuf, 0, sizeof(sendBuf));
+            memset(recvBuf, 0, sizeof(recvBuf));
         return STATE_USER_MENU;
 
         case 6: 
@@ -200,8 +199,8 @@ MenuState handleUserMenu(int sock) {
 
             feedBackMenu(60, 1000);
             
-            memset(recvBuf, 0, sizeof(recvBuf));
             memset(sendBuf, 0, sizeof(sendBuf));
+            memset(recvBuf, 0, sizeof(recvBuf));
         return STATE_USER_MENU;
 
         case 7: 
@@ -210,7 +209,7 @@ MenuState handleUserMenu(int sock) {
             strcpy(loggedInUserId, "");
             sendRequest(sock, sendBuf);
 
-            // memset(sendBuf, 0, sizeof(sendBuf));
+            memset(sendBuf, 0, sizeof(sendBuf));
         // break;
         return STATE_MAIN_MENU;
 
@@ -219,7 +218,7 @@ MenuState handleUserMenu(int sock) {
             sprintf(sendBuf, "DELETE_ID/%s", id); 
             sendRequest(sock, sendBuf);
 
-            // memset(sendBuf, 0, sizeof(sendBuf));
+            memset(sendBuf, 0, sizeof(sendBuf));
         // break;
         return STATE_MAIN_MENU;
         
@@ -229,11 +228,14 @@ MenuState handleUserMenu(int sock) {
     }
 
     sendRequest(sock, sendBuf);
-    memset(sendBuf, 0, sizeof(sendBuf));
-
+    
     MIIfree(MII);
     WOIIfree(WOII);
     WIIfree(WII);
     
+    memset(recvBuf, 0, sizeof(recvBuf));
+    memset(sendBuf, 0, sizeof(sendBuf));
+    memset(response, 0, sizeof(response));
+
     return STATE_USER_MENU;
 }
