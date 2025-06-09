@@ -100,7 +100,7 @@ void tableAdd() {
     char *msal_sql = "CREATE TABLE IF NOT EXISTS meal (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT, datetime TEXT, food_name TEXT, gram REAL, kcal REAL, FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE);";
     char *workout_sql = "CREATE TABLE IF NOT EXISTS workout (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT, datetime TEXT, exercise_name TEXT, minutes REAL, kcal REAL, FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE);";
     char *weightrecord_sql = "CREATE TABLE IF NOT EXISTS weightRecord (user_id TEXT, date TEXT, weight REAL, PRIMARY KEY (user_id, date), FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE);";
-    char *sql[4] = { users_sql, msal_sql, workout_sql, weightrecord_sql };
+    char *sql[4] = { users_sql, msal_sql, weightrecord_sql, weightrecord_sql };
     char *err_msg = NULL;
 
     for (int i = 0 ; i < 4; i++) {
@@ -218,7 +218,7 @@ void insertMeal(MealInputInfo *MII) {
 
     // 입력 확인
     // printf("DB 식단 : %s - %lu\n", MII->foodName, strlen(MII->foodName));
-    // printf("DB 식단 : %s - 공백 ? : %s(길이|%lu, 공백 위치|%lu)\n", MII->foodName, (strcspn(MII->foodName, "\n") != strlen(MII->foodName)) ? "있음" : "없음", strlen(MII->foodName), strcspn(MII->foodName, "\n"));
+    printf("DB 식단 : %s - 공백 ? : %s(길이|%lu, 공백 위치|%lu)\n", MII->foodName, (strcspn(MII->foodName, "\n") != strlen(MII->foodName)) ? "있음" : "없음", strlen(MII->foodName), strcspn(MII->foodName, "\n"));
 
     if (sqlite3_step(stmt) != SQLITE_DONE) {
         printf("식단 INSERT 실패: %s\n", sqlite3_errmsg(db));
@@ -247,7 +247,7 @@ void insertWorkout(WorkOutInputInfo *WOII) {
 
     // 입력 확인
     // printf("DB 운동 : %s - %lu\n", WOII->exerciseName, strlen(WOII->exerciseName));
-    // printf("DB 운동 : %s - 공백 ? : %s(길이|%lu, 공백 위치|%lu)\n", WOII->exerciseName, (strcspn(WOII->exerciseName, "\n") != strlen(WOII->exerciseName)) ? "있음" : "없음", strlen(WOII->exerciseName), strcspn(WOII->exerciseName, "\n"));
+    printf("DB 운동 : %s - 공백 ? : %s(길이|%lu, 공백 위치|%lu)\n", WOII->exerciseName, (strcspn(WOII->exerciseName, "\n") != strlen(WOII->exerciseName)) ? "있음" : "없음", strlen(WOII->exerciseName), strcspn(WOII->exerciseName, "\n"));
 
     if (sqlite3_step(stmt) != SQLITE_DONE) {
         printf("운동 INSERT 실패: %s\n", sqlite3_errmsg(db));
@@ -429,7 +429,7 @@ char *checkWeightLossProgress(char *userId) {
     sqlite3_stmt *stmt;
     char *cwlpstr = (char*)malloc(BUF_SIZE * sizeof(char));
     float progress = 0.0f, initialWeight = -1.0f, goalWeight = -1.0f, currentWeight = -1.0f;
-    
+    printf("DB -> %s\n", userId);
     // 1) 초기/목표 체중
      const char *dietQuery = "SELECT exercise_weight, goal_weight FROM user WHERE user_id = ?;";
     if (sqlite3_prepare_v2(db, dietQuery, -1, &stmt, NULL) == SQLITE_OK) {

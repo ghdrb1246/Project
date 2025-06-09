@@ -51,10 +51,12 @@ void handleClient(SOCKET clientSock) {
         buf[len] = '\0';
         printf("[요청] %s\n", buf);
         processRequest(clientSock, buf, response);
+
         send(clientSock, response, strlen(response), 0);
+        memset(response, 0, sizeof(response));
     }
 
-    memset(response, 0, sizeof(response));
+    // memset(response, 0, sizeof(response));
 }
 
 void processRequest(SOCKET clientSock, char *request, char *response) {
@@ -64,21 +66,19 @@ void processRequest(SOCKET clientSock, char *request, char *response) {
     WorkOutInputInfo *WOII = WOIImalloc();
     WeightInputInfo *WII = WIImalloc();
 
-    sscanf(request, "%[^/]", cmd);
+    memset(response, 0, sizeof(BUF_SIZE));
 
-   /*  if (!USI) {
-        printf("메모리 할당 실패!\n");
+    if (sscanf(request, "%[^/]", cmd) != 1) {
+        sprintf(response, "[오류] 잘못된 입력 형식");
         return;
-    } */
+    }
 
     // 회원가입 처리
     if (strcmp(cmd, "SIGNUP") == 0) {
-        sscanf(
-            request, 
-            "SIGNUP/%[^/]/%[^/]/%[^/]/%d/%f/%f/%f",
-            USI->id, USI->pw, USI->gender, &USI->age,
-           &USI->height, &USI->exerciseWeight, &USI->goalWeight
-        );
+        if (sscanf(request, "SIGNUP/%[^/]/%[^/]/%[^/]/%d/%f/%f/%f", USI->id, USI->pw, USI->gender, &USI->age, &USI->height, &USI->exerciseWeight, &USI->goalWeight) != 8) {
+            sprintf(response, "[오류] 잘못된 입력 형식");
+            return;
+        }
 
         printf("-> %s %s %s %d %f %f %f\n", USI->id, USI->pw, USI->gender, USI->age, USI->height, USI->exerciseWeight, USI->goalWeight);
 
@@ -92,14 +92,12 @@ void processRequest(SOCKET clientSock, char *request, char *response) {
 
         USIfree(USI);
     } 
-
     // 로그인 처리
     else if (strcmp(cmd, "LOGIN") == 0) {
-        sscanf(
-            request, 
-            "LOGIN/%[^/]/%s", 
-            USI->id, USI->pw
-        );
+        if (sscanf(request, "LOGIN/%[^/]/%s", USI->id, USI->pw) != 2) {
+            sprintf(response, "[오류] 잘못된 입력 형식");
+            return;
+        }
         
         if (loginUser(USI->id, USI->pw)) {
             sprintf(response, "[성공] 로그인 성공");
@@ -109,16 +107,12 @@ void processRequest(SOCKET clientSock, char *request, char *response) {
         }
         USIfree(USI);
     } 
-
-    /* 입력 함수 -> */
-
     // 식단 입력
     else if (strcmp(cmd, "INPUT_MEAL") == 0) {
-        sscanf(
-            request, 
-            "INPUT_MEAL/%[^/]/%[^/]/%[^/]/%f", 
-            MII->userId, MII->dateTime, MII->foodName, &MII->gram
-        );
+        if (sscanf(request, "INPUT_MEAL/%[^/]/%[^/]/%[^/]/%f", MII->userId, MII->dateTime, MII->foodName, &MII->gram) != 4) {
+            sprintf(response, "[오류] 잘못된 입력 형식");
+            return;
+        }
 
         printf("식단 입력 치리 -> %s %s %s %.1f\n", MII->userId, MII->dateTime, MII->foodName, MII->gram);
         
@@ -144,12 +138,11 @@ void processRequest(SOCKET clientSock, char *request, char *response) {
     } 
     // 운동 입력
     else if (strcmp(cmd, "INPUT_WORKOUT") == 0) {
-        sscanf(
-            request,
-            "INPUT_WORKOUT/%[^/]/%[^/]/%[^/]/%f",
-            WOII->userId, WOII->dateTime, WOII->exerciseName, &WOII->minutes
-        );
-
+        if (sscanf(request, "INPUT_WORKOUT/%[^/]/%[^/]/%[^/]/%f", WOII->userId, WOII->dateTime, WOII->exerciseName, &WOII->minutes) != 4) {
+            sprintf(response, "[오류] 잘못된 입력 형식");
+            return;
+        }
+        
         printf("운동 입력 치리 -> %s %s %s %.1f\n", WOII->userId ,WOII->dateTime, WOII->exerciseName, WOII->minutes);
 
         if (needConvert(EXERCISES_CSV_FILE, EXERCISES_DB_FILE)) {
@@ -160,12 +153,12 @@ void processRequest(SOCKET clientSock, char *request, char *response) {
         }
 
         float met = inputWorkoutAndCalc(WOII->exerciseName);
+        printf("met %f\n", met);
 
         if (met != -1) {
             sprintf(response, "[성공] 운동 검사 성공");
             WOII->kcal = METM(met, WOII->minutes, selectWeight(WOII->userId));
             insertWorkout(WOII);
-            // sprintf(response, "[실패] 체중 조회 실패");
         }
         else {
             sprintf(response, "[실패] 검사 실패");
@@ -174,6 +167,10 @@ void processRequest(SOCKET clientSock, char *request, char *response) {
     } 
     // 체중 입력
     else if (strcmp(cmd, "INPUT_WEIGHT") == 0) {
+        if (sscanf(request, "INPUT_WEIGHT/%[^/]/%[^/]/%f", WII->userId, WII->date, &WII->weight) != 1) {
+            sprintf(response, "[오류] 잘못된 입력 형식");
+            return;
+        }
         sscanf(
             request,
             "INPUT_WEIGHT/%[^/]/%[^/]/%f",
@@ -185,66 +182,86 @@ void processRequest(SOCKET clientSock, char *request, char *response) {
 
         WIIfree(WII);
     } 
-    
-    /* 조회 함수 -> */
-
     // 날짜별 기록 조회
     else if (strcmp(cmd, "GET_RECORD") == 0) {
-        char id[ID_SIZE], date[11], *rds;
-        
+        char id[ID_SIZE], date[11], *rds = (char*)malloc(BUF_SIZE * sizeof(char));
+        if (sscanf(request, "GET_RECORD/%[^/]/%s", id, date) != 2) {
+            sprintf(response, "[오류] 잘못된 입력 형식");
+            return;
+        }
         printf("날짜별 기록 조회\n");
-
-        sscanf(request, "GET_RECORD/%[^/]/%s", id, date);
-
+        
+        memset(rds, 0, sizeof(BUF_SIZE));
         rds = viewRecordsByDate(id, date);
         send(clientSock, rds, strlen(rds), 0);
-        // printf("MS : %s\n", rds);
+        printf("MS : %s\n", rds);
     } 
-
-    // 피드백 추천
-    else if (strcmp(cmd, "FEEDBACK") == 0) {
-        char id[ID_SIZE], date[11], *fbs;
-        printf("피드백 추천\n");
-        
-        sscanf(request, "GET_RECORD/%[^/]/%s", id, date);
-
-        fbs = viewRecordsByDate(id, date);
-        send(clientSock, fbs, strlen(fbs), 0);
-        // printf("MS : %s\n", rds);
-    } 
-    
-    /* 처리 함수 -> */
 
     // 감량 진행률 계산
     else if (strcmp(cmd, "CHECK_PROGRESS") == 0) {
-        char id[ID_SIZE], *cwlpstr;
+        char id[ID_SIZE], *cwlpstr = (char*)malloc(BUF_SIZE * sizeof(char));;
         
+        if (sscanf(request, "CHECK_PROGRESS/%s", id) != 1) {
+            sprintf(response, "[오류] 잘못된 입력 형식");
+            return;
+        }
         printf("감량 진행률 계산\n");
-
-        sscanf(request, "CHECK_PROGRESS/%s", id);
-
+        
+        memset(cwlpstr, 0, sizeof(BUF_SIZE));
         cwlpstr = checkWeightLossProgress(id);
         send(clientSock, cwlpstr, strlen(cwlpstr), 0);
         printf("MS : %s\n", cwlpstr);
         
     } 
+    // 피드백 추천
+    else if (strcmp(cmd, "FEEDBACK") == 0) {
+        char id[ID_SIZE], date[11], *fbs = (char*)malloc(BUF_SIZE * sizeof(char));
+        
+        if (sscanf(request, "FEEDBACK/%[^/]/%s", id, date) != 2) {
+            sprintf(response, "[오류] 잘못된 입력 형식");
+            return;
+        }
+        printf("피드백 추천\n");
+    
+        memset(fbs, 0, sizeof(BUF_SIZE));
+        fbs = viewRecordsByDate(id, date);
+        send(clientSock, fbs, strlen(fbs), 0);
+        printf("MS : %s\n", fbs);
+    } 
+    
     // 로그아웃 처리
     else if (strcmp(cmd, "LOGOUT") == 0) {
         char id[ID_SIZE];
-        sscanf(request, "LOGOUT/%s", id);
+        // char *los = (char*)malloc(BUF_SIZE * sizeof(char));
+
+        if (sscanf(request, "LOGOUT/%s", id) != 1) {
+            sprintf(response, "[오류] 잘못된 입력 형식");
+            return;
+        }
+        // memset(los, 0, sizeof(BUF_SIZE));
+        // sprintf(los, "[성공] 로그아웃 완료");
+        send(clientSock, request, strlen(los), 0);
+
         printf("%s 님이 로그아웃 처리 되었습니다.\n", id);
     } 
     // 회원 탈퇴 처리
     else if (strcmp(cmd, "DELETE_ID") == 0) {
         char id[ID_SIZE];
+        
         // printf("회원 탈퇴 처리 해당 사용자 DB 삭제\n");
-        sscanf(request, "DELETE_ID/%s", id);
+        if (sscanf(request, "DELETE_ID/%s", id) != 1) {
+            sprintf(response, "[오류] 잘못된 입력 형식");
+            return;
+        }
 
         printf("회원 탈퇴 처리 -> %s\n", id);
         deleteUserData(id);
     }
     
     else {
-        sprintf(response, "[오류] 알 수 없는 명령어");
+        if (sprintf(response, "[오류] 알 수 없는 명령어") != 0) {
+            sprintf(response, "[오류] 잘못된 입력 형식");
+            return;
+        }
     }
 }

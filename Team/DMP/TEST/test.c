@@ -1,68 +1,43 @@
 #include <stdio.h>
-#include<string.h>
-#include "UserInfo.h"
-
-void inputLine(const char *prompt, char *buf, int size);
-void signupMenu(UserSignupInfo *info);
+#include <stdlib.h>
+#include <string.h>
+#include "sqlite/sqlite3.h"
 
 int main() {
-    // 구조체 메모리 할당
-    UserSignupInfo *info = USImalloc();
-    if (!info) {
-        printf("메모리 할당 실패!\n");
+    sqlite3 *db;
+    sqlite3_stmt *stmt;
+
+    sqlite3_open("Server/DB/food.db", &db);
+
+    // 테이블 생성
+    sqlite3_exec(db, "CREATE TABLE IF NOT EXISTS foods (name TEXT PRIMARY KEY, kcal REAL);", 0, 0, 0);
+
+    FILE *fp = fopen("Server/CSV/food.csv", "r");
+    if (!fp) {
+        printf("CSV 파일 열기 실패!\n");
         return 1;
     }
 
-    // 사용자 입력 받기
-    signupMenu(info);
+    char line[256];
+    fgets(line, sizeof(line), fp);  // 헤더 라인 skip
 
-    // 입력받은 값 출력 (확인용)
-    printf("==== 입력된 정보 ====\n");
-    printf("ID: %s\n", info->id);
-    printf("PW: %s\n", info->pw);
-    printf("성별: %s\n", info->gender);
-    printf("나이: %d\n", info->age);
-    printf("키: %.1f\n", info->height);
-    printf("초기 체중: %.1f\n", info->initialWeight);
-    printf("목표 체중: %.1f\n", info->goalWeight);
+    sqlite3_prepare_v2(db, "INSERT INTO foods (name, kcal) VALUES (?, ?);", -1, &stmt, NULL);
 
-    // 메모리 해제
-    USIfree(info);
+    while (fgets(line, sizeof(line), fp)) {
+        char *name = strtok(line, ",\n");
+        char *kcalStr = strtok(NULL, ",\n");
+        float kcal = atof(kcalStr);
 
-    return 0;
-}
+        sqlite3_bind_text(stmt, 1, name, -1, SQLITE_STATIC);
+        sqlite3_bind_double(stmt, 2, kcal);
 
-// 안전하게 문자열 입력을 위한 함수
-void inputLine(const char *prompt, char *buf, int size) {
-    printf("%s", prompt);
-    if (fgets(buf, size, stdin) != NULL) {
-        buf[strcspn(buf, "\n")] = '\0';  // 개행 문자 제거
+        sqlite3_step(stmt);
+        sqlite3_reset(stmt);
     }
-}
-void signupMenu(UserSignupInfo *USI) {
-    printf("회원가입\n");
-    printf("\n");
-    // P_MENU_TITLE("회원가입");
-    // P_MENU_IN;
-    // P_MENU_SB_S("입력", "----");
-    
-    inputLine("ID 입력: ", USI->id, ID_SIZE);
-    inputLine("PW 입력: ", USI->pw, PW_SIZE);
-    inputLine("성별 (남/여): ", USI->gender, GENDER_SIZE);
-    // getchar();
-    
-    printf("나이: ");
-    scanf("%d", &USI->age); getchar();
 
-    printf("키 (cm): ");
-    scanf("%f", &USI->height); getchar();
-    
-    printf("초기 체중 (kg): ");
-    scanf("%f", &USI->initialWeight); getchar();
-    
-    printf("목표 체중 (kg): ");
-    scanf("%f", &USI->goalWeight); getchar();
-
-    // P_MENU_IN;
-    // P_MENU_END;
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+    fclose(fp);
+    printf("CSV → DB 저장 완료!\n");
+    return 0;
 }
