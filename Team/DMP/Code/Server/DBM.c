@@ -33,7 +33,7 @@ int DBO(const char *filename) {
         struct _stat st = { 0 };
         if (_stat(foldername, &st) != 0) {
             if (mkdir(foldername, mode) != 0) {
-                perror("DB 폴더 생성 실패");
+                perror("[ 서버 ] | DB 폴더 생성 실패");
                 return 1;
             }
         }
@@ -42,7 +42,7 @@ int DBO(const char *filename) {
         struct stat st = { 0 };
         if (stat(foldername, &st) != 0) {
             if (mkdir(foldername, mode) != 0) {
-                perror("DB 폴더 생성 실패");
+                perror("[ 서버 ] | DB 폴더 생성 실패");
                 return 1;
             }
         }
@@ -53,7 +53,7 @@ int DBO(const char *filename) {
 
     // SQLite DB 열기 또는 생성
     if (sqlite3_open(path, &db) != SQLITE_OK) {
-        fprintf(stderr, "DB 열기 실패: %s\n", sqlite3_errmsg(db));
+        fprintf(stderr, "[ 서버 ] | DB 열기 실패: %s\n", sqlite3_errmsg(db));
         sqlite3_close(db);
         return 1;
     }
@@ -82,10 +82,10 @@ int tableExists(const char *tableName) {
             
             sqlite3_finalize(stmt);
         }
-        else fprintf(stderr, "'%s' 해당 파일에 테이블이 존재하지 않습니다\n", sqlite3_errmsg(db));
+        else fprintf(stderr, "[ 서버 ] | '%s' 해당 파일에 테이블이 존재하지 않습니다\n", sqlite3_errmsg(db));
 
     }
-    else printf("SQL 실행 실패 : %s\n", sqlite3_errmsg(db));
+    else printf("[ 서버 ] | SQL 실행 실패 : %s\n", sqlite3_errmsg(db));
 
     sqlite3_free(sql);  // SQL 문자열 메모리 해제
 
@@ -105,40 +105,11 @@ void tableAdd() {
 
     for (int i = 0 ; i < 4; i++) {
         if (sqlite3_exec(db, sql[i], 0, 0, &err_msg) != SQLITE_OK) {
-            printf("%d 인텍스의 테이블 생성 실패: %s\n", i + 1, err_msg);
+            printf("[ 서버 ] | %d 인텍스의 테이블 생성 실패: %s\n", i + 1, err_msg);
             sqlite3_free(err_msg);
             return;
         }
     }
-    /* 
-    // user 테이블
-    if (sqlite3_exec(db, users_sql, 0, 0, &err_msg) != SQLITE_OK) {
-        printf("user 테이블 생성 실패: %s\n", err_msg);
-        sqlite3_free(err_msg);
-        return;
-    }
-
-    // 식단 테이블
-    if (sqlite3_exec(db, msal_sql, 0, 0, &err_msg) != SQLITE_OK) {
-        printf("식단 테이블 생성 실패: %s\n", err_msg);
-        sqlite3_free(err_msg);
-        return;
-    }
-
-    // 운동 테이블
-    if (sqlite3_exec(db, workout_sql, 0, 0, &err_msg) != SQLITE_OK) {
-        printf("운동 테이블 생성 실패: %s\n", err_msg);
-        sqlite3_free(err_msg);
-        return;
-    }
-    
-    // 체중 테이블
-    if (sqlite3_exec(db, weightrecord_sql, 0, 0, &err_msg) != SQLITE_OK) {
-        printf("체중 테이블 생성 실패: %s\n", err_msg);
-        sqlite3_free(err_msg);
-        return;
-    } 
-    */
 }
 
 int userExists(const char *userId) {
@@ -161,7 +132,7 @@ int signupUser(UserSignupInfo *USI) {
 
     // 첫 번째 INSERT: users
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
-        printf("SQL 준비 실패: %s\n", sqlite3_errmsg(db));
+        printf("[ 서버 ] | SQL 준비 실패: %s\n", sqlite3_errmsg(db));
         return 0;
     }
 
@@ -176,7 +147,7 @@ int signupUser(UserSignupInfo *USI) {
 
     // 실행
     if (sqlite3_step(stmt) != SQLITE_DONE) {
-        printf("user INSERT 실패: %s\n", sqlite3_errmsg(db));
+        printf("[ 서버 ] | user INSERT 실패: %s\n", sqlite3_errmsg(db));
         sqlite3_finalize(stmt);
 
         return 0;
@@ -206,7 +177,7 @@ void insertMeal(MealInputInfo *MII) {
     sqlite3_stmt *stmt;
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
-        printf("SQL 준비 실패: %s\n", sqlite3_errmsg(db));
+        printf("[ 서버 ] | SQL 준비 실패: %s\n", sqlite3_errmsg(db));
         return;
     }
 
@@ -216,15 +187,11 @@ void insertMeal(MealInputInfo *MII) {
     sqlite3_bind_double(stmt, 4, MII->gram);
     sqlite3_bind_double(stmt, 5, MII->kcal);
 
-    // 입력 확인
-    // printf("DB 식단 : %s - %lu\n", MII->foodName, strlen(MII->foodName));
-    printf("DB 식단 : %s - 공백 ? : %s(길이|%lu, 공백 위치|%lu)\n", MII->foodName, (strcspn(MII->foodName, "\n") != strlen(MII->foodName)) ? "있음" : "없음", strlen(MII->foodName), strcspn(MII->foodName, "\n"));
-
     if (sqlite3_step(stmt) != SQLITE_DONE) {
-        printf("식단 INSERT 실패: %s\n", sqlite3_errmsg(db));
+        printf("[ 서버 ] | 식단 INSERT 실패: %s\n", sqlite3_errmsg(db));
     } 
     else {
-        printf("식단 입력 완료!\n");
+        printf("[ 서버 ] | 식단 입력 완료!\n");
     }
 
     sqlite3_finalize(stmt);
@@ -235,7 +202,7 @@ void insertWorkout(WorkOutInputInfo *WOII) {
     sqlite3_stmt *stmt;
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
-        printf("SQL 준비 실패: %s\n", sqlite3_errmsg(db));
+        printf("[ 서버 ] | SQL 준비 실패: %s\n", sqlite3_errmsg(db));
         return;
     }
 
@@ -245,15 +212,11 @@ void insertWorkout(WorkOutInputInfo *WOII) {
     sqlite3_bind_double(stmt, 4, WOII->minutes);
     sqlite3_bind_double(stmt, 5, WOII->kcal);
 
-    // 입력 확인
-    // printf("DB 운동 : %s - %lu\n", WOII->exerciseName, strlen(WOII->exerciseName));
-    printf("DB 운동 : %s - 공백 ? : %s(길이|%lu, 공백 위치|%lu)\n", WOII->exerciseName, (strcspn(WOII->exerciseName, "\n") != strlen(WOII->exerciseName)) ? "있음" : "없음", strlen(WOII->exerciseName), strcspn(WOII->exerciseName, "\n"));
-
     if (sqlite3_step(stmt) != SQLITE_DONE) {
-        printf("운동 INSERT 실패: %s\n", sqlite3_errmsg(db));
+        printf("[ 서버 ] | 운동 INSERT 실패: %s\n", sqlite3_errmsg(db));
     } 
     else {
-        printf("운동 입력 완료!\n");
+        printf("[ 서버 ] | 운동 입력 완료!\n");
     }
 
     sqlite3_finalize(stmt);
@@ -264,7 +227,7 @@ void insertWeight(WeightInputInfo *WII) {
     sqlite3_stmt *stmt;
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
-        printf("SQL 준비 실패: %s\n", sqlite3_errmsg(db));
+        printf("[ 서버 ] | SQL 준비 실패: %s\n", sqlite3_errmsg(db));
         return;
     }
 
@@ -273,10 +236,10 @@ void insertWeight(WeightInputInfo *WII) {
     sqlite3_bind_double(stmt, 3, WII->weight);
 
     if (sqlite3_step(stmt) != SQLITE_DONE) {
-        printf("체중 INSERT 실패: %s\n", sqlite3_errmsg(db));
+        printf("[ 서버 ] | 체중 INSERT 실패: %s\n", sqlite3_errmsg(db));
     } 
     else {
-        printf("체중 입력/갱신 완료!\n");
+        printf("[ 서버 ] | 체중 입력/갱신 완료!\n");
     }
 
     sqlite3_finalize(stmt);
@@ -288,20 +251,20 @@ float selectWeight(const char *userId) {
     sqlite3_stmt *stmt;
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
-        printf("SQL 준비 실패: %s\n", sqlite3_errmsg(db));
+        printf("[ 서버 ] | SQL 준비 실패: %s\n", sqlite3_errmsg(db));
         return -1;
     }
 
     sqlite3_bind_text(stmt, 1, userId, -1, SQLITE_STATIC);
 
     if (sqlite3_step(stmt) == SQLITE_ROW) {
-        printf("체중 조회 완료!\n");
+        printf("[ 서버 ] | 체중 조회 완료!\n");
 
         weight = (float)sqlite3_column_double(stmt, 0);
     } 
 
     else {
-        printf("체중 조회 실패: %s\n", sqlite3_errmsg(db));
+        printf("[ 서버 ] | 체중 조회 실패: %s\n", sqlite3_errmsg(db));
     }
 
     sqlite3_finalize(stmt);
@@ -317,30 +280,29 @@ void deleteUserData(const char *userId) {
     for (int i = 0; i < 4; i++) {
         char *sql = (char*)malloc((strlen(tableNeame[i]) + 32) * sizeof(char));
         snprintf(sql, (strlen(tableNeame[i]) + 32), "DELETE FROM %s WHERE user_id = ?;", tableNeame[i]);
-        printf("%12s -> %s\n", tableNeame[i], sql);
 
         if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
-            printf("%s 의 SQL 준비 실패: %s\n", tableNeame[i], sqlite3_errmsg(db));
+            printf("[ 서버 ] | %s 의 SQL 준비 실패: %s\n", tableNeame[i], sqlite3_errmsg(db));
             return;
         }
         
         sqlite3_bind_text(stmt, 1, userId, -1, SQLITE_STATIC);
 
         if (sqlite3_step(stmt) == SQLITE_DONE) {
-            printf("%s 테이블의 데이터 모두 삭제 완료!\n", tableNeame[i]);
+            printf("[ 서버 ] | %s 테이블의 데이터 모두 삭제 완료!\n", tableNeame[i]);
             conut++;
         } 
         else {
-            printf("%s 테이블 데이터 삭제 실패: %s\n", tableNeame[i], sqlite3_errmsg(db));
+            printf("[ 서버 ] | %s 테이블 데이터 삭제 실패: %s\n", tableNeame[i], sqlite3_errmsg(db));
         }
         sqlite3_finalize(stmt);
     }
     
     if (conut > 3) {
-        printf("회원탈퇴 및 연관 데이터 모두 삭제 완료!\n");
+        printf("[ 서버 ] | 회원탈퇴 및 연관 데이터 모두 삭제 완료!\n");
     } 
     else {
-        printf("회원탈퇴 실패\n");
+        printf("[ 서버 ] | 회원탈퇴 실패\n");
     }
 }
 
@@ -370,7 +332,7 @@ char *viewRecordsByDate(const char *userId, const char *date)  {
         sqlite3_finalize(stmt);
     }
     else {
-        printf("식단 조회 실패: %s\n", sqlite3_errmsg(db));
+        printf("[ 서버 ] | 식단 조회 실패: %s\n", sqlite3_errmsg(db));
     }
 
     strcat(rdstr, "#");
@@ -397,7 +359,7 @@ char *viewRecordsByDate(const char *userId, const char *date)  {
         sqlite3_finalize(stmt);
     }
     else {
-        printf("운동 조회 실패: %s\n", sqlite3_errmsg(db));
+        printf("[ 서버 ] | 운동 조회 실패: %s\n", sqlite3_errmsg(db));
     }
     strcat(rdstr, "#");
 
@@ -419,7 +381,7 @@ char *viewRecordsByDate(const char *userId, const char *date)  {
         sqlite3_finalize(stmt);
     }
     else {
-        printf("체중 조회 실패: %s\n", sqlite3_errmsg(db));
+        printf("[ 서버 ] | 체중 조회 실패: %s\n", sqlite3_errmsg(db));
     }
 
     return rdstr;
@@ -429,7 +391,7 @@ char *checkWeightLossProgress(char *userId) {
     sqlite3_stmt *stmt;
     char *cwlpstr = (char*)malloc(BUF_SIZE * sizeof(char));
     float progress = 0.0f, initialWeight = -1.0f, goalWeight = -1.0f, currentWeight = -1.0f;
-    printf("DB -> %s\n", userId);
+    
     // 1) 초기/목표 체중
      const char *dietQuery = "SELECT exercise_weight, goal_weight FROM user WHERE user_id = ?;";
     if (sqlite3_prepare_v2(db, dietQuery, -1, &stmt, NULL) == SQLITE_OK) {
@@ -445,7 +407,7 @@ char *checkWeightLossProgress(char *userId) {
         sqlite3_finalize(stmt);
     }
     else {
-        printf("초기/목표 체중 조회 실패: %s\n", sqlite3_errmsg(db));
+        printf("[ 서버 ] | 초기/목표 체중 조회 실패: %s\n", sqlite3_errmsg(db));
     }
 
     // 2) 최신 체중
@@ -463,7 +425,7 @@ char *checkWeightLossProgress(char *userId) {
         sqlite3_finalize(stmt);
     }
     else {
-        printf("최신 체중 조회 실패: %s\n", sqlite3_errmsg(db));
+        printf("[ 서버 ] | 최신 체중 조회 실패: %s\n", sqlite3_errmsg(db));
     }
 
     progress = ((initialWeight - currentWeight) / (initialWeight - goalWeight)) * 100.0f;
@@ -476,25 +438,7 @@ char *checkWeightLossProgress(char *userId) {
         "progress:%.1f|initialWeight:%.1fkg|goalWeight:%.1fkg|currentWeight:%.1fkg",
         progress, initialWeight, goalWeight, currentWeight
     );
-/* 
-    // 3) 값이 유효한지 확인
-    if (initialWeight < 0 || goalWeight < 0 || currentWeight < 0) {
-        snprintf(cwlpstr, BUF_SIZE, "[오류] 진행률 계산에 필요한 데이터가 없습니다.");
-    }
-    else {
-        // 4) 진행률 계산
-        float progress = ((initialWeight - currentWeight) / (initialWeight - goalWeight)) * 100.0f;
-        if (progress < 0) progress = 0.0f;  // 음수 보정
-    
-        // 5) 결과 출력
-        snprintf(
-            cwlpstr, 
-            BUF_SIZE,
-            "progress:%.1f|initialWeight:%.1fkg|goalWeight:%.1fkg|currentWeight:%.1fkg",
-            progress, initialWeight, goalWeight, currentWeight
-        );
-    }
- */
+
     return cwlpstr;
 }
 
@@ -521,7 +465,7 @@ char *feedBack(char *userId) {
         sqlite3_finalize(stmt);
     }
     else {
-        printf("최신 체중 조회 실패: %s\n", sqlite3_errmsg(db));
+        printf("[ 서버 ] | 최신 체중 조회 실패: %s\n", sqlite3_errmsg(db));
     }
 
     // 2) 전전 체중
@@ -538,7 +482,7 @@ char *feedBack(char *userId) {
         sqlite3_finalize(stmt);
     }
     else {
-        printf("전전 체중 조회 실패: %s\n", sqlite3_errmsg(db));
+        printf("[ 서버 ] | 전전 체중 조회 실패: %s\n", sqlite3_errmsg(db));
     }
     
     // 3) 결과 출력

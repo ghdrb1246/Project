@@ -168,7 +168,17 @@ MenuState handleUserMenu(int sock) {
             weightMenu(WII);
             memset(sendBuf, 0, sizeof(sendBuf));
             sprintf(sendBuf, "INPUT_WEIGHT/%s/%s/%f", id, WII->date, WII->weight);
-            // memset(sendBuf, 0, sizeof(sendBuf));
+
+            if (sendRequestWithResponse(sock, sendBuf, response)) {
+                // 서버 응답에 \"성공\"이 포함되면
+                if (strstr(response, "성공")) {
+                    printf("[응답] %s\n", response);
+                }
+                else {
+                    printf("[응답] %s\n", response);
+                    printf("%s 체중이 아닙니다.\n", WOII->exerciseName);
+                }
+            }
         break;
         
         case 4:
@@ -220,10 +230,16 @@ MenuState handleUserMenu(int sock) {
             logOutMenu(id);
             memset(sendBuf, 0, sizeof(sendBuf));
             sprintf(sendBuf, "LOGOUT/%s", id); 
-            strcpy(loggedInUserId, "");
-            sendRequest(sock, sendBuf);
-
-            // memset(sendBuf, 0, sizeof(sendBuf));
+            if (sendRequestWithResponse(sock, sendBuf, response)) {
+                // 서버 응답에 \"성공\"이 포함되면
+                if (strstr(response, "성공")) {
+                    printf("[응답] %s\n", response);
+                    strcpy(loggedInUserId, "");
+                }
+                else {
+                    printf("[응답] %s\n", response);
+                }
+            }
         // break;
         return STATE_MAIN_MENU;
 
@@ -231,9 +247,16 @@ MenuState handleUserMenu(int sock) {
             deleteIdMenu(id);
             memset(sendBuf, 0, sizeof(sendBuf));
             sprintf(sendBuf, "DELETE_ID/%s", id); 
-            sendRequest(sock, sendBuf);
+            if (sendRequestWithResponse(sock, sendBuf, response)) {
+                // 서버 응답에 \"성공\"이 포함되면
+                if (strstr(response, "성공")) {
+                    printf("[응답] %s\n", response);
+                }
+                else {
+                    printf("[응답] %s\n", response);
+                }
+            }
 
-            // memset(sendBuf, 0, sizeof(sendBuf));
         // break;
         return STATE_MAIN_MENU;
         

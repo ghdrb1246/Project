@@ -5,31 +5,35 @@ int needConvert(const char *csv, const char *db) {
     struct stat csvStat, dbStat;
 
     if (stat(csv, &csvStat) != 0) {
-        printf("CSV 파일 확인 실패!\n");
+        printf("[ 서버 ] | CSV 파일 확인 실패\n");
         return 0;
     }
+
     if (stat(db, &dbStat) != 0) {
-        printf("DB 파일이 없으므로 변환 필요!\n");
+        printf("[ 서버 ] | DB 파일이 없으므로 변환 필요\n");
         return 1;
     }
+
     if (csvStat.st_mtime > dbStat.st_mtime) {
-        printf("CSV가 최신입니다. 변환 필요!\n");
+        printf("[ 서버 ] | CSV가 최신입니다. 변환 필요\n");
         return 1;
     }
-    printf("DB가 최신 상태입니다. 변환 스킵!\n");
+
+    printf("[ 서버 ] | DB가 최신 상태입니다.\n");
+    
     return 0;
 }
 
 // CSV → DB 변환 (기존 DB 삭제 후 새로 생성)
 void exercisesConvertCSVtoDB() {
-    printf("기존 DB를 삭제하고 새로 생성합니다.\n");
+    printf("[ 서버 ] | 기존 DB를 삭제하고 새로 생성합니다.\n");
 
     // DB 파일 삭제
     remove(EXERCISES_DB_FILE);
     // 새 DB 연결
     sqlite3 *db;
     if (sqlite3_open(EXERCISES_DB_FILE, &db)) {
-        printf("DB 열기 실패: %s\n", sqlite3_errmsg(db));
+        printf("[ 서버 ] | DB 열기 실패: %s\n", sqlite3_errmsg(db));
         return;
     }
 
@@ -42,7 +46,7 @@ void exercisesConvertCSVtoDB() {
     sqlite3_stmt *stmt;
     
     if (!fp) {
-        printf("CSV 열기 실패!\n");
+        printf("[ 서버 ] | CSV 열기 실패\n");
         sqlite3_close(db);
         return;
     }
@@ -68,13 +72,13 @@ void exercisesConvertCSVtoDB() {
     sqlite3_close(db);
     fclose(fp);
 
-    printf("CSV → DB 최신화 완료!\n");
+    printf("[ 서버 ] | CSV → DB 최신화 완료\n");
 }
 
 float inputWorkoutAndCalc(char *exercise) {
     sqlite3 *db;
     if (sqlite3_open(EXERCISES_DB_FILE, &db)) {
-        printf("DB 열기 실패: %s\n", sqlite3_errmsg(db));
+        printf("[ 서버 ] | DB 열기 실패: %s\n", sqlite3_errmsg(db));
         return -1;
     }
     
@@ -86,7 +90,7 @@ float inputWorkoutAndCalc(char *exercise) {
     const char *sql = "SELECT met FROM exercise WHERE name = ?;";
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
-        printf("SQL 준비 실패: %s\n", sqlite3_errmsg(db));
+        printf("[ 서버 ] | SQL 준비 실패: %s\n", sqlite3_errmsg(db));
         return -1;
     }
     sqlite3_bind_text(stmt, 1, exercise, -1, SQLITE_STATIC);
@@ -117,14 +121,14 @@ float METM(float met, float minutes, float user_weight) {
 
 // CSV → DB 변환 (기존 DB 삭제 후 새로 생성)
 void foodConvertCSVtoDB() {
-    printf("기존 DB를 삭제하고 새로 생성합니다.\n");
+    printf("[ 서버 ] | 기존 DB를 삭제하고 새로 생성합니다.\n");
 
     // DB 파일 삭제
     remove(FOOD_DB_FILE);
     // 새 DB 연결
     sqlite3 *db;
     if (sqlite3_open(FOOD_DB_FILE, &db)) {
-        printf("DB 열기 실패: %s\n", sqlite3_errmsg(db));
+        printf("[ 서버 ] | DB 열기 실패: %s\n", sqlite3_errmsg(db));
         return;
     }
 
@@ -137,7 +141,7 @@ void foodConvertCSVtoDB() {
     sqlite3_stmt *stmt;
     
     if (!fp) {
-        printf("CSV 열기 실패!\n");
+        printf("[ 서버 ] | CSV 열기 실패\n");
         sqlite3_close(db);
         return;
     }
@@ -163,13 +167,13 @@ void foodConvertCSVtoDB() {
     sqlite3_close(db);
     fclose(fp);
 
-    printf("CSV → DB 최신화 완료!\n");
+    printf("[ 서버 ] | CSV → DB 최신화 완료\n");
 }
 
 float inputFoodAndCalc(char *food) {
     sqlite3 *db;
     if (sqlite3_open(FOOD_DB_FILE, &db)) {
-        printf("DB 열기 실패: %s\n", sqlite3_errmsg(db));
+        printf("[ 서버 ] | DB 열기 실패: %s\n", sqlite3_errmsg(db));
         return -1;
     }
     
@@ -181,7 +185,7 @@ float inputFoodAndCalc(char *food) {
     const char *sql = "SELECT kcal FROM foods WHERE name = ?;";
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
-        printf("SQL 준비 실패: %s\n", sqlite3_errmsg(db));
+        printf("[ 서버 ] | SQL 준비 실패: %s\n", sqlite3_errmsg(db));
         return -1;
     }
     sqlite3_bind_text(stmt, 1, food, -1, SQLITE_STATIC);
