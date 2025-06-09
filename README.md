@@ -18,5 +18,5 @@ Project DB - https://github.com/ghdrb1246/Project.git
 
 *DMP*
 - <...>
-- ~~'25.06.07::V1.4|DMP~~
-- '25.06.08::V1.5|DMP
+- ~~'25.06.08::V1.5|DMP~~
+- '25.06.09::V1.6|DMP
