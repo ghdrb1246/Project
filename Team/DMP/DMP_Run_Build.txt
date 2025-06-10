@@ -15,6 +15,7 @@
         MacSO : ./Client_Run
         Win   : Client_Run.exe
 
+콘솔 한글 : chcp 65001
 
 # Test
 gcc -I. -I./Server Server/test.c -o TSR -lsqlite3   
