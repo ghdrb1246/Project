@@ -2,6 +2,7 @@
 
 void sendRequest(int sock, const char *message) {
     char recvBuf[BUF_SIZE];
+    
     send(sock, message, strlen(message), 0);
     int len = recv(sock, recvBuf, BUF_SIZE - 1, 0);
     if (len > 0) {
@@ -28,7 +29,7 @@ int sendRequestWithResponse(int sock, const char *message, char *response) {
 }
 
 MenuState handleMainMenu(int sock) {
-    int meunNumber = mainMenu();
+    int meunNumber = mainMenu(), state_main_num = STATE_EXIT;
     char sendBuf[BUF_SIZE];
     char id[ID_SIZE], pw[PW_SIZE];
     char response[BUF_SIZE];
@@ -52,8 +53,8 @@ MenuState handleMainMenu(int sock) {
             ); 
 
             sendRequest(sock, sendBuf);
-            // memset(sendBuf, 0, sizeof(sendBuf));
-        return STATE_MAIN_MENU;
+            state_main_num = STATE_MAIN_MENU;
+        break;
         
         case 2:
             loginMenu(id, pw);
@@ -67,7 +68,6 @@ MenuState handleMainMenu(int sock) {
                     // 로그인 성공 → 사용자 메뉴
                     strcpy(loggedInUserId, id);
 
-                    // memset(sendBuf, 0, sizeof(sendBuf));
                     memset(response, 0, sizeof(response));
                     return STATE_USER_MENU;
                 }
@@ -75,16 +75,17 @@ MenuState handleMainMenu(int sock) {
                     printf("[응답] %s\n", response);
                     // 실패 → 다시 메인 메뉴
                     // memset(sendBuf, 0, sizeof(sendBuf));
-                    memset(response, 0, sizeof(response));
                     return STATE_MAIN_MENU;
                 }
             }
             printf("로그인 중 오류 발생\n");
-        return STATE_MAIN_MENU;
-
+            state_main_num = STATE_MAIN_MENU;
+        break;
+            
         case 3:
             memset(sendBuf, 0, sizeof(sendBuf));
             printf("프로그램을 종료합니다.\n");
+            state_main_num = STATE_EXIT;
         break;
         
         default:
@@ -93,12 +94,13 @@ MenuState handleMainMenu(int sock) {
             sendRequest(sock, sendBuf);
 
             memset(sendBuf, 0, sizeof(sendBuf));
-        return STATE_MAIN_MENU;
-    }
+            state_main_num = STATE_MAIN_MENU;
+        break;
+        }
     
     USIfree(USI);
     
-    return STATE_EXIT;
+    return state_main_num;
 }
 
 MenuState handleUserMenu(int sock) {
@@ -114,7 +116,7 @@ MenuState handleUserMenu(int sock) {
     strcpy(id, loggedInUserId);
 
     int choice = userMenu(id);
-    int len;
+    int len, state_main_num = STATE_USER_MENU;
 
     MealInputInfo *MII = MIImalloc();
     WorkOutInputInfo *WOII = WOIImalloc();
@@ -139,6 +141,7 @@ MenuState handleUserMenu(int sock) {
                     }
                 }
             }
+            state_main_num = STATE_USER_MENU;
         break;
         
         case 2: 
@@ -159,6 +162,7 @@ MenuState handleUserMenu(int sock) {
                     }
                 }
             }
+            state_main_num = STATE_USER_MENU;
         break;
         
         case 3: 
@@ -176,6 +180,7 @@ MenuState handleUserMenu(int sock) {
                     printf("%s 체중이 아닙니다.\n", WOII->exerciseName);
                 }
             }
+            state_main_num = STATE_USER_MENU;
         break;
         
         case 4:
@@ -183,17 +188,16 @@ MenuState handleUserMenu(int sock) {
             memset(sendBuf, 0, sizeof(sendBuf));
             snprintf(sendBuf, sizeof(sendBuf), "GET_RECORD/%s/%s", id, date);
             send(sock, sendBuf, strlen(sendBuf), 0);
-            // sendRequest(sock, sendBuf);
 
             len = recv(sock, recvBuf, sizeof(recvBuf) - 1, 0);
             recvBuf[len] = '\0';
 
-            // printf("2CC : %s\n", recvBuf);
             viewRecordsByDate_OUT_Menu(recvBuf, date);
             
             memset(recvBuf, 0, sizeof(recvBuf));
             memset(sendBuf, 0, sizeof(sendBuf));
-        return STATE_USER_MENU;
+            state_main_num = STATE_USER_MENU;
+        break;
 
         case 5: 
             memset(sendBuf, 0, sizeof(sendBuf));
@@ -221,7 +225,8 @@ MenuState handleUserMenu(int sock) {
             
             memset(recvBuf, 0, sizeof(recvBuf));
             memset(sendBuf, 0, sizeof(sendBuf));
-        return STATE_USER_MENU;
+            state_main_num = STATE_USER_MENU;
+        break;
 
         case 7: 
             logOutMenu(id);
@@ -237,8 +242,9 @@ MenuState handleUserMenu(int sock) {
                     printf("[응답] %s\n", response);
                 }
             }
-        // break;
-        return STATE_MAIN_MENU;
+
+            state_main_num = STATE_MAIN_MENU;
+        break;
 
         case 8: 
             deleteIdMenu(id);
@@ -254,21 +260,20 @@ MenuState handleUserMenu(int sock) {
                 }
             }
 
-        // break;
-        return STATE_MAIN_MENU;
+            state_main_num = STATE_MAIN_MENU;
+        break;
         
         default:
             memset(sendBuf, 0, sizeof(sendBuf));
             printf("잘못된 선택입니다.\n");
+            
+            state_main_num = STATE_USER_MENU;
         break;
     }
-
-    sendRequest(sock, sendBuf);
-    memset(sendBuf, 0, sizeof(sendBuf));
 
     MIIfree(MII);
     WOIIfree(WOII);
     WIIfree(WII);
     
-    return STATE_USER_MENU;
+    return state_main_num;
 }

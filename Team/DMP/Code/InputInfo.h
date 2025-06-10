@@ -16,8 +16,6 @@
 // 메뉴 이동
 enum MenuState {
     STATE_MAIN_MENU,
-    // STATE_SIGNUP,
-    // STATE_LOGIN,
     STATE_USER_MENU,
     STATE_EXIT
 };

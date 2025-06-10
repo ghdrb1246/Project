@@ -20,18 +20,17 @@ int main() {
     bind(serverSock, (struct sockaddr*)&server, sizeof(server));
     listen(serverSock, 5);
 
-    printf("서버가 포트 %d에서 대기 중입니다...\n", PORT);
+    printf("[ 서버 ] | 서버가 포트 %d에서 대기 중입니다...\n", PORT);
     
     DBO("Users");
 
     while (1) {
         clientSock = accept(serverSock, (struct sockaddr*)&client, &clientSize);
-        printf("클라이언트 접속됨\n");
+        printf("[ 서버 ] | 클라이언트 접속됨\n");
+
         handleClient(clientSock);
         CLOSESOCKET(clientSock);
     }
-
-    // sqlite3_close(db);
     DBC();
     
     CLOSESOCKET(serverSock);
@@ -50,10 +49,14 @@ void handleClient(SOCKET clientSock) {
     while ((len = recv(clientSock, buf, BUF_SIZE - 1, 0)) > 0) {
         buf[len] = '\0';
         printf("[ 요청 ] | %s\n", buf);
+
         processRequest(clientSock, buf, response);
 
         send(clientSock, response, strlen(response), 0);
+        
         memset(response, 0, sizeof(response));
+        // memset(buf, 0, sizeof(buf));
+        // len = 0;
     }
 }
 
@@ -65,6 +68,7 @@ void processRequest(SOCKET clientSock, char *request, char *response) {
     WeightInputInfo *WII = WIImalloc();
 
     memset(response, 0, sizeof(BUF_SIZE));
+    memset(cmd, 0, sizeof(16));
 
     if (sscanf(request, "%[^/]", cmd) != 1) {
         sprintf(response, "[오류] 잘못된 입력 형식");
@@ -113,8 +117,6 @@ void processRequest(SOCKET clientSock, char *request, char *response) {
             sprintf(response, "[오류] 잘못된 입력 형식");
             return;
         }
-
-        printf("[ 서버 ] | 식단 입력 치리 -> %s %s %s %.1f\n", MII->userId, MII->dateTime, MII->foodName, MII->gram);
         
         if (needConvert(FOOD_CSV_FILE, FOOD_DB_FILE)) {
             foodConvertCSVtoDB();
@@ -128,6 +130,7 @@ void processRequest(SOCKET clientSock, char *request, char *response) {
         if (MII->kcal != -1) {
             sprintf(response, "[성공] 음식 검사 성공");
             insertMeal(MII);
+            printf("[ 서버 ] | 식단 입력 치리 -> %s %s %s %.1f\n", MII->userId, MII->dateTime, MII->foodName, MII->gram);
         }
         else {
             sprintf(response, "[실패] 검사 실패");
@@ -142,8 +145,6 @@ void processRequest(SOCKET clientSock, char *request, char *response) {
             sprintf(response, "[오류] 잘못된 입력 형식");
             return;
         }
-        
-        printf("[ 서버 ] | 운동 입력 치리 -> %s %s %s %.1f\n", WOII->userId ,WOII->dateTime, WOII->exerciseName, WOII->minutes);
 
         if (needConvert(EXERCISES_CSV_FILE, EXERCISES_DB_FILE)) {
             exercisesConvertCSVtoDB();
@@ -158,6 +159,7 @@ void processRequest(SOCKET clientSock, char *request, char *response) {
             sprintf(response, "[성공] 운동 검사 성공");
             WOII->kcal = METM(met, WOII->minutes, selectWeight(WOII->userId));
             insertWorkout(WOII);
+            printf("[ 서버 ] | 운동 입력 치리 -> %s %s %s %.1f\n", WOII->userId ,WOII->dateTime, WOII->exerciseName, WOII->minutes);
         }
         else {
             sprintf(response, "[실패] 검사 실패");

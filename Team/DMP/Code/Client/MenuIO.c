@@ -185,10 +185,6 @@ void mealMenu(MealInputInfo *MII) {
     // 음식명 입력
     memset(MII->foodName, 0, FOODNAME_SIZE);
     inputLine("음식명: ", MII->foodName, FOODNAME_SIZE);
-    // printf("음식명: "); scanf("%s", MII->foodName);
-    // 입력 확인
-    // printf("Meun 식단 : %s - %lu\n", MII->foodName, strlen(MII->foodName));
-    // printf("Meun 식단 : %s - 공백 ? : %s(길이|%lu, 공백 위치|%lu)\n", MII->foodName, (strcspn(MII->foodName, "\n") != strlen(MII->foodName)) ? "있음" : "없음", strlen(MII->foodName), strcspn(MII->foodName, "\n"));
     
     // 섭취량 입력
     printf("섭취량(g): ");

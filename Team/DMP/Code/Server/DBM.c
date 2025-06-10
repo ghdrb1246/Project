@@ -40,9 +40,6 @@ int DBO(const char *filename) {
         return 1;
     }
 
-    // 테이블이 존재하지 않으면 0, 존재하면 1를 반환
-    //  if (tableExists("users") != 1) usersTableDB();
-
     tableAdd();
 
     return 0; // 성공

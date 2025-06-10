@@ -84,7 +84,6 @@ float inputWorkoutAndCalc(char *exercise) {
     
     sqlite3_stmt *stmt;
     float met = -1;
-    // DBO("exercise");
 
     // DB에서 운동 찾기
     const char *sql = "SELECT met FROM exercise WHERE name = ?;";
@@ -179,7 +178,6 @@ float inputFoodAndCalc(char *food) {
     
     sqlite3_stmt *stmt;
     float kcal = -1;
-    // DBO("exercise");
 
     // DB에서 음식 찾기
     const char *sql = "SELECT kcal FROM foods WHERE name = ?;";
