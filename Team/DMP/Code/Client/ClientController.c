@@ -139,7 +139,6 @@ MenuState handleUserMenu(int sock) {
                     }
                 }
             }
-            // memset(sendBuf, 0, sizeof(sendBuf));
         break;
         
         case 2: 
@@ -160,8 +159,6 @@ MenuState handleUserMenu(int sock) {
                     }
                 }
             }
-
-            // memset(sendBuf, 0, sizeof(sendBuf));
         break;
         
         case 3: 

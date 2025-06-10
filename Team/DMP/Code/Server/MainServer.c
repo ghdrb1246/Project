@@ -261,7 +261,6 @@ void processRequest(SOCKET clientSock, char *request, char *response) {
             return;
         }
         
-        printf("> %lu\n", strlen(request));
         if (strlen(request) != 0) {
             sprintf(response, "[성공] 회원 탈퇴가 완료 성공");
             deleteUserData(id);

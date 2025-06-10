@@ -1,3 +1,6 @@
+#ifndef _CSVDB_
+#define _CSVDB_
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,3 +19,5 @@ float METM(float met, float minutes, float user_weight);
 
 void foodConvertCSVtoDB();
 float inputFoodAndCalc(char *food);
+
+#endif

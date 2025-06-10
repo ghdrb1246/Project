@@ -2,8 +2,23 @@
 #define _DBM_
 
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
+#include <sys/stat.h> // mkdir
+#include "sqlite/sqlite3.h"
 #include "InputInfo.h"
+
+// Windows 환경 
+#ifdef _WIN32
+    #include <direct.h>
+    #define mkdir(dir, mode) _mkdir(dir)
+    
+// macOS 환경
+#else 
+    #include <sys/types.h>
+    #include <unistd.h>
+#endif
+
 
 // DB 관리 모듈
 

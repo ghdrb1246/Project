@@ -1,22 +1,4 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <sys/stat.h> // mkdir
-#include "sqlite/sqlite3.h"
 #include "DBM.h"
-#include "InputInfo.h"
-
-
-#ifdef _WIN32
-    // Windows 환경 
-    #include <direct.h>
-    #define mkdir(dir, mode) _mkdir(dir)
-
-#else 
-    // macOS 환경
-    #include <sys/types.h>
-    #include <unistd.h>
-#endif
 
 // DB 관리 모듈
 

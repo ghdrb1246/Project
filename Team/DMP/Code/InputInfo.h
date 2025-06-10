@@ -1,6 +1,8 @@
 #ifndef USER_INFO_H
 #define USER_INFO_H
 
+#include <stdlib.h>
+
 #define ID_SIZE 50
 #define PW_SIZE 50
 #define GENDER_SIZE 5
@@ -11,13 +13,11 @@
 #define PORT 12345
 #define SERVER_IP "127.0.0.1"
 
-// #define SEND_BUFFER_SIZE 1024
-// #define RECV_BUFFER_SIZE 4096
-
+// 메뉴 이동
 enum MenuState {
     STATE_MAIN_MENU,
-    STATE_SIGNUP,
-    STATE_LOGIN,
+    // STATE_SIGNUP,
+    // STATE_LOGIN,
     STATE_USER_MENU,
     STATE_EXIT
 };
@@ -25,10 +25,23 @@ enum MenuState {
 /**
  * @brief 메뉴 이동
  * 
+ * @param STATE_MAIN_MENU 메인 메뉴
+ * @param STATE_USER_MENU 사용자 메뉴
+ * @param STATE_EXIT
  */
 typedef enum MenuState MenuState;
 
 // 회원가입 구조체
+struct UserSignupInfo {
+    char *id;
+    char *pw;
+    char *gender;
+    int age;
+    float height;
+    float exerciseWeight;
+    float goalWeight;
+};
+
 /**
  * @brief 회원가입 사용자 정보
  * 
@@ -39,18 +52,17 @@ typedef enum MenuState MenuState;
  * @param exerciseWeight 현재 체중
  * @param goalWeight 목표 체중
  */
-typedef struct {
-    char *id;
-    char *pw;
-    char *gender;
-    int age;
-    float height;
-    float exerciseWeight;
-    float goalWeight;
-} UserSignupInfo;
-
+typedef struct UserSignupInfo UserSignupInfo;
 
 // 식단 입력 구조체
+struct MealInputInfo {
+    char *userId;
+    char *dateTime;
+    char *foodName;
+    float gram;
+    float kcal;
+};
+
 /**
  * @brief 식단 정보
  * 
@@ -61,15 +73,17 @@ typedef struct {
  * @param kcal 음식 칼로리
  * 
  */
-typedef struct {
-    char *userId;
-    char *dateTime;
-    char *foodName;
-    float gram;
-    float kcal;
-} MealInputInfo;
+typedef struct MealInputInfo MealInputInfo;
 
 // 운동 입력 구조체
+struct WorkOutInputInfo {
+    char *userId;
+    char *dateTime;
+    char *exerciseName;
+    float minutes;
+    float kcal;
+};
+
 /**
  * @brief 식단 정보
  * 
@@ -80,15 +94,15 @@ typedef struct {
  * @param kcal 운동 칼로리
  * 
  */
-typedef struct {
-    char *userId;
-    char *dateTime;
-    char *exerciseName;
-    float minutes;
-    float kcal;
-} WorkOutInputInfo;
+typedef struct WorkOutInputInfo WorkOutInputInfo;
 
 // 체중 입력 구조체
+struct WeightInputInfo {
+    char *userId;
+    char *date;
+    float weight;
+};
+
 /**
  * @brief 체중 정보
  * 
@@ -97,11 +111,7 @@ typedef struct {
  * @param weight 체중 
  * 
  */
-typedef struct {
-    char *userId;
-    char *date;
-    float weight;
-} WeightInputInfo;
+typedef struct WeightInputInfo WeightInputInfo;
 
 /**
  * @brief UserSignupInfo 구조체 동적할당
