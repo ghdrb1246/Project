@@ -1,7 +1,8 @@
 # Server 
     - Build
-        MacSO : gcc -I. -I./Server Server/MainServer.c Server/DBM.c Server/exerciseDB.c InputInfo.c -o Server_Run -lsqlite3
-        Win   : gcc -I. -I./Server Server/MainServer.c Server/DBM.c Server/exerciseDB.c InputInfo.c -L. -o Server_Run.exe -lsqlite3 -lws2_32
+        MacSO : gcc -I. -I./Server Server/MainServer.c Server/DBM.c Server/CsvDB.c InputInfo.c -o server_Run -lsqlite3  
+        Win   : gcc -I. -I./Server Server/MainServer.c Server/DBM.c Server/CsvDB.c InputInfo.c -L. -o Server_Run.exe -lsqlite3 -lws2_32
+        
         MacSO : ./server_Run
     - Run
         Win   : server_Run.exe
