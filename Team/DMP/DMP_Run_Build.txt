@@ -10,7 +10,7 @@
 # Client
     - Build
         MacSO : gcc -I. -I./Client Client/MainClient.c Client/MenuIO.c Client/ClientController.c InputInfo.c -o Client_Run
-        Win   : gcc  -I. -I/Client Client/MainClient.c Client/MenuIO.c Client/ClientController.c InputInfo.c -o Client_Run.exe -lws2_32
+        Win   : gcc -I. -I./Client Client/MainClient.c Client/MenuIO.c Client/ClientController.c InputInfo.c -o Client_Run.exe -lws2_32
     
     -Run
         MacSO : ./Client_Run
