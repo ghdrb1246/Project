@@ -70,6 +70,7 @@ void processRequest(SOCKET clientSock, char *request, char *response) {
     memset(response, 0, sizeof(BUF_SIZE));
     memset(cmd, 0, sizeof(16));
 
+    // 명령어 분리
     if (sscanf(request, "%[^/]", cmd) != 1) {
         sprintf(response, "[오류] 잘못된 입력 형식");
         return;
@@ -82,14 +83,13 @@ void processRequest(SOCKET clientSock, char *request, char *response) {
             return;
         }
 
-        printf("[ 서버 ] | 회원가입 처리 -> %s %s %s %d %f %f %f\n", USI->id, USI->pw, USI->gender, USI->age, USI->height, USI->exerciseWeight, USI->goalWeight);
-
         if (userExists(USI->id)) {
-            sprintf(response, "[실패] 이미 존재하는 ID입니다->");
+            sprintf(response, "[실패] 이미 존재하는 ID입니다");
         } 
         else {
+            printf("[ 서버 ] | 회원가입 처리 -> %s %s %s %d %f %f %f\n", USI->id, USI->pw, USI->gender, USI->age, USI->height, USI->exerciseWeight, USI->goalWeight);
             signupUser(USI);
-            sprintf(response, "[성공] 회원가입 완료");
+            sprintf(response, "[성공] 회원가입 완료");  
         }
 
         USIfree(USI);
@@ -147,23 +147,39 @@ void processRequest(SOCKET clientSock, char *request, char *response) {
         }
 
         if (needConvert(EXERCISES_CSV_FILE, EXERCISES_DB_FILE)) {
-            exercisesConvertCSVtoDB();
+            exerciseConvertCSVtoDB();
         } 
         else {
             printf("[ 서버 ] | 최신화 불필요, 기존 DB 사용!\n");
         }
 
+       // MET 데이터 조회
         float met = inputWorkoutAndCalc(WOII->exerciseName);
 
         if (met != -1) {
-            sprintf(response, "[성공] 운동 검사 성공");
-            WOII->kcal = METM(met, WOII->minutes, selectWeight(WOII->userId));
-            insertWorkout(WOII);
-            printf("[ 서버 ] | 운동 입력 치리 -> %s %s %s %.1f\n", WOII->userId ,WOII->dateTime, WOII->exerciseName, WOII->minutes);
-        }
+            // 체중 데이터 확인
+            float userWeight = checkWeightRecord(WOII->userId);
+            if (userWeight == -1) {
+                // weightRecord에 데이터 없으면 users 테이블에서 현재 체중을 가져옴
+                userWeight = checkSelectCurrentWeight(WOII->userId);
+            }
+
+            if (userWeight == -1) {
+                // 여전히 체중 데이터를 못 찾았다면 오류 처리
+                sprintf(response, "[실패] 체중 데이터가 없어 칼로리 계산 불가");
+            } 
+            else {
+                // 4MET 계산 → kcal 계산
+                WOII->kcal = METM(met, WOII->minutes, userWeight);
+                insertWorkout(WOII);
+                sprintf(response, "[성공] 운동 검사 및 저장 완료");
+            }
+            
+        } 
         else {
-            sprintf(response, "[실패] 검사 실패");
-        }
+            sprintf(response, "[실패] 운동명 검사 실패");
+        } 
+
         WOIIfree(WOII);
     } 
 
@@ -221,6 +237,7 @@ void processRequest(SOCKET clientSock, char *request, char *response) {
         send(clientSock, cwlpstr, strlen(cwlpstr), 0);
         
     } 
+    
     // 피드백 추천
     else if (strcmp(cmd, "FEEDBACK") == 0) {
         char id[ID_SIZE], date[11], *fbs = (char*)malloc(BUF_SIZE * sizeof(char));
@@ -273,6 +290,7 @@ void processRequest(SOCKET clientSock, char *request, char *response) {
         }
     }
     
+    // 예외 처리
     else {
         sprintf(response, "[오류] 알 수 없는 명령어");
     }

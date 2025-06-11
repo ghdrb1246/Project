@@ -1,7 +1,7 @@
 #include "DBM.h"
 
-// DB 관리 모듈
 
+// DB 선언
 static sqlite3 *db;
 
 int DBO(const char *filename) {
@@ -93,7 +93,7 @@ void tableAdd() {
 
 int userExists(const char *userId) {
     sqlite3_stmt *stmt;
-    const char *sql = "SELECT * FROM user WHERE id = ?;";
+    const char *sql = "SELECT user_id FROM user WHERE user_id = ?;";
 
     sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
     sqlite3_bind_text(stmt, 1, userId, -1, SQLITE_STATIC);
@@ -224,7 +224,7 @@ void insertWeight(WeightInputInfo *WII) {
     sqlite3_finalize(stmt);
 }
 
-float selectWeight(const char *userId) {
+float checkWeightRecord(const char *userId) {
     const char *sql = "SELECT weight FROM weightRecord WHERE user_id = ? ORDER BY date DESC LIMIT 1;";
     float weight = -1;
     sqlite3_stmt *stmt;
@@ -237,13 +237,40 @@ float selectWeight(const char *userId) {
     sqlite3_bind_text(stmt, 1, userId, -1, SQLITE_STATIC);
 
     if (sqlite3_step(stmt) == SQLITE_ROW) {
-        printf("[ 서버 ] | 체중 조회 완료!\n");
+        printf("[ 서버 ] | 체중 기록 조회 완료!\n");
 
         weight = (float)sqlite3_column_double(stmt, 0);
     } 
 
     else {
-        printf("[ 서버 ] | 체중 조회 실패: %s\n", sqlite3_errmsg(db));
+        printf("[ 서버 ] | 체중 기록 조회 실패: %s\n", sqlite3_errmsg(db));
+    }
+
+    sqlite3_finalize(stmt);
+
+    return weight;
+}
+
+float checkSelectCurrentWeight(const char *userId) {
+    const char *sql = "SELECT exercise_weight FROM user WHERE user_id = ?;";
+    float weight = -1;
+    sqlite3_stmt *stmt;
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+        printf("[ 서버 ] | SQL 준비 실패: %s\n", sqlite3_errmsg(db));
+        return -1;
+    }
+
+    sqlite3_bind_text(stmt, 1, userId, -1, SQLITE_STATIC);
+
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        printf("[ 서버 ] | 사용자 현재 체중 조회 완료!\n");
+
+        weight = (float)sqlite3_column_double(stmt, 0);
+    } 
+
+    else {
+        printf("[ 서버 ] | 사용자 현재 체중 조회 실패: %s\n", sqlite3_errmsg(db));
     }
 
     sqlite3_finalize(stmt);

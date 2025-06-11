@@ -107,7 +107,7 @@ SELECT * FROM weightRecord; */
 -- INSERT INTO weightRecord (user_id, date, weight) VALUES ('gh1', '2025-06-03', 50);
 
 
--- DELETE FROM user WHERE user_id = 'gh3';
+DELETE FROM user WHERE user_id = 'gh3';
 -- DELETE FROM meal WHERE user_id = 'gh3';
 -- DELETE FROM workout WHERE user_id = 'gh3';
 -- DELETE FROM weightRecord WHERE user_id = 'gh3';
@@ -134,4 +134,8 @@ SELECT * FROM weightRecord; */
 
 -- SELECT kcal FROM foods WHERE name = '사과';
 
-SELECT exercise_weight, goal_weight FROM user WHERE user_id = 'gh1';
+-- SELECT exercise_weight, goal_weight FROM user WHERE user_id = 'gh1';
+
+-- SELECT exercise_weight FROM user WHERE user_id = ?;
+
+-- SELECT user_id FROM user WHERE user_id = 'gh1';

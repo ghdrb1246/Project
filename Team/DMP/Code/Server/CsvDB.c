@@ -1,6 +1,5 @@
 #include "CsvDB.h"
 
-// CSV 최신화 필요 여부 검사
 int needConvert(const char *csv, const char *db) {
     struct stat csvStat, dbStat;
 
@@ -25,7 +24,7 @@ int needConvert(const char *csv, const char *db) {
 }
 
 // CSV → DB 변환 (기존 DB 삭제 후 새로 생성)
-void exercisesConvertCSVtoDB() {
+void exerciseConvertCSVtoDB() {
     printf("[ 서버 ] | 기존 DB를 삭제하고 새로 생성합니다.\n");
 
     // DB 파일 삭제

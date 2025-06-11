@@ -1,19 +1,24 @@
 #ifndef MENU_IO_H
 #define MENU_IO_H
 
-#define _GNU_SOURCE  // strtok_r 사용
-
-#define P_MENU_TITLE(s)     printf("================= [%s] =================\n", s)
-#define P_MENU_IN           printf("--------------------------------------------------------------\n")
-#define P_MENU_END          printf("==============================================================\n\n")
-#define P_MENU_SB_S(s, l)   printf("[ %s %s------------------------------------------------- ]\n", s, l)
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "InputInfo.h"
 
-/* OUT */
+// 메뉴 제목
+#define P_MENU_TITLE(s) printf("================= [%s] =================\n", s)
+
+// 메뉴 중간 제목
+#define P_MENU_SB_S(s, l)   printf("[ %s %s------------------------------------------------- ]\n", s, l)
+
+// 메뉴 중간 점선
+#define P_MENU_IN           printf("--------------------------------------------------------------\n")
+
+// 메뉴 끝 점선
+#define P_MENU_END          printf("==============================================================\n\n")
+
+// ------------- OUT -------------
 
 /**
  * @brief 메인메뉴
@@ -104,7 +109,9 @@ void logOutMenu(const char *userId);
  */
 void deleteIdMenu(const char *userId);
 
-/* In */
+// ------------------------------
+
+// ------------- In -------------
 
 /**
  * @brief fgets()함수 활용 문자열 입력
@@ -144,5 +151,7 @@ int validDateTime(char *datetime);
  * @param date 기록을 획인할 날짜
  */
 void viewRecordsByDate_IN_Menu(char *date);
+
+// ------------------------------
 
 #endif

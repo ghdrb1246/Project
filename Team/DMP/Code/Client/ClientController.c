@@ -43,7 +43,9 @@ MenuState handleMainMenu(int sock) {
     
     switch (meunNumber) {
         case 1:
-            signupMenu(USI);
+             // 회원가입 유저 데이터 입력
+            
+             signupMenu(USI);
             memset(sendBuf, 0, sizeof(sendBuf));
             sprintf(
                 sendBuf, 
@@ -57,6 +59,8 @@ MenuState handleMainMenu(int sock) {
         break;
         
         case 2:
+            // 로그인 입력
+
             loginMenu(id, pw);
             memset(sendBuf, 0, sizeof(sendBuf));
             sprintf(sendBuf, "LOGIN/%s/%s", id, pw);
@@ -83,12 +87,16 @@ MenuState handleMainMenu(int sock) {
         break;
             
         case 3:
+            // 프로그램 종료
+
             memset(sendBuf, 0, sizeof(sendBuf));
             printf("프로그램을 종료합니다.\n");
             state_main_num = STATE_EXIT;
         break;
         
         default:
+            // 예외 처리
+
             memset(sendBuf, 0, sizeof(sendBuf));
             sprintf(sendBuf, "MENU/%d", meunNumber);
             sendRequest(sock, sendBuf);
@@ -96,7 +104,7 @@ MenuState handleMainMenu(int sock) {
             memset(sendBuf, 0, sizeof(sendBuf));
             state_main_num = STATE_MAIN_MENU;
         break;
-        }
+    }
     
     USIfree(USI);
     
@@ -124,6 +132,8 @@ MenuState handleUserMenu(int sock) {
 
     switch (choice) {
         case 1: 
+            // 식단 입력
+
             while(1) {
                 mealMenu(MII);
                 memset(sendBuf, 0, sizeof(sendBuf));
@@ -145,6 +155,8 @@ MenuState handleUserMenu(int sock) {
         break;
         
         case 2: 
+            // 운동 입력
+
             while(1) {
                 workOutMenu(WOII);
                 memset(sendBuf, 0, sizeof(sendBuf));
@@ -158,7 +170,9 @@ MenuState handleUserMenu(int sock) {
                     }
                     else {
                         printf("[응답] %s\n", response);
-                        printf("%s 는/은 제공된 운동 파일에 입력 운동은 없습니다. 다시 입력 해주세요..\n", WOII->exerciseName);
+                        printf("%s 는/은 제공된 운동 파일에 입력 운동은 없습니다.\n", WOII->exerciseName);
+                        printf("다시 입력 해주세요..\n");
+                        break;
                     }
                 }
             }
@@ -166,6 +180,8 @@ MenuState handleUserMenu(int sock) {
         break;
         
         case 3: 
+            // 체중 입력
+
             weightMenu(WII);
             memset(sendBuf, 0, sizeof(sendBuf));
             sprintf(sendBuf, "INPUT_WEIGHT/%s/%s/%f", id, WII->date, WII->weight);
@@ -184,6 +200,8 @@ MenuState handleUserMenu(int sock) {
         break;
         
         case 4:
+            // 날짜별 기록 조회
+
             viewRecordsByDate_IN_Menu(date); 
             memset(sendBuf, 0, sizeof(sendBuf));
             snprintf(sendBuf, sizeof(sendBuf), "GET_RECORD/%s/%s", id, date);
@@ -200,6 +218,8 @@ MenuState handleUserMenu(int sock) {
         break;
 
         case 5: 
+            // 감량 진행률 조회
+
             memset(sendBuf, 0, sizeof(sendBuf));
             sprintf(sendBuf, "CHECK_PROGRESS/%s", id); 
             send(sock, sendBuf, strlen(sendBuf), 0);
@@ -214,6 +234,8 @@ MenuState handleUserMenu(int sock) {
         return STATE_USER_MENU;
 
         case 6: 
+            // 피드백 보기
+
             memset(sendBuf, 0, sizeof(sendBuf));
             sprintf(sendBuf, "FEEDBACK/%s", id); 
             send(sock, sendBuf, strlen(sendBuf), 0);
@@ -229,6 +251,8 @@ MenuState handleUserMenu(int sock) {
         break;
 
         case 7: 
+            // 로그아웃
+
             logOutMenu(id);
             memset(sendBuf, 0, sizeof(sendBuf));
             sprintf(sendBuf, "LOGOUT/%s", id); 
@@ -247,6 +271,8 @@ MenuState handleUserMenu(int sock) {
         break;
 
         case 8: 
+            // 회원탈퇴
+
             deleteIdMenu(id);
             memset(sendBuf, 0, sizeof(sendBuf));
             sprintf(sendBuf, "DELETE_ID/%s", id); 

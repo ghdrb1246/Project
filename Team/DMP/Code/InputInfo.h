@@ -3,14 +3,31 @@
 
 #include <stdlib.h>
 
+// 유저 ID 문자열 크기
 #define ID_SIZE 50
+
+// 유저 PW 문자열 크기
 #define PW_SIZE 50
+
+// 성별 문자열 크기
 #define GENDER_SIZE 5
+
+// 날쩌/시간 문자열 크기
 #define DATETIME_SIZE 17
+
+// 음식명 문자열 크기
 #define FOODNAME_SIZE 50
+
+// 운동명 문자열 크기
 #define EXERCISENAME_SIZE 50
+
+// 버퍼 크기
 #define BUF_SIZE 4096
+
+// 포트
 #define PORT 12345
+
+// IP
 #define SERVER_IP "127.0.0.1"
 
 // 메뉴 이동
@@ -25,7 +42,7 @@ enum MenuState {
  * 
  * @param STATE_MAIN_MENU 메인 메뉴
  * @param STATE_USER_MENU 사용자 메뉴
- * @param STATE_EXIT
+ * @param STATE_EXIT 프로그램 종료
  */
 typedef enum MenuState MenuState;
 

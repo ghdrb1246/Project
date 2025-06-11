@@ -19,8 +19,6 @@
     #include <unistd.h>
 #endif
 
-// DB 관리 모듈
-
 /**
  * @brief DB 파일을 "DB/..filename" 폴더에 생성 또는 오픈
  * 
@@ -45,6 +43,12 @@ int tableExists(const char *tableName);
 /**
  * @brief DB 테이블 생성
  * 
+ * @note - Users.DB에 테이블 생성
+ * @note | user
+ * @note | meal
+ * @note | weightRecard
+ * @note | workout
+ * 
  */
 void tableAdd();
 
@@ -52,7 +56,7 @@ void tableAdd();
  * @brief 사용자 id가 존재하는지 확인
  * 
  * @param userId 확인할 id
- * @return int | 성공 1, 실패 0
+ * @return int | 존재 : 1 없음 : 0
  */
 int userExists(const char *userId);
 
@@ -96,12 +100,20 @@ void insertWorkout(WorkOutInputInfo *WOII);
 void insertWeight(WeightInputInfo *WII);
 
 /**
- * @brief 체중 조회 함수
+ * @brief 체중 기록 조회 함수
  * 
  * @param userId 사용자 id
  * @return float 조회한 체중 반횐
  */
-float selectWeight(const char *userId);
+float checkWeightRecord(const char *userId);
+
+/**
+ * @brief 사용자 현재 체중 조회 함수
+ * 
+ * @param userId 사용자 id
+ * @return float 조회한 체중 반횐
+ */
+float checkSelectCurrentWeight(const char *userId);
 
 /**
  * @brief 사용자 ID로 연관 데이터 삭제 함수
